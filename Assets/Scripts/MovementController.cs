@@ -17,8 +17,8 @@ public class MovementController : MonoBehaviour
                 if (Physics.Raycast(ray, out RaycastHit hitResult))
                 {
                     // Create a particle if hit
-                    // GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    // go.transform.position = hitResult.point;
+                    GameObject part = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    part.transform.position = hitResult.point;
                 }
             }
         }
