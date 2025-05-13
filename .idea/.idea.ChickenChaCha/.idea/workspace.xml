@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cf343dc9-d287-4343-9388-7a878b737d36" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
+    <list default="true" id="cf343dc9-d287-4343-9388-7a878b737d36" name="변경" comment="resolve test">
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/ShaderGraphSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ShaderGraphSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/URPProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/URPProjectSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,10 +16,22 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Kyungil-Study/ChickenChaCha.git",
+    "accountId": "2bbca625-967e-4bdd-b0ab-3ca1c371bfd9"
+  }
+}]]></component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/340c3b1a1ad54b41a4fa6d9d6bea45c51fe00/fa/e472c25a/Physics.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/e35f1b2769b6499aa0f83a53f65df1367c00/e5/fb8feba6/Input.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/asdf/Desktop/unity/ChickenChaCha/Assets/Scripts/MovementController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/asdf/Desktop/unity/ChickenChaCha/Assets/Scripts/MovementController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/asdf/Desktop/unity/ChickenChaCha/Assets/Scripts/MovementController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/asdf/Desktop/unity/ChickenChaCha/Assets/Scripts/MovementController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/asdf/Desktop/unity/ChickenChaCha/Assets/Scripts/MovementController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/asdf/Desktop/unity/ChickenChaCha/Assets/Scripts/MovementController.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/asdf/Desktop/unity/ChickenChaCha/Assets/Scripts/MovementController.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -45,6 +58,22 @@
       <option name="EXE_PATH" value="D:\2022.3.62f1\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath D:\Dev\ChickenChaCha -testResults Logs/results.xml -logFile Logs/Editor.log -testPlatform EditMode -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="D:\Dev\ChickenChaCha" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Start Unity" type="RunUnityExe" factoryName="Unity Executable">
+      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.62f1\Editor\Unity.exe" />
+      <option name="PROGRAM_PARAMETERS" value="-projectPath C:\Users\asdf\Desktop\unity\ChickenChaCha -debugCodeOptimization" />
+      <option name="WORKING_DIRECTORY" value="C:\Users\asdf\Desktop\unity\ChickenChaCha" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Unit Tests (batch mode)" type="RunUnityExe" factoryName="Unity Executable">
+      <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.62f1\Editor\Unity.exe" />
+      <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath C:\Users\asdf\Desktop\unity\ChickenChaCha -testResults Logs/results.xml -logFile Logs/Editor.log -testPlatform EditMode -debugCodeOptimization" />
+      <option name="WORKING_DIRECTORY" value="C:\Users\asdf\Desktop\unity\ChickenChaCha" />
       <option name="PASS_PARENT_ENVS" value="1" />
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <method v="2" />
@@ -94,12 +123,23 @@
       <updated>1747116201066</updated>
       <workItem from="1747116203799" duration="2426000" />
       <workItem from="1747121820369" duration="2017000" />
+      <workItem from="1747125673124" duration="451000" />
     </task>
+    <task id="LOCAL-00001" summary="resolve test">
+      <option name="closed" value="true" />
+      <created>1747126035025</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1747126035025</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
   <component name="UnityProjectDiscoverer">
     <option name="hasUnityReference" value="true" />
@@ -120,5 +160,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="resolve test" />
+    <option name="LAST_COMMIT_MESSAGE" value="resolve test" />
   </component>
 </project>
