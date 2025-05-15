@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "254790663301",
+    "project_id": "chickenchacha-9e5ed",
+    "storage_bucket": "chickenchacha-9e5ed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:254790663301:android:e1889a155f5255a4c0bdec",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.ChickenChaCha"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2ixNRGpIOJy3dEDjVEnQfKNbIwbzZ_kk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
