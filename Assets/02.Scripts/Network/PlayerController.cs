@@ -14,7 +14,7 @@ public class PlayerController : NetworkBehaviour
     private Vector3 velocity; // 중력 적용을 위한 속도 벡터
     
     public MeshRenderer MeshRenderer;
-
+    
     [Networked, OnChangedRender(nameof(ColorChanged))]
     public Color NetworkedColor { get; set; }
     private void Awake()
@@ -36,8 +36,6 @@ public class PlayerController : NetworkBehaviour
         }
         
     }
-    
-    
     void ColorChanged()
     {
         GameManager.Instance.ColorChanged(MeshRenderer, NetworkedColor);
@@ -56,4 +54,6 @@ public class PlayerController : NetworkBehaviour
         // CharacterController를 사용하여 이동
         characterController.Move(move * (moveSpeed * Runner.DeltaTime));
     }
+
+    
 }

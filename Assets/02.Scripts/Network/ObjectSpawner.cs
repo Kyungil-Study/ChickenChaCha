@@ -1,7 +1,7 @@
 using Fusion;
 using UnityEngine;
 
-public class ObjectSpawner : SimulationBehaviour, IPlayerJoined
+public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 {
     
     public GameObject playerPrefab;
@@ -12,13 +12,6 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined
         GameManagerSpawn();
         PlayerSpawn(player);
     }
-    
-    public void PlayerLeft(PlayerRef player)
-    {
-        // 플레이어가 떠났을 때 GameManager를 스폰
-        GameManagerSpawn();
-    }
-    
     private void GameManagerSpawn()
     {
         if (GameManager.Instance != null)
@@ -37,6 +30,16 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined
         if (player == Runner.LocalPlayer)
         {
             Runner.Spawn(playerPrefab);
+        }
+    }
+
+    public void PlayerLeft(PlayerRef player)
+    {
+        if(Runner.IsSharedModeMasterClient)
+        {
+            Debug.Log($"{player}, {Runner.LocalPlayer}");
+            GameManager.Instance.InstanceNull(true);
+            GameManagerSpawn();
         }
     }
 }
