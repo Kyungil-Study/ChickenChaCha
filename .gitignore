@@ -74,3 +74,6 @@ crashlytics-build.properties
 
 # Rider Local 파일 세팅 제외
 .idea
+
+*/vFolders Data.asset
+*/vFolders Data.meta
