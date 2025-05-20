@@ -77,5 +77,7 @@ crashlytics-build.properties
 
 /*/vFolders Data.asset
 /*/vFolders Data.asset.meta
-/Assets/0.External/vFolders/vFolders Data.asset
-/Assets/0.External/vFolders/vFolders Data.asset.meta
+/[Aa]ssets/0.External/vFolders/vFoldersData.asset
+/[Aa]ssets/0.External/vFolders/vFoldersData.asset.meta
+/[Aa]ssets/0.External/vFolders/vFoldersPalette.asset
+/[Aa]ssets/0.External/vFolders/vFoldersPalette.asset.meta
