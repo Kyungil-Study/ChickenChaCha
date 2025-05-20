@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public struct MyInput : INetworkInput
 {
     public bool MouseClick;
+    public Vector2 ClickPosition;
 }
 
 public class Test_Runner : MonoBehaviour, INetworkRunnerCallbacks
@@ -33,6 +34,23 @@ public class Test_Runner : MonoBehaviour, INetworkRunnerCallbacks
         });
     }
 
+    private float clickCooldown = 0f;
+
+    public void Update()
+    {
+        // 마우스 클릭 감지
+        if (Input.GetMouseButtonDown(0))
+        {
+            clickCooldown = 0.2f; // 클릭 유지 시간
+        }
+
+        // 시간 감소
+        if (clickCooldown > 0)
+        {
+            clickCooldown -= Time.deltaTime;
+        }
+    }
+    
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         if (runner.LocalPlayer == player && spawnedPlayers.ContainsKey(player) == false)
@@ -47,10 +65,10 @@ public class Test_Runner : MonoBehaviour, INetworkRunnerCallbacks
     {
         var inputData = new MyInput();
 
-        // 마우스 클릭 확인
-        if (Input.GetMouseButtonDown(0))
+        if (clickCooldown > 0f)
         {
             inputData.MouseClick = true;
+            inputData.ClickPosition = Input.mousePosition;
         }
 
         input.Set(inputData);

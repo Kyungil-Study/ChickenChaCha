@@ -133,6 +133,7 @@ GameObject:
   - component: {fileID: 105029596}
   - component: {fileID: 105029595}
   - component: {fileID: 105029594}
+  - component: {fileID: 105029597}
   - component: {fileID: 105029593}
   m_Layer: 0
   m_Name: Plane (4)
@@ -228,6 +229,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &105029597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105029592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 687f45a98d9a3ef45bfe18988e5d1e2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isWalkable: 1
 --- !u!1 &301811218
 GameObject:
   m_ObjectHideFlags: 0
@@ -239,6 +253,7 @@ GameObject:
   - component: {fileID: 301811222}
   - component: {fileID: 301811221}
   - component: {fileID: 301811220}
+  - component: {fileID: 301811223}
   - component: {fileID: 301811219}
   m_Layer: 0
   m_Name: Plane (3)
@@ -334,6 +349,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &301811223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 301811218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 687f45a98d9a3ef45bfe18988e5d1e2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isWalkable: 1
 --- !u!1 &321351352
 GameObject:
   m_ObjectHideFlags: 0
@@ -345,6 +373,7 @@ GameObject:
   - component: {fileID: 321351356}
   - component: {fileID: 321351355}
   - component: {fileID: 321351354}
+  - component: {fileID: 321351357}
   - component: {fileID: 321351353}
   m_Layer: 0
   m_Name: Plane (1)
@@ -440,6 +469,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &321351357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 321351352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 687f45a98d9a3ef45bfe18988e5d1e2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isWalkable: 1
 --- !u!1 &476779733
 GameObject:
   m_ObjectHideFlags: 0
@@ -586,8 +628,8 @@ GameObject:
   - component: {fileID: 583937775}
   - component: {fileID: 583937774}
   - component: {fileID: 583937773}
+  - component: {fileID: 583937776}
   - component: {fileID: 583937772}
-  - component: {fileID: 583937771}
   m_Layer: 0
   m_Name: Plane (6)
   m_TagString: Untagged
@@ -595,24 +637,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &583937771
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 583937770}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SortKey: 1015365056
-  ObjectInterest: 1
-  Flags: 262145
-  NestedObjects: []
-  NetworkedBehaviours: []
-  ForceRemoteRenderTimeframe: 0
 --- !u!64 &583937772
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -700,6 +724,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &583937776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 583937770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0564dc0365f03a84d9ca4b316ab754b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionType: 0
 --- !u!1 &906473510
 GameObject:
   m_ObjectHideFlags: 0
@@ -865,6 +902,7 @@ GameObject:
   - component: {fileID: 1117225917}
   - component: {fileID: 1117225916}
   - component: {fileID: 1117225915}
+  - component: {fileID: 1117225918}
   - component: {fileID: 1117225914}
   m_Layer: 0
   m_Name: Plane (2)
@@ -960,6 +998,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1117225918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1117225913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 687f45a98d9a3ef45bfe18988e5d1e2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isWalkable: 1
 --- !u!1 &1216556103
 GameObject:
   m_ObjectHideFlags: 0
@@ -972,7 +1023,7 @@ GameObject:
   - component: {fileID: 1216556107}
   - component: {fileID: 1216556106}
   - component: {fileID: 1216556105}
-  - component: {fileID: 1216556104}
+  - component: {fileID: 1216556109}
   m_Layer: 0
   m_Name: Plane (5)
   m_TagString: Untagged
@@ -980,24 +1031,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1216556104
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1216556103}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SortKey: 610732498
-  ObjectInterest: 1
-  Flags: 262145
-  NestedObjects: []
-  NetworkedBehaviours: []
-  ForceRemoteRenderTimeframe: 0
 --- !u!64 &1216556105
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1085,6 +1118,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1216556109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1216556103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0564dc0365f03a84d9ca4b316ab754b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionType: 1
 --- !u!1 &1343158030
 GameObject:
   m_ObjectHideFlags: 0
@@ -1096,6 +1142,7 @@ GameObject:
   - component: {fileID: 1343158034}
   - component: {fileID: 1343158033}
   - component: {fileID: 1343158032}
+  - component: {fileID: 1343158035}
   - component: {fileID: 1343158031}
   m_Layer: 0
   m_Name: Plane
@@ -1191,130 +1238,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1653736703
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1653736707}
-  - component: {fileID: 1653736706}
-  - component: {fileID: 1653736705}
-  - component: {fileID: 1653736704}
-  - component: {fileID: 1653736708}
-  m_Layer: 0
-  m_Name: Cube
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!65 &1653736704
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1653736703}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &1653736705
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1653736703}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1653736706
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1653736703}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &1653736707
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1653736703}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3, y: -1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1653736708
+--- !u!114 &1343158035
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1653736703}
+  m_GameObject: {fileID: 1343158030}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Script: {fileID: 11500000, guid: 687f45a98d9a3ef45bfe18988e5d1e2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SortKey: 4270351386
-  ObjectInterest: 1
-  Flags: 262145
-  NestedObjects: []
-  NetworkedBehaviours: []
-  ForceRemoteRenderTimeframe: 0
+  isWalkable: 1
 --- !u!1 &2102909493
 GameObject:
   m_ObjectHideFlags: 0
@@ -1368,7 +1304,6 @@ SceneRoots:
   - {fileID: 906473513}
   - {fileID: 476779735}
   - {fileID: 2102909495}
-  - {fileID: 1653736707}
   - {fileID: 1343158034}
   - {fileID: 321351356}
   - {fileID: 1117225917}
