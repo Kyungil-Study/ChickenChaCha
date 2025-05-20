@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 
-public class RuleManager : MonoBehaviour
+public class RuleManager : NetworkBehaviour
 {
     /*
         할일 목록
