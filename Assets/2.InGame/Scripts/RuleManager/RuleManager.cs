@@ -50,20 +50,19 @@ public class RuleManager : MonoBehaviour, IToRule
         //꽁지가 4개 미만이면 false 리턴
         //이 함수가 true면 승리, false면 진행 혹은 패배
         return false;
-        //이 함수를 사용한다면? if문으로 하거나 bool 변수에 대입하면 될 듯
     }
     
     // 3. 액티브 플레이어에게 선택 타일을 전달 받고 뒤집어 보여주며 성공 / 실패 판별 => 액티브 플레이어에게 전달해줘야 됨
     // ps. 이를 토대로 이동 여부도 판정
     public bool OpenTile()
     {
-        //플레이어에게 선택 타일 정보 획득
-        //게임매니저에게서 발판 정보 받아오기
-        //둘을 비교, 태그든 레이어든 뭔가 판별 수단이나 발판마다 각기 다른 고유의 무언가가 있을 것
-        //같다면 true, 틀리다면 false 리턴
-        //이 함수의 리턴값에 의해 플레이어가 움직일지 말지가 정해짐
+        IToMap NextTileInfo = null; //게임매니저에게서 발판 정보 받아오기
+        IToPlayer SelectTileInfo = null; //플레이어에게 선택 타일 정보 받아오기
+        if (NextTileInfo == SelectTileInfo) // 두 타일이 같은 종류의 타일인지 비교
+        {
+            return true;
+        }
         return false;
-        //이 함수를 사용한다면? if문으로 하거나 bool 변수에 대입하면 될 듯
     }
     
     // 4. 3번의 결과를 토대로 판단(3번과 크게 다를바 없어서 삭제)
