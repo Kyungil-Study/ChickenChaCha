@@ -34,7 +34,6 @@ public class PlayerController : NetworkBehaviour
         {
             GameManager.Instance.RPC_AddScore();
         }
-        
     }
     void ColorChanged()
     {

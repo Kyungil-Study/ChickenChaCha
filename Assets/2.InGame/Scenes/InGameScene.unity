@@ -411,7 +411,7 @@ PrefabInstance:
     - target: {fileID: -3316551504817770192, guid: 2ffe015b4a1769b4793631efbdd3d525,
         type: 3}
       propertyPath: SortKey
-      value: 2026107222
+      value: 3612699836
       objectReference: {fileID: 0}
     - target: {fileID: 1975691305830763581, guid: 2ffe015b4a1769b4793631efbdd3d525,
         type: 3}
