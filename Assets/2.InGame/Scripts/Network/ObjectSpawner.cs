@@ -10,7 +10,7 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
     public GameObject playerPrefab;
     public NetworkPrefabRef gameManagerPrefab;
     private NetworkObject mGameManager;
-
+    
     public void PlayerJoined(PlayerRef player)
     {
         GameManagerSpawn();
@@ -31,10 +31,10 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
         }
     }
 
-    public void GameManagerChange()
-    {
-        GameManager.Instance.GetComponent<NetworkObject>().RequestStateAuthority();
-    }
+    // public void GameManagerChange()
+    // {
+    //     GameManager.Instance.GetComponent<NetworkObject>().RequestStateAuthority();
+    // }
 
     private void PlayerSpawn(PlayerRef player)
     {
@@ -46,10 +46,10 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 
     public void PlayerLeft(PlayerRef player)
     {
-        var players = Runner.ActivePlayers.OrderBy(player => player.AsIndex);
-        if (players.FirstOrDefault() == Runner.LocalPlayer)
-        {
-            GameManagerChange();
-        }
+        // var players = Runner.ActivePlayers.OrderBy(player => player.AsIndex);
+        // if (players.FirstOrDefault() == Runner.LocalPlayer)
+        // {
+        //     GameManagerChange();
+        // }
     }
 }

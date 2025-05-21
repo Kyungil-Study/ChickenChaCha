@@ -7,7 +7,9 @@ public interface IToNetwork
      */
     #region From 프로젝트 매니저_박승식
     // 매니저
-
+    // 새로운 플레이어 입장 시에 UI로 띄우는 코드
+    // 그 플레이어의 정보 코드로 가져올 수 있음 , Local, 승패 int 승 패
+    
     #endregion
     
     #region From 기술 리드_김우태

@@ -1,26 +1,49 @@
+using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>
+public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPlayerLeft, IToNetwork
 {
-    //public static GameManager Instance { get; private set; }
+    private List<PlayerInfo> mPlayers;
+    public class PlayerInfo
+    {
+        public PlayerRef player;
+        public string playerName;
+        public int score;
+    }
     
-    [Networked] public int Score { get; set; }
+    public override void Spawned()
+    {
+        mPlayers = new List<PlayerInfo>();
+    }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_AddScore()
+    public void PlayerJoined(PlayerRef player)
     {
-        Score++;
-        Debug.Log(Score);
+        mPlayers.Add(new PlayerInfo
+        {
+            player = player,
+            score = 1
+        });
+    }
+
+    public void PlayerLeft(PlayerRef player)
+    {
+        int removedPlayersScore = mPlayers.Find(p => p.player == player).score;
+        mPlayers.Remove(mPlayers.Find(p => p.player == player));
+    }
+
+    public List<PlayerInfo> GetPlayersInfo()
+    {
+        return mPlayers;
     }
     
-    public void ColorChanged(MeshRenderer renderer, Color color)
-    {
-        renderer.material.color = color;
-    }
-    
-    public override void FixedUpdateNetwork()
-    {
-        
-    }
+    // [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    // public void RPC_AddScore()
+    // {
+    //     
+    // }
+    // public void ColorChanged(MeshRenderer renderer, Color color)
+    // {
+    //     renderer.material.color = color;
+    // }
 }

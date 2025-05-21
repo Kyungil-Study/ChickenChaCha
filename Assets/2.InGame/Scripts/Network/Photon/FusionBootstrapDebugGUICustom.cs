@@ -1,3 +1,5 @@
+using UnityEngine.Serialization;
+
 namespace Fusion {
   using System;
   using UnityEngine;
@@ -18,6 +20,12 @@ namespace Fusion {
     FusionBootstrapCustom _networkDebugStart;
     string _clientCount;
     bool _isMultiplePeerMode;
+
+    private string mNickName;
+    public string GetNickName()
+    {
+        return mNickName;
+    }
 
     Dictionary<FusionBootstrapCustom.Stage, string> _nicifiedStageNames;
 
@@ -135,6 +143,7 @@ namespace Fusion {
               GUILayout.Label("Room:", GUILayout.Height(height), GUILayout.Width(width * .33f));
               nds.DefaultRoomName = GUILayout.TextField(nds.DefaultRoomName, 25, GUILayout.Height(height));
             }
+            
             GUILayout.EndHorizontal();
 
             if (GUILayout.Button("Start Shared Client", GUILayout.Height(height))) {

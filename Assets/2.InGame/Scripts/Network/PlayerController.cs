@@ -12,40 +12,25 @@ public class PlayerController : NetworkBehaviour
 
     private CharacterController characterController;
     private Vector3 velocity; // 중력 적용을 위한 속도 벡터
-    
-    public MeshRenderer MeshRenderer;
-    
-    [Networked, OnChangedRender(nameof(ColorChanged))]
-    public Color NetworkedColor { get; set; }
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
     }
     
-    public override void Spawned()
-    {
-        GameManager.Instance.ColorChanged(MeshRenderer, NetworkedColor);
-    }
     void Update()
     {
-        if (HasStateAuthority && Input.GetKeyDown(KeyCode.E))
+        if (HasStateAuthority && Input.GetKey(KeyCode.Mouse0))
         {
-            // Changing the material color here directly does not work since this code is only executed on the client pressing the button and not on every client.
-            NetworkedColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                Debug.Log(hit.collider.gameObject.name);
+            }else
+            {
+                Debug.Log("Raycast hit nothing");
+            }
         }
-        
-        if (HasStateAuthority && Input.GetKeyDown(KeyCode.R))
-        {
-            GameManager.Instance.RPC_AddScore();
-        }
-        
-    }
-    void ColorChanged()
-    {
-        GameManager.Instance.ColorChanged(MeshRenderer, NetworkedColor);
-    }
-
-    
+    } 
     public override void FixedUpdateNetwork()
     {
         // 방향키 입력 받기
@@ -58,4 +43,33 @@ public class PlayerController : NetworkBehaviour
         // CharacterController를 사용하여 이동
         characterController.Move(move * (moveSpeed * Runner.DeltaTime));
     }
+    
+    //public MeshRenderer MeshRenderer;
+    // void ColorChanged()
+    // {
+    //     GameManager.Instance.ColorChanged(MeshRenderer, NetworkedColor);
+    // }
+    
+    // [Networked, OnChangedRender(nameof(ColorChanged))]
+    // public Color NetworkedColor { get; set; }
+    //
+    //
+    // public override void Spawned()
+    // {
+    //     GameManager.Instance.ColorChanged(MeshRenderer, NetworkedColor);
+    // }
+    // void Update()
+    // {
+    //     if (HasStateAuthority && Input.GetKeyDown(KeyCode.E))
+    //     {
+    //         // Changing the material color here directly does not work since this code is only executed on the client pressing the button and not on every client.
+    //         NetworkedColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
+    //     }
+    //     
+    //     if (HasStateAuthority && Input.GetKeyDown(KeyCode.R))
+    //     {
+    //         GameManager.Instance.RPC_AddScore();
+    //     }
+    //     
+    // } 
 }
