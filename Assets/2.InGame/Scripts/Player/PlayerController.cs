@@ -29,11 +29,6 @@ public class PlayerController : NetworkBehaviour
             // Changing the material color here directly does not work since this code is only executed on the client pressing the button and not on every client.
             NetworkedColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
         }
-        
-        if (HasStateAuthority && Input.GetKeyDown(KeyCode.R))
-        {
-            GameManager.Instance.RPC_AddScore();
-        }
     }
     void ColorChanged()
     {
