@@ -32,7 +32,7 @@ public interface IToMap
     
     #region FromRule_ 문현승
 
-    public void NextTlieInfo(); //리턴값 타일
+    public IToMap NextTlieInfo(); //리턴값 타일
     // 앞에 있는 타일의 정보를 확인할 수 있는 메소드가 필요합니다.
     
     public bool OnPlayerInfo();

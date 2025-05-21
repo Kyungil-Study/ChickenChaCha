@@ -32,8 +32,13 @@ public class RuleManager : MonoBehaviour, IToRule
     // ps. 대기 중인 플레이어에게도 누군가 앞지른 정보를 보내줘야 하는가? => 앞지른 플레이어에게 대기 중인 플레이어의 정보를 가져와야 할 듯
     public void PassPlayer()
     {
-        //GameManager에서 발판 정보 받아오기
-        //발판 정보가 몇 번째 타일인지 체크하기
+        IToMap NextTileInfo = null; // 다음 타일 정보
+        if (NextTileInfo.OnPlayerInfo()) // 다음 발판의 사람이 있는지 여부
+        {
+            NextTileInfo = NextTileInfo.NextTlieInfo(); // 있으면 그 다음 발판 확인
+        } 
+        // 위 과정 반복 후 없으면 그 발판 정보 가져오기
+        
         //바로 앞이면 그대로 진행, 만약 2번째 3번째 앞이라면 플레이어가 있음을 확인
         //플레이어가 있음을 확인했으면 이동에 성공했을 때 플레이어를 앞질렀음을 의미
         //지나친 플레이어가 꽁지를 가지고 있다면 뺏어올 수 있도록 결과를 리턴 -> int로 꽁지 개수를 리턴하든가, bool로 플레이어 여부를 리턴하면 될 듯
