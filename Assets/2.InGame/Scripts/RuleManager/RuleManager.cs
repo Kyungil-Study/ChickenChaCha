@@ -3,58 +3,58 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class RuleManager : MonoBehaviour, IToRule
+public class RuleManager : DontDestroyOnNetwork<RuleManager>, IToRule
 {
     /*
         할일 목록
         - 1. 플레이어를 앞질렀는지 판별( + 대기 플레이어의 꽁지 여부 확인)
         - 2. 획득한 꽁지로 승리 판별
         - 3. 액티브 플레이어에게 선택 타일을 전달 받고 뒤집어 보여주며 성공 / 실패 판별
-        - X3번과 겹처서 삭제X 4. 타일 값 비교하여 이동 가능한지 판별
     */
     /*
         필요한 정보
         - 1. 플레이어가 맞춰야 할 오픈된 타일 값 확인 => 게임매니저가 오픈된 타일 값을 확인하면서 플레이어의 여부를 확인하게 됨
         - 2. 꽁지가 4개가 되었는지 안 되었는지 확인 => 액티브 플레이어
         - 3. 선택 타일 정보 확인 => 액티브 플레이어
-        - X3번과 겹처서 삭제X 4. 3번 리턴값 비교하여 판별
     */
     /*
         구현 어떻게 할지
         - 1. 앞 타일의 다른 플레이어가 존재하는지 확인(게임매니저에서도 맞출 타일을 확인하기 위해선 플레이어의 여부를 확인해야되기 때문에 이 정보를 바탕으로 구현)
         - 2. 1번의 정보를 토대로 플레이어를 앞질렀다면 액티브 플레이어의 꽁지 개수 확인 => 4개라면 승리 씬으로(나머지는 패배 씬) 4개가 아니라면 이어서 진행
         - 3. 액티브 플레이어에게서 선택한 타일 정보를 받으면 해당 타일을 뒤집어 보여주는 로직(마우스 이벤트 활용?) => 성공 실패 리턴
-        - X3번과 겹처서 삭제X 4. 3번 리턴값을 토대로 성공이면 이동, 실패면 플레이어 대기로 진입
     */
     
     // 1. 플레이어 앞질렀는지 판별 함수 => 앞질렀는지 여부를 액티브 플레이어에게 전달해줘야됨
     // ps. 앞지른 플레이어가 꽁지를 가지고 있는지도 확인해야 함 => 앞지른 플레이어의 꽁지 정보 받아오기
-    // ps. 대기 중인 플레이어에게도 누군가 앞지른 정보를 보내줘야 하는가? => 앞지른 플레이어에게 대기 중인 플레이어의 정보를 가져와야 할 듯
-    public void PassPlayer()
+    public int PassPlayer() // 플레이어를 앞질렀는지 확인하고 앞질렀으면 가져가게 될 꽁지 개수 리턴;
     {
+        int tail = 0;
         IToMap NextTileInfo = null; // 다음 타일 정보
-        if (NextTileInfo.OnPlayerInfo()) // 다음 발판의 사람이 있는지 여부
+        if (NextTileInfo.OnPlayerInfo() != null) // 다음 발판의 사람이 있는지 여부
         {
+            tail += NextTileInfo.OnPlayerInfo().PlayerId/*임시로 지정, 나중에 꼬리 개수를 확인하는 변수로 변환 예정*/;
+            // **꽁지 개수 0으로 변경하는 코드 작성 필요**
             NextTileInfo = NextTileInfo.NextTlieInfo(); // 있으면 그 다음 발판 확인
-        } 
-        // 위 과정 반복 후 없으면 그 발판 정보 가져오기
-        
-        //바로 앞이면 그대로 진행, 만약 2번째 3번째 앞이라면 플레이어가 있음을 확인
-        //플레이어가 있음을 확인했으면 이동에 성공했을 때 플레이어를 앞질렀음을 의미
-        //지나친 플레이어가 꽁지를 가지고 있다면 뺏어올 수 있도록 결과를 리턴 -> int로 꽁지 개수를 리턴하든가, bool로 플레이어 여부를 리턴하면 될 듯
+        }
+        else // 위 과정 반복 후 플레이어가 없으면 그 발판 정보 가져오기
+        {
+            NextTileInfo = null;
+        }
+
+        return tail;  // 얻게 될 꽁지 수 리턴
     }
     
     // 2. 획득한 꽁지로 승리 판별 => 액티브 플레이어에게 1번의 정보를 리턴 후 꽁지 정보를 받아와 4개일 시 승리 판정 아닐시 게임 진행
     // ps. 승리 판정이 나면 다른 플레이어들은 패배 판정
-    public bool CheckTail()
+    public bool CheckTail() //이 함수가 true면 승리, false면 진행 혹은 패배
     {
-        //1번을 통해 플레이어에게 정보 전달
-        //플레이어가 받은 정보를 토대로 꽁지 개수를 더하기
-        //더해진 꽁지 정보를 받아오기
-        //꽁지가 4개면 true 리턴
-        //꽁지가 4개 미만이면 false 리턴
-        //이 함수가 true면 승리, false면 진행 혹은 패배
-        return false;
+        IToPlayer CheckTailInfo = null;
+        // 사전 작업: PassPlayer로 꽁지 개수 플레이어에게 전달해주기
+        if (CheckTailInfo != null) // 플레이어 꽁지 개수 확인, 후에 == 4로 변경 예정
+        {
+            return true; // 꽁지가 4개면 true 리턴
+        }
+        return false; //꽁지가 4개 미만이면 false 리턴
     }
     
     // 3. 액티브 플레이어에게 선택 타일을 전달 받고 뒤집어 보여주며 성공 / 실패 판별 => 액티브 플레이어에게 전달해줘야 됨
@@ -63,13 +63,10 @@ public class RuleManager : MonoBehaviour, IToRule
     {
         IToMap NextTileInfo = null; //게임매니저에게서 발판 정보 받아오기
         IToPlayer SelectTileInfo = null; //플레이어에게 선택 타일 정보 받아오기
-        if (NextTileInfo == SelectTileInfo) // 두 타일이 같은 종류의 타일인지 비교
+        if (NextTileInfo.EqualTile(SelectTileInfo))
         {
             return true;
         }
         return false;
     }
-    
-    // 4. 3번의 결과를 토대로 판단(3번과 크게 다를바 없어서 삭제)
-    
 }
