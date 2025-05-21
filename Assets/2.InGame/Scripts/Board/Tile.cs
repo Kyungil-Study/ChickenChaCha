@@ -2,21 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public class Tile : NetworkBehaviour
 {
-    public Tile next;
-    public Tile prev;
-    public int imageKey { get; set; } // TODO: Networked
-    public PlayerRef player;
-    public Renderer renderer;
+    [Networked,OnChangedRender(nameof(SetImage))]
+    public int imageKey { get; set; }
+    [SerializeField] private Renderer renderer;
 
-    public Texture2D img;
-    
-    public void SetImage(int key)
+    public void SetImage()
     {
         renderer.material.mainTexture = LoadImage(imageKey);
-        imageKey = key;
     }
     
     private Texture2D LoadImage(int key)

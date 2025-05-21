@@ -1,22 +1,29 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Fusion;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class BoardManager : NetworkBehaviour
 {
-    public Tile[] steppingTiles;
-    public Tile[] selectingTiles;
+    public static BoardManager Instance;
+    public SteppingTile[] steppingTiles;
+    public SelectingTile[] selectingTiles;
     public GameObject playerPrefab;
     
     private readonly int[] imageKeys = new int[12] {0,1,2,3,4,5,6,7,8,9,10,11};
-
-    private void Update()
+    
+    private void Awake()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Instance == null)
         {
-            InitTiles();
+            Instance = this;
+        }
+        else
+        {
+            Runner.Despawn(Object);
         }
     }
 
@@ -32,7 +39,7 @@ public class BoardManager : NetworkBehaviour
             {
                 rndKey = RandomUtil.GetShuffled(imageKeys);
             }
-            steppingTiles[i].SetImage(rndKey[i % keyLength]);
+            steppingTiles[i].imageKey = (rndKey[i % keyLength]);
             steppingTiles[i].next = steppingTiles[i == steppingTiles.Length - 1 ? 0 : i + 1];
             steppingTiles[i].prev = steppingTiles[i == 0 ? steppingTiles.Length - 1 : i - 1];
         }
@@ -41,11 +48,11 @@ public class BoardManager : NetworkBehaviour
         rndKey = RandomUtil.GetShuffled(imageKeys);
         for(int i = 0; i < selectingTiles.Length; i++)
         {
-            selectingTiles[i].SetImage(rndKey[i]);
+            selectingTiles[i].imageKey = (rndKey[i]);
         }
     }
     
-    public void InitPlayerPiece()
+    public void InitPlayerPieces()
     {
         PlayerRef[] players = Runner.ActivePlayers.ToArray();
         int playerCount = players.Length;
@@ -54,12 +61,24 @@ public class BoardManager : NetworkBehaviour
 
         for (int i = 0; i < playerCount; i++)
         {
-            Tile tile = steppingTiles[i * div];
+            SteppingTile tile = steppingTiles[i * div];
             PlayerRef player = players[i];
-            Runner.Spawn(playerPrefab, tile.transform.position, Quaternion.identity, player);
-            tile.player = player;
+            
+            SpawnPlayer(player, tile.transform.position);
+            tile.standingPlayer = player;
         }
     }
 
+    private void SpawnPlayer(PlayerRef player, Vector3 position)
+    {
+        Runner.Spawn(playerPrefab, position, Quaternion.identity, player);
+    }
     
+    public void SubscribeAllSelectingTiles(Action<Tile> callback)
+    {
+        foreach (var tile in selectingTiles)
+        {
+            tile.onClick += callback;
+        }
+    }
 }
