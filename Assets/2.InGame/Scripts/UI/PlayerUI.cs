@@ -1,18 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Fusion;
+using Fusion.Sockets;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class PlayerUI : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    // 로컬 플레이어 이름 저장
+    [SerializeField] private TMP_Text mPlayerNameText;
+    
+    public void SetLocalPlayerName(string playerName)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        mPlayerNameText.text = playerName;
     }
 }
