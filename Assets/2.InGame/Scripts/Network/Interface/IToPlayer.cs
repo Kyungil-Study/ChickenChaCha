@@ -31,8 +31,17 @@ public interface IToPlayer
 
     #endregion
     
-    #region FromD
-    // 팀원 D
+    #region From 룰매니저 문현승
+
+    public void CheckTailInfo()
+    {
+        // 플레이어의 현재 꽁지를 확인할 수 있는 메소드가 필요합니다.
+    }
+    
+    public void SelectTileInfo()
+    {
+        // 플레이어가 현재 선택한 타일을 확인할 수 있는 메소드가 필요합니다.
+    }
 
     #endregion
 }
