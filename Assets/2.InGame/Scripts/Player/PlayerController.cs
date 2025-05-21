@@ -7,45 +7,52 @@ using Random = UnityEngine.Random;
 
 public class PlayerController : NetworkBehaviour
 {
-    public float moveSpeed = 5f; // 이동 속도
-    public float gravity = -9.81f; // 중력 값
+    private Camera camera;
+    [SerializeField] private LayerMask tileLayer;
 
-    private CharacterController characterController;
-    private Vector3 velocity; // 중력 적용을 위한 속도 벡터
+    private int number = 0;
     
-    public MeshRenderer MeshRenderer;
-    
-    [Networked, OnChangedRender(nameof(ColorChanged))]
-    public Color NetworkedColor { get; set; }
     private void Awake()
     {
-        characterController = GetComponent<CharacterController>();
-        
+        camera = Camera.main;
     }
     void Update()
     {
-        if (HasStateAuthority && Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKey(KeyCode.Mouse0))
         {
-            // Changing the material color here directly does not work since this code is only executed on the client pressing the button and not on every client.
-            NetworkedColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, tileLayer))
+            {
+                Debug.Log(hit.collider.gameObject.name);
+                number++;
+            }
+            else
+            {
+                Debug.Log("Raycast hit nothing");
+            }
         }
     }
-    void ColorChanged()
-    {
-        GameManager.Instance.ColorChanged(MeshRenderer, NetworkedColor);
-    }
-
     
     public override void FixedUpdateNetwork()
     {
-        // 방향키 입력 받기
-        float moveX = Input.GetAxis("Horizontal");
-        float moveZ = Input.GetAxis("Vertical");
+        if (Object.HasInputAuthority == false) return;
 
-        // 이동 벡터 계산
-        Vector3 move = transform.right * moveX + transform.forward * moveZ;
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out var hit, tileLayer))
+            {
+                Debug.Log("입력 성공");
+            }
+            else
+            {
+                Debug.Log("입력 실패");
+            }
+        }
+    }
 
-        // CharacterController를 사용하여 이동
-        characterController.Move(move * (moveSpeed * Runner.DeltaTime));
+    private void OnGUI()
+    {
+        GUI.Label(new Rect(20, 20, 200, 40), $"Last Clicked: {number.ToString()}");
     }
 }
