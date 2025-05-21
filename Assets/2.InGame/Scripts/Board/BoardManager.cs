@@ -54,8 +54,7 @@ public class BoardManager : NetworkBehaviour
 
         for (int i = 0; i < playerCount; i++)
         {
-            int pos = i == 0 ? 0 : i * div - 1;
-            Tile tile = steppingTiles[pos];
+            Tile tile = steppingTiles[i * div];
             PlayerRef player = players[i];
             Runner.Spawn(playerPrefab, tile.transform.position, Quaternion.identity, player);
             tile.player = player;
