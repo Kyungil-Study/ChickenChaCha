@@ -3,19 +3,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct UIPlayerScoreData
+{
+    public string playerName;
+    public int playerScore;
+}
+
 public class ScoreBoardUI : MonoBehaviour
 {
     [SerializeField] private PlayerScoreUI[] mPlayerScores;
-     
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+    public void UpdatePlayerScores(List<UIPlayerScoreData> playerScores)
     {
-        
+        if (mPlayerScores.Length < playerScores.Count)
+        {
+            Debug.LogAssertion("PlayerScoreUI is not enough , scores count max is " + mPlayerScores.Length);
+            return;
+        }
+
+        for (int i = 0; i < playerScores.Count; i++)
+        {
+            mPlayerScores[i].UpdateUI(playerScores[i].playerName, playerScores[i].playerScore);
+        }
     }
+    
 }

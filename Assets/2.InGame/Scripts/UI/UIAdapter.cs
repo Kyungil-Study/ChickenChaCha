@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 public class UIAdapter : MonoBehaviour, IToUI
 {
     private static UIAdapter instance;
-
+    
+    [SerializeField] private PlayerUI mPlayerUI;
+    [SerializeField] private ScoreBoardUI mScoreBoardUI;
+    
     public static UIAdapter Instance
     {
         get
@@ -21,5 +25,15 @@ public class UIAdapter : MonoBehaviour, IToUI
             }
             return instance;
         }
+    }
+
+    public void SetLocalPlayerName(string playerName)
+    {
+        mPlayerUI.SetLocalPlayerName(playerName);
+    }
+
+    public void UpdatePlayerScore(List<UIPlayerScoreData> playerScores)
+    {
+        mScoreBoardUI.UpdatePlayerScores(playerScores);
     }
 }
