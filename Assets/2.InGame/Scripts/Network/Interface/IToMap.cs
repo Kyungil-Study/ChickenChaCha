@@ -30,8 +30,22 @@ public interface IToMap
 
     #endregion
     
-    #region FromD
-    // 팀원 D
+    #region FromRule_ 문현승
+
+    public void NextTlieInfo()
+    {
+        // 앞에 있는 타일의 정보를 확인할 수 있는 메소드가 필요합니다.
+    }
+    
+    public void OnPlayerInfo()
+    {
+        // 타일 위 플레이어 여부를 확인할 수 있는 메소드가 필요합니다.
+    }
+
+    public void TileSeparate()
+    {
+        // 타일을 분류하는 메소드가 필요합니다.(태그 비교 or 레이어 비교 같은)
+    }
 
     #endregion
 }

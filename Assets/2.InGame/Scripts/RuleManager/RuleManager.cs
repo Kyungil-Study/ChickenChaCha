@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class RuleManager : NetworkBehaviour
+public class RuleManager : MonoBehaviour, IToRule
 {
     /*
         할일 목록
@@ -32,21 +32,38 @@ public class RuleManager : NetworkBehaviour
     // ps. 대기 중인 플레이어에게도 누군가 앞지른 정보를 보내줘야 하는가? => 앞지른 플레이어에게 대기 중인 플레이어의 정보를 가져와야 할 듯
     public void PassPlayer()
     {
-        
+        //GameManager에서 발판 정보 받아오기
+        //발판 정보가 몇 번째 타일인지 체크하기
+        //바로 앞이면 그대로 진행, 만약 2번째 3번째 앞이라면 플레이어가 있음을 확인
+        //플레이어가 있음을 확인했으면 이동에 성공했을 때 플레이어를 앞질렀음을 의미
+        //지나친 플레이어가 꽁지를 가지고 있다면 뺏어올 수 있도록 결과를 리턴 -> int로 꽁지 개수를 리턴하든가, bool로 플레이어 여부를 리턴하면 될 듯
     }
     
     // 2. 획득한 꽁지로 승리 판별 => 액티브 플레이어에게 1번의 정보를 리턴 후 꽁지 정보를 받아와 4개일 시 승리 판정 아닐시 게임 진행
     // ps. 승리 판정이 나면 다른 플레이어들은 패배 판정
-    public void CheckTail()
+    public bool CheckTail()
     {
-        
+        //1번을 통해 플레이어에게 정보 전달
+        //플레이어가 받은 정보를 토대로 꽁지 개수를 더하기
+        //더해진 꽁지 정보를 받아오기
+        //꽁지가 4개면 true 리턴
+        //꽁지가 4개 미만이면 false 리턴
+        //이 함수가 true면 승리, false면 진행 혹은 패배
+        return false;
+        //이 함수를 사용한다면? if문으로 하거나 bool 변수에 대입하면 될 듯
     }
     
     // 3. 액티브 플레이어에게 선택 타일을 전달 받고 뒤집어 보여주며 성공 / 실패 판별 => 액티브 플레이어에게 전달해줘야 됨
     // ps. 이를 토대로 이동 여부도 판정
     public bool OpenTile()
     {
+        //플레이어에게 선택 타일 정보 획득
+        //게임매니저에게서 발판 정보 받아오기
+        //둘을 비교, 태그든 레이어든 뭔가 판별 수단이나 발판마다 각기 다른 고유의 무언가가 있을 것
+        //같다면 true, 틀리다면 false 리턴
+        //이 함수의 리턴값에 의해 플레이어가 움직일지 말지가 정해짐
         return false;
+        //이 함수를 사용한다면? if문으로 하거나 bool 변수에 대입하면 될 듯
     }
     
     // 4. 3번의 결과를 토대로 판단(3번과 크게 다를바 없어서 삭제)

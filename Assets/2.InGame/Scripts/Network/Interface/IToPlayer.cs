@@ -31,7 +31,7 @@ public interface IToPlayer
 
     #endregion
     
-    #region From 룰매니저 문현승
+    #region FromRule_ 문현승
 
     public void CheckTailInfo()
     {
