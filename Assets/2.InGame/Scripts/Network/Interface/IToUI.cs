@@ -10,6 +10,7 @@ public interface IToUI
     #region From 프로젝트 매니저_박승식
     // 매니저
     void SetLocalPlayerName(string playerName);
+    void SetTurnPlayerName(string playerName);
     void UpdatePlayerScore(List<UIPlayerScoreData> playerScores);
 
     #endregion

@@ -5,31 +5,36 @@ using UnityEngine;
 
 public class UIAdapter : MonoBehaviour, IToUI
 {
-    private static UIAdapter instance;
-    
-    [SerializeField] private PlayerUI mPlayerUI;
-    [SerializeField] private ScoreBoardUI mScoreBoardUI;
-    
+    private static UIAdapter mInstance;
     public static UIAdapter Instance
     {
         get
         {
-            if (instance == null)
+            if (mInstance == null)
             {
-                instance = FindObjectOfType<UIAdapter>();
+                mInstance = FindObjectOfType<UIAdapter>();
 
-                if (instance == null)
+                if (mInstance == null)
                 {
                     Debug.LogError("UIAdapter couldn't be found, You should add it to the scene.");
                 }
             }
-            return instance;
+            return mInstance;
         }
     }
+    
+    [SerializeField] private PlayerUI mPlayerUI;
+    [SerializeField] private ScoreBoardUI mScoreBoardUI;
+    [SerializeField] private TurnUI mTurnUI;
 
     public void SetLocalPlayerName(string playerName)
     {
         mPlayerUI.SetLocalPlayerName(playerName);
+    }
+
+    public void SetTurnPlayerName(string playerName)
+    {
+        mTurnUI.SetTurnPlayerName(playerName);
     }
 
     public void UpdatePlayerScore(List<UIPlayerScoreData> playerScores)
