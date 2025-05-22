@@ -19,11 +19,16 @@ public class PlayerController : NetworkBehaviour
         
         Debug.Log($"Object {Object.Id} (Player: {Runner.LocalPlayer}) Spawned. " +
                   $"Current InputAuthority: {Object.InputAuthority}, Current StateAuthority: {Object.StateAuthority}");
-        
-        if (Object.InputAuthority == PlayerRef.None)
+
+        if (Runner.LocalPlayer == Object.StateAuthority)
         {
-            Object.AssignInputAuthority(Runner.LocalPlayer);
+            
         }
+        
+        // if (Object.InputAuthority == PlayerRef.None)
+        // {
+        //     Object.AssignInputAuthority(Runner.LocalPlayer);
+        // }
 
         Debug.Log($"Object {Object.Id} to Player {Runner.LocalPlayer}." +
                   $"InputAuthority: {Object.InputAuthority}, Current StateAuthority: {Object.StateAuthority}");
