@@ -20,7 +20,11 @@ public class PlayerController : NetworkBehaviour
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
-        
+    }
+    
+    public override void Spawned()
+    {
+        GameManager.Instance.ColorChanged(MeshRenderer, NetworkedColor);
     }
     void Update()
     {

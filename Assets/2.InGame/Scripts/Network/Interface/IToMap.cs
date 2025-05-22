@@ -1,3 +1,5 @@
+using Fusion;
+
 public interface IToMap
 {
     /*
@@ -30,8 +32,16 @@ public interface IToMap
 
     #endregion
     
-    #region FromD
-    // 팀원 D
+    #region FromRule_ 문현승
 
+    public IToMap NextTlieInfo(); //리턴값 타일
+    // 앞에 있는 타일의 정보를 확인할 수 있는 메소드가 필요합니다.
+    
+    public PlayerRef OnPlayerInfo();
+    // 타일 위 플레이어 여부를 확인할 수 있는 메소드가 필요합니다.
+
+    public bool EqualTile(IToPlayer tile); // 매개변수 IToPlayer => Tile로 변경 필요
+    // 두 타일이 같은 종류의 타일인지 확인하는 메소드가 필요합니다.
+    
     #endregion
 }
