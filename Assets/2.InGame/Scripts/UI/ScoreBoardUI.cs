@@ -13,17 +13,28 @@ public class ScoreBoardUI : MonoBehaviour
 {
     [SerializeField] private PlayerScoreUI[] mPlayerScores;
 
-    public void UpdatePlayerScores(List<UIPlayerScoreData> playerScores)
+    public void Update()
     {
-        if (mPlayerScores.Length < playerScores.Count)
+        var gameManager = GameManager.Instance;
+        if (gameManager == null)
+            return;
+        
+        var playerInfos = gameManager.GetPlayersInfo();
+        UpdatePlayerScores(playerInfos);
+    }
+
+    public void UpdatePlayerScores(List<PlayerInfo> playerInfos)
+    {
+        if (mPlayerScores.Length < playerInfos.Count)
         {
             Debug.LogAssertion("PlayerScoreUI is not enough , scores count max is " + mPlayerScores.Length);
             return;
         }
 
-        for (int i = 0; i < playerScores.Count; i++)
+        for (int i = 0; i < playerInfos.Count; i++)
         {
-            mPlayerScores[i].UpdateUI(playerScores[i].playerName, playerScores[i].playerScore);
+            var playerInfo = playerInfos[i];
+            mPlayerScores[i].UpdateUI(playerInfo.playerName, playerInfo.score);
         }
     }
     
