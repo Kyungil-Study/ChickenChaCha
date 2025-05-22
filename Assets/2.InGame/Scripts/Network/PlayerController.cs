@@ -12,6 +12,7 @@ public class PlayerController : NetworkBehaviour
 
     private CharacterController characterController;
     private Vector3 velocity; // 중력 적용을 위한 속도 벡터
+    public bool isActive;
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
@@ -35,16 +36,6 @@ public class PlayerController : NetworkBehaviour
         {
             Debug.Log($"Has Input Authority : {HasInputAuthority}");
             Debug.Log($"Has State Authority : {HasStateAuthority}");
-        }
-
-        if (HasStateAuthority && Input.GetKeyDown(KeyCode.Q))
-        {
-            GameManager.Instance.AblePlayerInputAuthority(Runner.LocalPlayer);
-        }
-        
-        if (HasStateAuthority && Input.GetKeyDown(KeyCode.W))
-        {
-            GameManager.Instance.RemovePlayerInputAuthority(Runner.LocalPlayer);
         }
     } 
     public override void FixedUpdateNetwork()
