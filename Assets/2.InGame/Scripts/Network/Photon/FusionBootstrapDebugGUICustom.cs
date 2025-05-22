@@ -97,6 +97,7 @@ namespace Fusion {
       }
     }
 
+    public string nickName;
     protected virtual void OnGUI() {
 
       var nds = EnsureNetworkDebugStartExists();
@@ -142,6 +143,14 @@ namespace Fusion {
             {
               GUILayout.Label("Room:", GUILayout.Height(height), GUILayout.Width(width * .33f));
               nds.DefaultRoomName = GUILayout.TextField(nds.DefaultRoomName, 25, GUILayout.Height(height));
+            }
+            
+            GUILayout.EndHorizontal();
+            
+            GUILayout.BeginHorizontal();
+            {
+              GUILayout.Label("Name:", GUILayout.Height(height), GUILayout.Width(width * .33f));
+              nickName = GUILayout.TextField(nickName, 25, GUILayout.Height(height));
             }
             
             GUILayout.EndHorizontal();

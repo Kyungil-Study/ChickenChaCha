@@ -30,6 +30,22 @@ public class PlayerController : NetworkBehaviour
                 Debug.Log("Raycast hit nothing");
             }
         }
+
+        if (HasInputAuthority && Input.GetKeyDown(KeyCode.R))
+        {
+            Debug.Log($"Has Input Authority : {HasInputAuthority}");
+            Debug.Log($"Has State Authority : {HasStateAuthority}");
+        }
+
+        if (HasStateAuthority && Input.GetKeyDown(KeyCode.Q))
+        {
+            GameManager.Instance.AblePlayerInputAuthority(Runner.LocalPlayer);
+        }
+        
+        if (HasStateAuthority && Input.GetKeyDown(KeyCode.W))
+        {
+            GameManager.Instance.RemovePlayerInputAuthority(Runner.LocalPlayer);
+        }
     } 
     public override void FixedUpdateNetwork()
     {

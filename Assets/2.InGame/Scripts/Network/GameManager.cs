@@ -2,28 +2,58 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPlayerLeft, IToNetwork
+public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerLeft, IToNetwork
 {
     private List<PlayerInfo> mPlayers;
-    public class PlayerInfo
-    {
-        public PlayerRef player;
-        public string playerName;
-        public int score;
-    }
     
     public override void Spawned()
     {
         mPlayers = new List<PlayerInfo>();
     }
 
-    public void PlayerJoined(PlayerRef player)
+    public void ActivePlayer(PlayerRef player)
     {
-        mPlayers.Add(new PlayerInfo
+        
+    }
+
+    public void PlayerJoinAddList(PlayerInfo playerInfo)
+    {
+        mPlayers.Add(playerInfo);
+    }
+    
+    public void AblePlayerInputAuthority(PlayerRef player)
+    {
+        foreach (var playerInfo in mPlayers)
         {
-            player = player,
-            score = 1
-        });
+            if (playerInfo.player == player)
+            {
+                playerInfo.netObj.AssignInputAuthority(player);
+            }
+        }
+    }
+    
+    public void RemovePlayerInputAuthority(PlayerRef player)
+    {
+        foreach (var playerInfo in mPlayers)
+        {
+            if (playerInfo.player == player)
+            {
+                playerInfo.netObj.RemoveInputAuthority();
+            }
+        }
+    }
+    
+    public PlayerInfo GetPlayer(PlayerRef player)
+    {
+        foreach (var playerInfo in mPlayers)
+        {
+            if (playerInfo.player == player)
+            {
+                return playerInfo;
+            }
+        }
+
+        return null;
     }
 
     public void PlayerLeft(PlayerRef player)
