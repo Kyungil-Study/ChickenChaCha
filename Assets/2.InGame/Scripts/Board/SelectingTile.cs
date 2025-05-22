@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 public class SelectingTile : Tile, IPointerClickHandler
 {
     private static readonly int SHOW_FACE = Animator.StringToHash("ShowFace");
+    private static readonly int HIDE_FACE = Animator.StringToHash("HideFace");
     
     public Animator anim;
     public Action<Tile> onClick;
@@ -19,5 +20,10 @@ public class SelectingTile : Tile, IPointerClickHandler
     public void ShowFace()
     {
         anim.SetTrigger(SHOW_FACE);
+    }
+    
+    public void HideFace()
+    {
+        anim.SetTrigger(HIDE_FACE);
     }
 }
