@@ -9,28 +9,35 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     [UnitySerializeField]
     private NetworkDictionary<PlayerRef, PlayerInfo> mPlayerInfo => default;
     
-    
-    private int mPlayerCount;
-    protected override void Awake()
-    {
-        base.Awake();
-        mPlayerCount = 0;
-    }
-
-
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_AddPlayer(PlayerRef player)
     {
-        if (mPlayerCount >= 4)
+        if (mPlayerInfo.Count >= 4)
         {
             Debug.Log("Max player count reached.");
             return;
         }
-        PlayerInfo playerInfo = new PlayerInfo();
-        playerInfo.player = player;
-        playerInfo.isActive = false;
-        playerInfo.score = 1;
+
+        PlayerInfo playerInfo = new PlayerInfo(player, false, 1);
+        Debug.Log($"{playerInfo.player} , {playerInfo.isActive}, {playerInfo.score}");
         mPlayerInfo.Add(player, playerInfo);
+    }
+
+    public PlayerInfo? GetPlayerInfoOrNull(PlayerRef player)
+    {
+        foreach (KeyValuePair<PlayerRef, PlayerInfo> playerInfo in mPlayerInfo)
+        {
+            if (playerInfo.Key == player)
+            {
+                return playerInfo.Value;
+            }
+        }
+        return null;
+    }
+
+    public PlayerRef GetLocalPlayer()
+    {
+        return Runner.LocalPlayer;
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
