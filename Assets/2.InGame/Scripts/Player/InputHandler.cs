@@ -11,10 +11,8 @@ public class InputHandler : NetworkBehaviour
     [SerializeField] private LayerMask clickLayer;
 
     private bool bClicked;
-    private float clickTime;
-    private Ray ray;
-    private int number = 0;
-
+    private bool IsMyTurn = false;
+    
     public override void Spawned()
     {
         camera = Camera.main;
@@ -23,6 +21,8 @@ public class InputHandler : NetworkBehaviour
     
     void Update()
     {
+        // if (IsMyTurn == false) return;   내 턴일때만 입력 가능하게 예외처리
+        
         if (Input.GetKey(KeyCode.Mouse0))
         {
             bClicked = true;
