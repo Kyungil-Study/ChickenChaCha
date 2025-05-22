@@ -9,6 +9,18 @@ EditorBuildSettings:
     path: Assets/1.Lobby/Scenes/Lobby.unity
     guid: 38b737e81bf5c1948aeb0fe34cfeba1d
   - enabled: 1
-    path: Assets/2.InGame/Scenes/InGameScene.unity
-    guid: abf3d43c947e0e1458819afa8ff23534
+    path: Assets/3.Develop/Network/Scenes/NetworkDevelopScene.unity
+    guid: de185b72d3acf6249b6e38585fc3fcb0
+  - enabled: 1
+    path: Assets/3.Develop/Map/Scenes/MapDevelopScene.unity
+    guid: 8a435e147a2e1d9499fb6d1b281cf89d
+  - enabled: 1
+    path: Assets/3.Develop/Player/Scenes/PlayerDevelopScene.unity
+    guid: b126abccdf9d371428a6ba07ea66583a
+  - enabled: 1
+    path: Assets/3.Develop/Rule/Scenes/RuleDevelopScene.unity
+    guid: 3ed4a823b0c8e1b49bcb214c4f3b7e9a
+  - enabled: 1
+    path: Assets/3.Develop/UI/Scenes/UIDevelopScene.unity
+    guid: 5356a229255a3b34faea3ad77aa2749c
   m_configObjects: {}
