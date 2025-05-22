@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class PlayerInput : MonoBehaviour
+public class NetworkPlayer : MonoBehaviour
 {
     
 }
