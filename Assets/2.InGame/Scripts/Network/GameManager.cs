@@ -40,6 +40,16 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
         return Runner.LocalPlayer;
     }
 
+    public List<PlayerRef> GetPlayersInfo()
+    {
+        List<PlayerRef> players = new List<PlayerRef>();
+        foreach (KeyValuePair<PlayerRef, PlayerInfo> playerInfo in mPlayerInfo)
+        {
+            players.Add(playerInfo.Key);
+        }
+        return players;
+    }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_DebugList()
     {
