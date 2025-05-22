@@ -85,4 +85,5 @@ crashlytics-build.properties
 /[Aa]ssets/0.External/vFolders/vFoldersPalette.asset
 /[Aa]ssets/0.External/vFolders/vFoldersPalette.asset.meta
 
-/ProjectSettings/Packages/com.unity.probuilder/Settings.json
+/[Pp]rojectSettings/[Pp]ackages/com.unity.probuilder/[Ss]ettings.json
+# [Ss]ettings.json
