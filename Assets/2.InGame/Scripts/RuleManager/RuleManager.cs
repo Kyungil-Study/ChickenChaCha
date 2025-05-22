@@ -29,7 +29,7 @@ public class RuleManager : DontDestroyOnNetwork<RuleManager>, IToRule
     public int PassPlayer() // 플레이어를 앞질렀는지 확인하고 앞질렀으면 가져가게 될 꽁지 개수 리턴;
     {
         int tail = 0;
-        SteppingTile tile = null; // 다음 타일 정보
+        SteppingTile tile = new SteppingTile(); // 다음 타일 정보
         while (true)
         {
             if (tile.Next.StandingPlayer != null) // 다음 발판의 사람이 있는지 여부
@@ -65,9 +65,9 @@ public class RuleManager : DontDestroyOnNetwork<RuleManager>, IToRule
     // ps. 이를 토대로 이동 여부도 판정
     public bool OpenTile()
     {
-        SteppingTile tile = null; //게임매니저에게서 발판 정보 받아오기
-        Tile SelectTileInfo = null; //플레이어에게 선택 타일 정보 받아오기
-        if (tile.Next.IsSamePicture(SelectTileInfo))
+        SteppingTile tile = new SteppingTile(); //게임매니저에게서 발판 정보 받아오기
+        Tile selectTileInfo = null; //플레이어에게 선택 타일 정보 받아오기
+        if (tile.Next.IsSamePicture(selectTileInfo))
         {
             return true;
         }
