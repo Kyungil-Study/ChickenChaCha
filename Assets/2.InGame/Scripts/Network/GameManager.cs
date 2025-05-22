@@ -9,12 +9,23 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     [UnitySerializeField]
     private NetworkDictionary<PlayerRef, PlayerInfo> mPlayerInfo => default;
     
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkArray<PlayerRef> mPlayers => default;
+    
+    // [Networked] 
+    // [UnitySerializeField]
+    // private NetworkDictionary<Tile, Tile> mTileInfo => default;
+    
+    
+    
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_AddPlayer(PlayerRef player)
     {
         if (mPlayerInfo.Count >= 4)
         {
             Debug.Log("Max player count reached.");
+            
             return;
         }
 
