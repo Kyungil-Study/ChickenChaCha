@@ -5,7 +5,7 @@ using Fusion;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-// 입력만
+// 플레이어 입력 처리 받는 스크립트
 
 public class InputHandler : NetworkBehaviour
 {
@@ -59,15 +59,15 @@ public class InputHandler : NetworkBehaviour
             }
         }
     }
-
-    private void OnGUI()
-    {
-        GUI.Label(new Rect(20, 20, 250, 30), $"Click Handled: {bClicked}");
-    }
     
     public void SelectTileInfo(Tile tile)
     {
         selectedTile = tile;
         Debug.Log("선택된 타일 : " + selectedTile?.name);
+    }
+    
+    private void OnGUI()
+    {
+        GUI.Label(new Rect(20, 20, 250, 30), $"Click Handled: {bClicked}");
     }
 }

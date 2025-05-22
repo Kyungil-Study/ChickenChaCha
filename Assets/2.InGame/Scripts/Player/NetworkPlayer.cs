@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class NetworkPlayer : MonoBehaviour
+// 플레이어 데이터, 애니메이션 등 처리하기
+
+public class NetworkPlayer : NetworkBehaviour
 {
     private int tailCount;
     public int CheckTailInfo()
