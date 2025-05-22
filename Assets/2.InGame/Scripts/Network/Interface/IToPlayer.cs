@@ -1,4 +1,5 @@
 using Fusion;
+using UnityEngine;
 
 public interface IToPlayer
 {
@@ -38,7 +39,7 @@ public interface IToPlayer
     public int CheckTailInfo();
     // 플레이어가 현재 가지고 있는 꽁지 개수를 리턴하는 메소드가 필요합니다.
 
-    public void SelectTileInfo(); // 리턴값 타일
+    public void SelectTileInfo(GameObject tile); // 리턴값 타일
     // 플레이어가 현재 선택한 타일을 확인할 수 있는 메소드가 필요합니다.
     
     #endregion

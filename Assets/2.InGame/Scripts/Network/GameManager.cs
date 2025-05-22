@@ -11,36 +11,20 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerLeft, IToNe
         mPlayers = new List<PlayerInfo>();
     }
 
-    public void ActivePlayer(PlayerRef player)
+    public void SetActivePlayer(PlayerRef player)
     {
-        
+        PlayerInfo info = GetPlayer(player);
+        info.isActive = false;
+        info.nextPlayer.isActive = true;
     }
 
     public void PlayerJoinAddList(PlayerInfo playerInfo)
     {
+        if (mPlayers.Count == 4)
+        {
+            mPlayers[0].isActive = true;
+        }
         mPlayers.Add(playerInfo);
-    }
-    
-    public void AblePlayerInputAuthority(PlayerRef player)
-    {
-        foreach (var playerInfo in mPlayers)
-        {
-            if (playerInfo.player == player)
-            {
-                playerInfo.netObj.AssignInputAuthority(player);
-            }
-        }
-    }
-    
-    public void RemovePlayerInputAuthority(PlayerRef player)
-    {
-        foreach (var playerInfo in mPlayers)
-        {
-            if (playerInfo.player == player)
-            {
-                playerInfo.netObj.RemoveInputAuthority();
-            }
-        }
     }
     
     public PlayerInfo GetPlayer(PlayerRef player)
@@ -75,5 +59,27 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerLeft, IToNe
     // public void ColorChanged(MeshRenderer renderer, Color color)
     // {
     //     renderer.material.color = color;
+    // }
+    
+    // public void AblePlayerInputAuthority(PlayerRef player)
+    // {
+    //     foreach (var playerInfo in mPlayers)
+    //     {
+    //         if (playerInfo.player == player)
+    //         {
+    //             playerInfo.netObj.AssignInputAuthority(player);
+    //         }
+    //     }
+    // }
+    //
+    // public void RemovePlayerInputAuthority(PlayerRef player)
+    // {
+    //     foreach (var playerInfo in mPlayers)
+    //     {
+    //         if (playerInfo.player == player)
+    //         {
+    //             playerInfo.netObj.RemoveInputAuthority();
+    //         }
+    //     }
     // }
 }
