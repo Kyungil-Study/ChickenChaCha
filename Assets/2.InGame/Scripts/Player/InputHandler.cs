@@ -5,27 +5,38 @@ using Fusion;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+// 입력만
+
 public class InputHandler : NetworkBehaviour
 {
     private Camera camera;
     [SerializeField] private LayerMask clickLayer;
 
-    private bool bClicked;
+    public Tile selectedTile;
+    
     private bool IsMyTurn = false;
+    private bool bClicked;
     
     public override void Spawned()
     {
         camera = Camera.main;
         bClicked = false;
+        
+        // networkPlayer = GetComponent<NetworkPlayer>();
     }
     
     void Update()
     {
-        // if (IsMyTurn == false) return;   내 턴일때만 입력 가능하게 예외처리
+        // if (IsMyTurn == false) return;   // 내 턴일때만 입력 가능하게 예외처리
         
         if (Input.GetKey(KeyCode.Mouse0))
         {
             bClicked = true;
+        }
+
+        if (Input.GetKey(KeyCode.Alpha1))
+        {
+            Debug.Log(selectedTile);
         }
     }
     public override void FixedUpdateNetwork()
@@ -37,9 +48,10 @@ public class InputHandler : NetworkBehaviour
             Ray ray = camera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out var hit, Mathf.Infinity, clickLayer))
             {
+                var tile = hit.collider.gameObject.GetComponent<Tile>();
                 Debug.Log($"[클릭 성공] {hit.collider.name}");
-
-                hit.collider.gameObject.GetComponent<NetworkObject>();
+                
+                SelectTileInfo(tile);
             }
             else
             {
@@ -51,5 +63,11 @@ public class InputHandler : NetworkBehaviour
     private void OnGUI()
     {
         GUI.Label(new Rect(20, 20, 250, 30), $"Click Handled: {bClicked}");
+    }
+    
+    public void SelectTileInfo(Tile tile)
+    {
+        selectedTile = tile;
+        Debug.Log("선택된 타일 : " + selectedTile?.name);
     }
 }

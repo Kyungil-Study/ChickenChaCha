@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class NetworkPlayer : MonoBehaviour, IToPlayer
+public class NetworkPlayer : MonoBehaviour
 {
+    private int tailCount;
     public int CheckTailInfo()
     {
-        throw new System.NotImplementedException();
-    }
-
-    public void SelectTileInfo()
-    {
-        throw new System.NotImplementedException();
+        // 나중에 꼬리 개수 리턴
+        return tailCount;
     }
 }
