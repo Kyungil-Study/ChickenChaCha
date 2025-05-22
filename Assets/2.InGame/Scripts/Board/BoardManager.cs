@@ -9,6 +9,7 @@ using UnityEngine.Events;
 public class BoardManager : NetworkBehaviour
 {
     public static BoardManager Instance;
+    public Texture2D[] tileTextures;
     public SteppingTile[] steppingTiles;
     public SelectingTile[] selectingTiles;
     public GameObject playerPrefab;
@@ -27,6 +28,14 @@ public class BoardManager : NetworkBehaviour
         }
     }
 
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            InitTiles();
+        }
+    }
+
     public void InitTiles()
     {
         int[] rndKey = RandomUtil.GetShuffled(imageKeys);
@@ -39,7 +48,8 @@ public class BoardManager : NetworkBehaviour
             {
                 rndKey = RandomUtil.GetShuffled(imageKeys);
             }
-            steppingTiles[i].imageKey = (rndKey[i % keyLength]);
+            int imgKey = rndKey[i % keyLength];
+            steppingTiles[i].SetImage(imgKey, tileTextures[imgKey]);
             steppingTiles[i].Next = steppingTiles[i == steppingTiles.Length - 1 ? 0 : i + 1];
             steppingTiles[i].Prev = steppingTiles[i == 0 ? steppingTiles.Length - 1 : i - 1];
         }
@@ -48,7 +58,8 @@ public class BoardManager : NetworkBehaviour
         rndKey = RandomUtil.GetShuffled(imageKeys);
         for(int i = 0; i < selectingTiles.Length; i++)
         {
-            selectingTiles[i].imageKey = (rndKey[i]);
+            int imgKey = rndKey[i % keyLength];
+            selectingTiles[i].SetImage(imgKey, tileTextures[imgKey]);
         }
     }
     
