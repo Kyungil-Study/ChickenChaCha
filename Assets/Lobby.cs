@@ -10,21 +10,26 @@ public class Lobby : MonoBehaviour
     private void OnGUI()
     {
         // 중앙 위치 계산
-        float width = 600;
-        float height = 200;
+        float width = Screen.width / 2;
+        float height = Screen.height / 2;
         float x = (Screen.width - width) / 2;
         float y = (Screen.height - height) / 2;
+        
+        // 글씨 크기 스타일 정의
+        GUIStyle labelStyle = new GUIStyle(GUI.skin.label) { fontSize = 50 };
+        GUIStyle textFieldStyle = new GUIStyle(GUI.skin.textField) { fontSize = 50 };
+        GUIStyle buttonStyle = new GUIStyle(GUI.skin.button) { fontSize = 50 };
 
         GUILayout.BeginArea(new Rect(x, y, width, height));
         {
             GUILayout.BeginHorizontal();
             {
-                GUILayout.Label("Build Index:", GUILayout.Width(160));
-                mBuildIndex = GUILayout.TextField(mBuildIndex, 50, GUILayout.Width(400));
+                GUILayout.Label("Build Index:", labelStyle, GUILayout.Width(width * 0.3f));
+                mBuildIndex = GUILayout.TextField(mBuildIndex, 50, textFieldStyle, GUILayout.Width(width * 0.6f));
             }
             GUILayout.EndHorizontal();
 
-            if (GUILayout.Button("Load Scene", GUILayout.Width(560)))
+            if (GUILayout.Button("Load Scene", buttonStyle, GUILayout.Width(width * 0.9f), GUILayout.Height(height * 0.2f)))
             {
                 if (int.TryParse(mBuildIndex, out int buildIndex))
                 {
