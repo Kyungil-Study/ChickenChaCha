@@ -39,12 +39,7 @@ public class InputHandler : NetworkBehaviour
             {
                 Debug.Log($"[클릭 성공] {hit.collider.name}");
 
-                // 매니저 클래스나 로직 전달
-                // var selectable = hit.collider.GetComponent<ISelectable>();
-                // if (selectable != null)
-                // {
-                //     
-                // }
+                hit.collider.gameObject.GetComponent<NetworkObject>();
             }
             else
             {
