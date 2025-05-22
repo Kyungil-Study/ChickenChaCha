@@ -40,8 +40,8 @@ public class BoardManager : NetworkBehaviour
                 rndKey = RandomUtil.GetShuffled(imageKeys);
             }
             steppingTiles[i].imageKey = (rndKey[i % keyLength]);
-            steppingTiles[i].next = steppingTiles[i == steppingTiles.Length - 1 ? 0 : i + 1];
-            steppingTiles[i].prev = steppingTiles[i == 0 ? steppingTiles.Length - 1 : i - 1];
+            steppingTiles[i].Next = steppingTiles[i == steppingTiles.Length - 1 ? 0 : i + 1];
+            steppingTiles[i].Prev = steppingTiles[i == 0 ? steppingTiles.Length - 1 : i - 1];
         }
         
         // selectingTiles
@@ -65,7 +65,7 @@ public class BoardManager : NetworkBehaviour
             PlayerRef player = players[i];
             
             SpawnPlayer(player, tile.transform.position);
-            tile.standingPlayer = player;
+            tile.StandingPlayer = player;
         }
     }
 

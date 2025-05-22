@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-public class Tile : NetworkBehaviour
+public abstract class Tile : NetworkBehaviour
 {
     [Networked,OnChangedRender(nameof(SetImage))]
     public int imageKey { get; set; }
@@ -19,5 +19,10 @@ public class Tile : NetworkBehaviour
     private Texture2D LoadImage(int key)
     {
         return Resources.Load<Texture2D>($"Tile/{key + 1:00}"); // TODO: change
+    }
+
+    public bool IsSamePicture(Tile tile)
+    {
+        return imageKey == tile.imageKey;
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SteppingTile : Tile
 {
-    public Tile next;
-    public Tile prev;
-    public PlayerRef standingPlayer;
+    public Tile Next { get; set; }
+    public Tile Prev { get; set; }
+    public PlayerRef StandingPlayer { get; set; }
 }
