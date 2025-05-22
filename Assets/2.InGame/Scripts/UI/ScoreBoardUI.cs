@@ -19,8 +19,8 @@ public class ScoreBoardUI : MonoBehaviour
         if (gameManager == null)
             return;
         
-        var playerInfos = gameManager.GetPlayersInfo();
-        UpdatePlayerScores(playerInfos);
+        //var playerInfos = gameManager.GetPlayersInfo();
+        //UpdatePlayerScores(playerInfos);
     }
 
     public void UpdatePlayerScores(List<PlayerInfo> playerInfos)
@@ -34,7 +34,7 @@ public class ScoreBoardUI : MonoBehaviour
         for (int i = 0; i < playerInfos.Count; i++)
         {
             var playerInfo = playerInfos[i];
-            mPlayerScores[i].UpdateUI(playerInfo.playerName, playerInfo.score);
+            //mPlayerScores[i].UpdateUI(playerInfo.playerName, playerInfo.score);
         }
     }
     
