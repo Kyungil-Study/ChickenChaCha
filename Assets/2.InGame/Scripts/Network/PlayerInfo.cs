@@ -1,11 +1,15 @@
 using Fusion;
 
-public class PlayerInfo
+public struct PlayerInfo : INetworkStruct
 {
     public PlayerRef player;
-    public NetworkObject netObj;
     public bool isActive;
-    public PlayerInfo nextPlayer;
-    public string playerName;
     public int score;
+
+    public PlayerInfo(PlayerRef player, bool isActive, int score)
+    {
+        this.player = player;
+        this.isActive = isActive;
+        this.score = score;
+    }
 }
