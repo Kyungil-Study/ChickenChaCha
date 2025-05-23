@@ -89,7 +89,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     {
         if(Runner.TryGetPlayerObject(Player, out NetworkObject netObj))
         {
-            netObj.GetComponent<NetworkPlayer>();
+            netObj.GetComponent<NetworkPlayer>().ReceiveMovePermission(isActive);
         }
         // mPlayerInfo.Set(nextPlayer,
         //     new PlayerInfo(mPlayerInfo[nextPlayer].player, isActive, mPlayerInfo[nextPlayer].score));

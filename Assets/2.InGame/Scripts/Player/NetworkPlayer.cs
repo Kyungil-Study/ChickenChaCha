@@ -67,7 +67,10 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
 
     public override void Spawned()
     {
-        Runner.SetPlayerObject(Runner.LocalPlayer, Object); // 게임 매니저가 이 오브젝트(Player)를 찾을 수 있도록하는 코드
+        if (HasStateAuthority)
+        {
+            Runner.SetPlayerObject(Runner.LocalPlayer, Object); // 게임 매니저가 이 오브젝트(Player)를 찾을 수 있도록하는 코드
+        }
         inputHandler = GetComponent<InputHandler>();
         SetState(new WaitingState()); // 초기 상태는 대기로
     }
