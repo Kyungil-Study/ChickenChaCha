@@ -11,7 +11,7 @@ public interface IToPlayer
     
     #region From 프로젝트 매니저_박승식
     // 매니저
-
+    void MovePlayer(Vector3 position); // 플레이어 이동
     #endregion
     
     #region From 기술 리드_김우태

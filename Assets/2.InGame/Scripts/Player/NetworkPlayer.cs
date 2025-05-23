@@ -86,6 +86,11 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
     }
 
     // 외부 매니저 클래스에서 상태 변경 가능하도록하는 메서드
+    public void MovePlayer(Vector3 position)
+    {
+        transform.position = position;
+    }
+
     public void ReceiveMovePermission(bool allowed)
     {
         if (allowed)
