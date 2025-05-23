@@ -67,7 +67,10 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
 
     public override void Spawned()
     {
-        Runner.SetPlayerObject(Runner.LocalPlayer, Object); // 게임 매니저가 이 오브젝트(Player)를 찾을 수 있도록하는 코드
+        if (HasStateAuthority)
+        {
+            Runner.SetPlayerObject(Runner.LocalPlayer, Object); // 게임 매니저가 이 오브젝트(Player)를 찾을 수 있도록하는 코드
+        }
         inputHandler = GetComponent<InputHandler>();
         
         // 타일 선택 동작 위임 : 이벤트
@@ -98,6 +101,11 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
     }
     
     // 외부 매니저 클래스에서 상태 변경 가능하도록하는 메서드
+    public void MovePlayer(Vector3 position)
+    {
+        transform.position = position;
+    }
+
     public void ReceiveMovePermission(bool allowed)
     {
         if (allowed)

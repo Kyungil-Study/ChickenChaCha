@@ -7,18 +7,14 @@ using UnityEngine.EventSystems;
 
 public abstract class Tile : NetworkBehaviour
 {
-    [Networked,OnChangedRender(nameof(SetImage))]
+    [Networked]
     public int imageKey { get; set; }
     [SerializeField] private Renderer renderer;
 
-    public void SetImage()
+    public void SetImage(int key, Texture2D img)
     {
-        renderer.material.mainTexture = LoadImage(imageKey);
-    }
-    
-    private Texture2D LoadImage(int key)
-    {
-        return Resources.Load<Texture2D>($"Tile/{key + 1:00}"); // TODO: change
+        renderer.material.mainTexture = img;
+        imageKey = key;
     }
 
     public bool IsSamePicture(Tile tile)

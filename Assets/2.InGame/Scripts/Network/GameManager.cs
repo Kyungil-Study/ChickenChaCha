@@ -5,16 +5,57 @@ using UnityEngine;
 
 public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlayerJoined
 {
+    
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<Tile, SteppingTile> mSteppingTileInfo => default;
+
+    public void AddTile(Tile t, SteppingTile tile)
+    {
+        mSteppingTileInfo.Add(t, tile);
+    }
+    
+    
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<Tile, SelectingTile> mSelectingTileInfo => default;
+    
+    
+    public void SendSelectedTile(PlayerRef player, SelectingTile tile)
+    {
+        bool result = RuleManager.Instance.OpenTile(new SteppingTile(), tile);
+        //SetPlayerState(player, result);
+    }
+    
+    public void SendSelectedTile(SelectingTile tile)
+    {
+        throw new NotImplementedException();
+    }
+
+    public SelectingTile GetSelectedTile()
+    {
+        throw new NotImplementedException();
+    }
+    
+    
+    // 에러 코드 주석 처리
+    // 에러코드 수정후
+    // 아래 파일 호출부도 복원해주세요.
+    // ScoreBoaurUI
+    // PlayerController 
+    /*
     [Networked] 
     [UnitySerializeField]
     private NetworkDictionary<PlayerRef, PlayerInfo> mPlayerInfo => default;
+    
     
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_AddPlayer(PlayerRef player)
     {
         if (mPlayerInfo.Count >= 4)
         {
-            Debug.Log("Max player count reached.");
+            Debug.Log("더 이상 추가 할 수 없습니다.");
+            
             return;
         }
 
@@ -25,81 +66,51 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
 
     public PlayerInfo? GetPlayerInfoOrNull(PlayerRef player)
     {
-        foreach (KeyValuePair<PlayerRef, PlayerInfo> playerInfo in mPlayerInfo)
+        if(mPlayerInfo.TryGet(player, out var value))
         {
-            if (playerInfo.Key == player)
-            {
-                return playerInfo.Value;
-            }
+            return value;
         }
         return null;
     }
 
-    public PlayerRef GetLocalPlayer()
+    public PlayerInfo? GetLocalPlayerOrNull()
     {
-        return Runner.LocalPlayer;
+        if(mPlayerInfo.TryGet(Runner.LocalPlayer, out var value))
+        {
+            return value;
+        }
+        return null;
     }
 
     public List<PlayerRef> GetPlayersInfo()
     {
         List<PlayerRef> players = new List<PlayerRef>();
-        foreach (KeyValuePair<PlayerRef, PlayerInfo> playerInfo in mPlayerInfo)
+        foreach (var playerInfo in mPlayerInfo)
         {
             players.Add(playerInfo.Key);
         }
         return players;
     }
+    
+    public void SetPlayerState(PlayerRef Player, bool isActive)
+    {
+        if(Runner.TryGetPlayerObject(Player, out NetworkObject netObj))
+        {
+            netObj.GetComponent<NetworkPlayer>().ReceiveMovePermission(isActive);
+        }
+        // mPlayerInfo.Set(nextPlayer,
+        //     new PlayerInfo(mPlayerInfo[nextPlayer].player, isActive, mPlayerInfo[nextPlayer].score));
+    }
+    
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_DebugList()
     {
         
     }
-    
+    */
     public void PlayerJoined(PlayerRef player)
     {
-        RPC_AddPlayer(player);
-    }
-    
-    // public void ColorChanged(MeshRenderer renderer, Color color)
-    // {
-    //     renderer.material.color = color;
-    // }
-    
-    // public void AblePlayerInputAuthority(PlayerRef player)
-    // {
-    //     foreach (var playerInfo in mPlayers)
-    //     {
-    //         if (playerInfo.player == player)
-    //         {
-    //             playerInfo.netObj.AssignInputAuthority(player);
-    //         }
-    //     }
-    // }
-    //
-    // public void RemovePlayerInputAuthority(PlayerRef player)
-    // {
-    //     foreach (var playerInfo in mPlayers)
-    //     {
-    //         if (playerInfo.player == player)
-    //         {
-    //             playerInfo.netObj.RemoveInputAuthority();
-    //         }
-    //     }
-    // }
-
-    public void SendSelectedTile(SelectingTile tile)
-    {
-        
-    }
-
-    public SelectingTile GetSelectedTile()
-    {
-        throw new NotImplementedException();
-    }
-    
-    public int CheckTailInfo(IToPlayer player)
-    {
-        throw new NotImplementedException();
+        //RPC_AddPlayer(player);
     }
 }
