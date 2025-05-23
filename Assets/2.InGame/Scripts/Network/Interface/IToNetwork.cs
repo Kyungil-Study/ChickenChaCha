@@ -29,6 +29,9 @@ public interface IToNetwork
     
     #region FromC
     // 팀원 C
+    void SendSelectedTile(SelectingTile tile);
+    
+    public SelectingTile GetSelectedTile(); // 플레이어가 현재 선택한 타일을 확인할 수 있는 메소드가 필요합니다.
 
     #endregion
     

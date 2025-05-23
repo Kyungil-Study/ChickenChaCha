@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Fusion;
+using Unity.VisualScripting;
 using UnityEngine;
 
 // 플레이어 데이터, 애니메이션 등 처리하기
@@ -54,11 +56,21 @@ public class WaitingState : IPlayerState
 
 public class NetworkPlayer : NetworkBehaviour, IToPlayer
 {
-    public SelectingTile selectedTile;
     public InputHandler inputHandler;
     
     [SerializeField] private IPlayerState currentState;
-    private int tailCount;
+    public GameObject tailModel;// 꽁지 모델 관리 오브젝트
+
+    [Networked, OnChangedRender(nameof(OnChangedTailCount))] public int networkedTailCount { get; set; }
+
+    private void Update()
+    {
+        
+    }
+
+    void OnChangedTailCount()
+    {
+    }
 
     public override void Spawned()
     {
@@ -87,8 +99,4 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
             SetState(new WaitingState());
     }
 
-    public int CheckTailInfo() => tailCount;
-    public SelectingTile GetSelectedTile() => selectedTile;
-    public void SetSelectedTile(SelectingTile tile) => selectedTile = tile;
-    public void SelectTileInfo() { }
 }

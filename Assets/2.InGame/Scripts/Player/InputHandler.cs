@@ -54,7 +54,7 @@ public class InputHandler : NetworkBehaviour
                 if (tile != null)
                 {
                     selectedTile = tile;
-                    GetComponent<NetworkPlayer>()?.SetSelectedTile(tile);
+                    GameManager.Instance.SendSelectedTile(selectedTile);
                 }
             }
             else
