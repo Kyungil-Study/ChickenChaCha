@@ -90,15 +90,14 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
 
     public void SendSelectedTile(SelectingTile tile)
     {
-        throw new NotImplementedException();
+        
     }
 
     public SelectingTile GetSelectedTile()
     {
         throw new NotImplementedException();
     }
-
-
+    
     public int CheckTailInfo(IToPlayer player)
     {
         throw new NotImplementedException();
