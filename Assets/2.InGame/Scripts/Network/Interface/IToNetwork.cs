@@ -27,8 +27,12 @@ public interface IToNetwork
 
     #endregion
     
-    #region FromC
+    #region From 플레이어_남건우
     // 팀원 C
+    
+    void SendSelectedTile(SelectingTile tile);  // 플레이어가 입력한 타일을 매니저 클래스에게 보냅니다
+    
+    public SelectingTile GetSelectedTile();
 
     #endregion
     
