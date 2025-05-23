@@ -107,6 +107,7 @@ public class BoardManager : NetworkBehaviour
 
     public void InitPlayerPieces()
     {
+        
         PlayerRef[] players = Runner.ActivePlayers.ToArray();
         int playerCount = players.Length;
 

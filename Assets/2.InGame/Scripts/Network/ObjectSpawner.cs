@@ -9,13 +9,10 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 
     public GameObject playerPrefab;
     public NetworkPrefabRef gameManagerPrefab;
-    
-    private PlayerInfo mPlayerInfo;
-    public FusionBootstrapDebugGUICustom gui;
+    public DataBase dataBase;
     
     public void PlayerJoined(PlayerRef player)
     {
-        mPlayerInfo = new PlayerInfo();
         GameManagerSpawn();
         PlayerSpawn(player);
     }
@@ -33,16 +30,20 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
             Runner.Spawn(gameManagerPrefab);
         }
     }
+    
+    private void DataBaseSpawn(PlayerRef player)
+    {
+        if (player == Runner.LocalPlayer)
+        {
+            Runner.Spawn(dataBase);
+        }
+    }
 
     private void PlayerSpawn(PlayerRef player)
     {
         if (player == Runner.LocalPlayer)
         {
-            mPlayerInfo.player = player;
-            mPlayerInfo.playerName = gui.nickName;
-            mPlayerInfo.score = 1;
-            mPlayerInfo.netObj = Runner.Spawn(playerPrefab);
-            GameManager.Instance.PlayerJoinAddList(mPlayerInfo);
+            Runner.Spawn(playerPrefab);
         }
     }
 

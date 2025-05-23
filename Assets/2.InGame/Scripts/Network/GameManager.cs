@@ -1,79 +1,116 @@
+using System;
 using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerLeft, IToNetwork
+public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlayerJoined
 {
-    private List<PlayerInfo> mPlayers;
     
-    public override void Spawned()
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<Tile, SteppingTile> mSteppingTileInfo => default;
+
+    public void AddTile(Tile t, SteppingTile tile)
     {
-        mPlayers = new List<PlayerInfo>();
+        mSteppingTileInfo.Add(t, tile);
+    }
+    
+    
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<Tile, SelectingTile> mSelectingTileInfo => default;
+    
+    
+    public void SendSelectedTile(PlayerRef player, SelectingTile tile)
+    {
+        bool result = RuleManager.Instance.OpenTile(new SteppingTile(), tile);
+        //SetPlayerState(player, result);
+    }
+    
+    public void SendSelectedTile(SelectingTile tile)
+    {
+        throw new NotImplementedException();
     }
 
-    public void ActivePlayer(PlayerRef player)
+    public SelectingTile GetSelectedTile()
     {
-        
-    }
-
-    public void PlayerJoinAddList(PlayerInfo playerInfo)
-    {
-        mPlayers.Add(playerInfo);
+        throw new NotImplementedException();
     }
     
-    public void AblePlayerInputAuthority(PlayerRef player)
-    {
-        foreach (var playerInfo in mPlayers)
-        {
-            if (playerInfo.player == player)
-            {
-                playerInfo.netObj.AssignInputAuthority(player);
-            }
-        }
-    }
     
-    public void RemovePlayerInputAuthority(PlayerRef player)
-    {
-        foreach (var playerInfo in mPlayers)
-        {
-            if (playerInfo.player == player)
-            {
-                playerInfo.netObj.RemoveInputAuthority();
-            }
-        }
-    }
+    // 에러 코드 주석 처리
+    // 에러코드 수정후
+    // 아래 파일 호출부도 복원해주세요.
+    // ScoreBoaurUI
+    // PlayerController 
+    /*
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<PlayerRef, PlayerInfo> mPlayerInfo => default;
     
-    public PlayerInfo GetPlayer(PlayerRef player)
+    
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_AddPlayer(PlayerRef player)
     {
-        foreach (var playerInfo in mPlayers)
+        if (mPlayerInfo.Count >= 4)
         {
-            if (playerInfo.player == player)
-            {
-                return playerInfo;
-            }
+            Debug.Log("더 이상 추가 할 수 없습니다.");
+            
+            return;
         }
 
+        PlayerInfo playerInfo = new PlayerInfo(player, false, 1);
+        Debug.Log($"{playerInfo.player} , {playerInfo.isActive}, {playerInfo.score}");
+        mPlayerInfo.Add(player, playerInfo);
+    }
+
+    public PlayerInfo? GetPlayerInfoOrNull(PlayerRef player)
+    {
+        if(mPlayerInfo.TryGet(player, out var value))
+        {
+            return value;
+        }
         return null;
     }
 
-    public void PlayerLeft(PlayerRef player)
+    public PlayerInfo? GetLocalPlayerOrNull()
     {
-        int removedPlayersScore = mPlayers.Find(p => p.player == player).score;
-        mPlayers.Remove(mPlayers.Find(p => p.player == player));
+        if(mPlayerInfo.TryGet(Runner.LocalPlayer, out var value))
+        {
+            return value;
+        }
+        return null;
     }
 
-    public List<PlayerInfo> GetPlayersInfo()
+    public List<PlayerRef> GetPlayersInfo()
     {
-        return mPlayers;
+        List<PlayerRef> players = new List<PlayerRef>();
+        foreach (var playerInfo in mPlayerInfo)
+        {
+            players.Add(playerInfo.Key);
+        }
+        return players;
     }
     
-    // [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    // public void RPC_AddScore()
-    // {
-    //     
-    // }
-    // public void ColorChanged(MeshRenderer renderer, Color color)
-    // {
-    //     renderer.material.color = color;
-    // }
+    public void SetPlayerState(PlayerRef Player, bool isActive)
+    {
+        if(Runner.TryGetPlayerObject(Player, out NetworkObject netObj))
+        {
+            netObj.GetComponent<NetworkPlayer>().ReceiveMovePermission(isActive);
+        }
+        // mPlayerInfo.Set(nextPlayer,
+        //     new PlayerInfo(mPlayerInfo[nextPlayer].player, isActive, mPlayerInfo[nextPlayer].score));
+    }
+    
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_DebugList()
+    {
+        
+    }
+    */
+    public void PlayerJoined(PlayerRef player)
+    {
+        //RPC_AddPlayer(player);
+    }
 }
