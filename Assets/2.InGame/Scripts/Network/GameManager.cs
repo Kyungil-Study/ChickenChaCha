@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Fusion;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
     [Networked] 
     private NetworkDictionary<NetworkId, PlayerInfo> mNetworkPlayerDictionary => default;
     
-    [Networked] 
+    [Networked, Capacity(36)] 
     private NetworkDictionary<NetworkId, TileInfo> mNetworkTileDictionary => default;
     
     public void AddDictionary<T>(NetworkId id, INetworkStruct networkStruct) where T : INetworkStruct
@@ -26,12 +27,19 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         }
         Debug.Log("Added to dictionary: " + id);
     }
-     
+    
     public void SetPlayerState(PlayerRef Player, bool isActive)
     {
+        Debug.Log(Player);
+        if (Player != Runner.LocalPlayer)
+        {
+            return;
+        }
+        
         if(Runner.TryGetPlayerObject(Player, out NetworkObject netObj))
         {
             netObj.GetComponent<NetworkPlayer>().ReceiveMovePermission(isActive);
+            Debug.Log("Set Player State");
         }
         // mPlayerInfo.Set(nextPlayer,
         //     new PlayerInfo(mPlayerInfo[nextPlayer].player, isActive, mPlayerInfo[nextPlayer].score));
@@ -56,6 +64,8 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         }
         return null;
     }
+    
+    //==========================이 앞, 추가됨=======================================
 
     private void Update()
     {
@@ -65,18 +75,21 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         }
     }
 
+    public PlayerRef[] ActivePlayers;
+    public int CurPlayerIndex { get; set; }
+    
     public void GameStart()
     {
-        BoardManager bm = BoardManager.Instance;
-        bm.InitBoard();
+        ActivePlayers = Runner.ActivePlayers.OrderBy(player => player.AsIndex).ToArray();
+        BoardManager.Instance.InitBoard(ActivePlayers);
+        SetPlayerState(ActivePlayers[0],true);
     }
 
-    private Tile FindTargetTile(PlayerRef player)
+    private SteppingTile FindTargetTile(PlayerRef player)
     {
-        PlayerInfo pInfo = (PlayerInfo)GetNetWorkStrut<PlayerInfo>(Runner.GetPlayerObject(player));
-        TileInfo tInfo = (TileInfo)GetNetWorkStrut<TileInfo>(pInfo.steppingTile);
-        SteppingTile standing = BoardManager.Instance.steppingTiles[tInfo.index];
-
+        var t = Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>();
+        SteppingTile standing = t.currentTile;
+        
         while (standing.StandingPlayer != PlayerRef.None)
         {
             standing = standing.Next;
@@ -87,7 +100,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
 
     public void Showdown(PlayerRef player, Tile select)
     {
-        Tile target = FindTargetTile(player);
+        SteppingTile target = FindTargetTile(player);
         if (target.IsSamePicture(select))
         {
             Success();
@@ -98,7 +111,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         }
         void Success()
         {
-            Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>().MovePlayer(target.transform.position);
+            Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>().MovePlayer(target);
             
             Debug.Log("Suck");
         }
@@ -106,11 +119,21 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         void Fail()
         {
             SetPlayerState(player, false);
-        
-            PlayerRef nextPlayer = PlayerRef.None;
+            MoveIndex();
+            
+            PlayerRef nextPlayer = ActivePlayers[CurPlayerIndex];
             SetPlayerState(nextPlayer, true);
             
             Debug.Log("Fuck");
+        }
+    }
+    
+    private void MoveIndex()
+    {
+        CurPlayerIndex++;
+        if (CurPlayerIndex >= ActivePlayers.Length)
+        {
+            CurPlayerIndex = 0;
         }
     }
     

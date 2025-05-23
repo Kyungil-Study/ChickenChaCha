@@ -27,7 +27,7 @@ public class InputHandler : NetworkBehaviour
     {
         if (bCanInput == false) return;   // 내 턴일때만 입력 가능하게 예외처리
         
-        if (Input.GetKey(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             bClicked = true;
         }
