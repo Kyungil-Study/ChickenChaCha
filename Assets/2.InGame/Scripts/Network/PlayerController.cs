@@ -41,7 +41,7 @@ public class PlayerController : NetworkBehaviour
 
         if (HasStateAuthority && Input.GetKeyDown(KeyCode.E))
         {
-            GameManager.Instance.RPC_DebugList();
+            //GameManager.Instance.RPC_DebugList();
         }
     } 
     public override void FixedUpdateNetwork()

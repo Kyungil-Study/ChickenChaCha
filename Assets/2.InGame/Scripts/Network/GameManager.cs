@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlayerJoined
 {
-    #region TileData
+    
     [Networked] 
     [UnitySerializeField]
     private NetworkDictionary<Tile, SteppingTile> mSteppingTileInfo => default;
@@ -15,16 +15,18 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
         mSteppingTileInfo.Add(t, tile);
     }
     
+    
     [Networked] 
     [UnitySerializeField]
     private NetworkDictionary<Tile, SelectingTile> mSelectingTileInfo => default;
     
+    
     public void SendSelectedTile(PlayerRef player, SelectingTile tile)
     {
         bool result = RuleManager.Instance.OpenTile(new SteppingTile(), tile);
-        SetPlayerState(player, result);
+        //SetPlayerState(player, result);
     }
-
+    
     public void SendSelectedTile(SelectingTile tile)
     {
         throw new NotImplementedException();
@@ -34,13 +36,18 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     {
         throw new NotImplementedException();
     }
-    #endregion
     
-    #region PlayerData
     
+    // 에러 코드 주석 처리
+    // 에러코드 수정후
+    // 아래 파일 호출부도 복원해주세요.
+    // ScoreBoaurUI
+    // PlayerController 
+    /*
     [Networked] 
     [UnitySerializeField]
     private NetworkDictionary<PlayerRef, PlayerInfo> mPlayerInfo => default;
+    
     
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_AddPlayer(PlayerRef player)
@@ -101,47 +108,9 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     {
         
     }
-    
+    */
     public void PlayerJoined(PlayerRef player)
     {
-        RPC_AddPlayer(player);
+        //RPC_AddPlayer(player);
     }
-    
-
-    #endregion
-
-    #region TestScripts
-// [Networked] 
-    // [UnitySerializeField]
-    // private NetworkDictionary<Tile, Tile> mTileInfo => default;
-    // public void ColorChanged(MeshRenderer renderer, Color color)
-    // {
-    //     renderer.material.color = color;
-    // }
-    
-    // public void AblePlayerInputAuthority(PlayerRef player)
-    // {
-    //     foreach (var playerInfo in mPlayers)
-    //     {
-    //         if (playerInfo.player == player)
-    //         {
-    //             playerInfo.netObj.AssignInputAuthority(player);
-    //         }
-    //     }
-    // }
-    //
-    // public void RemovePlayerInputAuthority(PlayerRef player)
-    // {
-    //     foreach (var playerInfo in mPlayers)
-    //     {
-    //         if (playerInfo.player == player)
-    //         {
-    //             playerInfo.netObj.RemoveInputAuthority();
-    //         }
-    //     }
-    // }
-
-    #endregion
-
-
 }
