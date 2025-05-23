@@ -56,6 +56,64 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         }
         return null;
     }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            GameStart();
+        }
+    }
+
+    public void GameStart()
+    {
+        BoardManager bm = BoardManager.Instance;
+        bm.InitBoard();
+    }
+
+    private Tile FindTargetTile(PlayerRef player)
+    {
+        PlayerInfo pInfo = (PlayerInfo)GetNetWorkStrut<PlayerInfo>(Runner.GetPlayerObject(player));
+        TileInfo tInfo = (TileInfo)GetNetWorkStrut<TileInfo>(pInfo.steppingTile);
+        SteppingTile standing = BoardManager.Instance.steppingTiles[tInfo.index];
+
+        while (standing.StandingPlayer != PlayerRef.None)
+        {
+            standing = standing.Next;
+        }
+
+        return standing;
+    }
+
+    public void Showdown(PlayerRef player, Tile select)
+    {
+        Tile target = FindTargetTile(player);
+        if (target.IsSamePicture(select))
+        {
+            Success();
+        }
+        else
+        {
+            Fail();
+        }
+        void Success()
+        {
+            Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>().MovePlayer(target.transform.position);
+            
+            Debug.Log("Suck");
+        }
+
+        void Fail()
+        {
+            SetPlayerState(player, false);
+        
+            PlayerRef nextPlayer = PlayerRef.None;
+            SetPlayerState(nextPlayer, true);
+            
+            Debug.Log("Fuck");
+        }
+    }
+    
     
     
     

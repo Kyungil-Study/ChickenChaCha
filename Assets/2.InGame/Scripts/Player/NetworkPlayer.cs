@@ -96,7 +96,7 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
     {
         if (currentState is ActiveState)
         {
-            //GameManager.Instance.SendSelectedTile(tile);  // 인터페이스로 연결되어 있을 것
+            GameManager.Instance.Showdown(Runner.LocalPlayer, tile);  // 인터페이스로 연결되어 있을 것
         }
     }
     

@@ -31,13 +31,11 @@ public class BoardManager : NetworkBehaviour
         }
     }
 
-    private void Update()
+    public void InitBoard()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
-            SpawnSelectingTiles(4,3,transform.position, new Vector3(-3, 2.5f, -3),new Vector3(3, 2.5f, 3));
-        }
+        SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
+        SpawnSelectingTiles(4,3,transform.position, new Vector3(-3, 2.5f, -3),new Vector3(3, 2.5f, 3));
+        InitPlayerPieces();
     }
 
     public void SpawnSteppingTiles(Vector3 zeroPosition)
@@ -109,7 +107,7 @@ public class BoardManager : NetworkBehaviour
             SteppingTile tile = steppingTiles[i * div];
             PlayerRef player = players[i];
 
-            SpawnPlayer(player, tile.transform.position);
+            SpawnPlayer(player, tile.transform.position + transform.position);
             tile.StandingPlayer = player;
         }
     }
