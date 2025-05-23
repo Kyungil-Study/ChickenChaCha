@@ -37,15 +37,15 @@ public class ScoreBoardUI : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < playerRefs.Count; i++)
-        {
-            PlayerInfo? infoOrNull = gameManager.GetPlayerInfoOrNull(playerRefs[i]);
-            if (infoOrNull.HasValue)
-            {
-                var playerInfo = infoOrNull.Value;
-                mPlayerScores[i].UpdateUI(playerInfo.player.ToString(), playerInfo.score);
-            }
-        }
+        // for (int i = 0; i < playerRefs.Count; i++)
+        // {
+        //     PlayerInfo? infoOrNull = gameManager.GetPlayerInfoOrNull(playerRefs[i]);
+        //     if (infoOrNull.HasValue)
+        //     {
+        //         var playerInfo = infoOrNull.Value;
+        //         mPlayerScores[i].UpdateUI(playerInfo.player.ToString(), playerInfo.score);
+        //     }
+        // }
     }
     
 }

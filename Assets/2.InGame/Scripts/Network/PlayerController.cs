@@ -38,11 +38,6 @@ public class PlayerController : NetworkBehaviour
                 Debug.Log("Raycast hit nothing");
             }
         }
-
-        if (HasStateAuthority && Input.GetKeyDown(KeyCode.E))
-        {
-            GameManager.Instance.RPC_DebugList();
-        }
     } 
     public override void FixedUpdateNetwork()
     {
