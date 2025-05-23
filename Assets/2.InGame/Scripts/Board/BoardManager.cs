@@ -61,8 +61,10 @@ public class BoardManager : NetworkBehaviour
                 steppingTiles[index] = netObj.GetComponent<SteppingTile>();
                 int imageKey = rndKey[index];
                 
-                steppingTiles[index].SetImage(imageKey, tileTextures[imageKey]);
-                //GameManager.Instance.RPC_AddDictionary(netObj.Id,new TileInfo(ETileType.Stepping, index, imageKey));
+                steppingTiles[index].SetImage(imageKey);
+                TileInfo info = new TileInfo(ETileType.Stepping, index, imageKey);
+                steppingTiles[index].Info = info;
+                //GameManager.Instance.RPC_AddDictionary(netObj.Id,info);
                 
                 initPosition += direction * 2;
                 index++;
@@ -90,7 +92,7 @@ public class BoardManager : NetworkBehaviour
                 var netObj = Runner.Spawn(selectingTilePrefab, offset + start + garo * x + sero * z);
                 selectingTiles[index] = netObj.GetComponent<SelectingTile>();
                 //GameManager.Instance.RPC_AddDictionary(netObj.Id, new TileInfo(ETileType.Selecting, index, imageKey));
-                selectingTiles[index].SetImage(imageKey, tileTextures[imageKey]);
+                selectingTiles[index].SetImage(imageKey);
             }
         }
     }

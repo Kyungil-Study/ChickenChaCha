@@ -58,7 +58,7 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
     public IPlayerState currentState;
     
     public GameObject tailModel;// 꽁지 모델 관리 오브젝트
-    [Networked, OnChangedRender(nameof(OnChangedTailCount))] public int networkedTailCount { get; set; }
+    [Networked, OnChangedRender(nameof(OnChangedTailCount))] public int NetworkedTailCount { get; set; }
 
     void OnChangedTailCount()
     {
