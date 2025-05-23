@@ -5,6 +5,26 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
+public enum ETileType
+{
+    Stepping,
+    Selecting
+}
+
+public struct TileInfo : INetworkStruct
+{
+    public ETileType type;
+    public int index;
+    public int imageKey;
+
+    public TileInfo(ETileType type, int index, int imageKey)
+    {
+        this.type = type;
+        this.index = index;
+        this.imageKey = imageKey;
+    }
+}
+
 public abstract class Tile : NetworkBehaviour
 {
     [Networked]

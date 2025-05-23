@@ -40,37 +40,14 @@ public class BoardManager : NetworkBehaviour
         }
     }
 
-    public void InitTiles()
-    {
-        int[] rndKey = RandomUtil.GetShuffled(imageKeys);
-        int keyLength = imageKeys.Length;
-
-        // steppingTiles
-        for (int i = 0; i < steppingTiles.Length; i++)
-        {
-            if (i == keyLength)
-            {
-                rndKey = RandomUtil.GetShuffled(imageKeys);
-            }
-
-            int imgKey = rndKey[i % keyLength];
-            steppingTiles[i].SetImage(imgKey, tileTextures[imgKey]);
-            steppingTiles[i].Next = steppingTiles[i == steppingTiles.Length - 1 ? 0 : i + 1];
-            steppingTiles[i].Prev = steppingTiles[i == 0 ? steppingTiles.Length - 1 : i - 1];
-        }
-
-        // selectingTiles
-        rndKey = RandomUtil.GetShuffled(imageKeys);
-        for (int i = 0; i < selectingTiles.Length; i++)
-        {
-            int imgKey = rndKey[i % keyLength];
-            selectingTiles[i].SetImage(imgKey, tileTextures[imgKey]);
-        }
-    }
-
     public void SpawnSteppingTiles(Vector3 zeroPosition)
     {
         int index = 0;
+        
+        int[] firstBag = RandomUtil.GetShuffled(imageKeys);
+        int[] secondBag = RandomUtil.GetShuffled(imageKeys);
+        var rndKey= firstBag.Concat(secondBag).ToArray();
+        
         Vector3 firstEnd = SpawnLine(zeroPosition, Vector3.forward);
         Vector3 secondEnd = SpawnLine(firstEnd, Vector3.right);
         Vector3 thirdEnd = SpawnLine(secondEnd, Vector3.back);
@@ -80,10 +57,15 @@ public class BoardManager : NetworkBehaviour
         {
             for (int i = 0; i < 6; i++)
             {
-                var tile = Runner.Spawn(steppingTilePrefab, initPosition);
-                steppingTiles[index++] = tile.GetComponent<SteppingTile>();
+                var netObj = Runner.Spawn(steppingTilePrefab, initPosition);
+                steppingTiles[index] = netObj.GetComponent<SteppingTile>();
+                int imageKey = rndKey[index];
+                
+                steppingTiles[index].SetImage(imageKey, tileTextures[imageKey]);
+                //GameManager.Instance.RPC_AddDictionary(netObj.Id,new TileInfo(ETileType.Stepping, index, imageKey));
                 
                 initPosition += direction * 2;
+                index++;
             }
 
             return initPosition;
@@ -95,19 +77,26 @@ public class BoardManager : NetworkBehaviour
         Vector3 diff = end - start;
         Vector3 garo = Vector3.right * diff.x / (columnCount - 1);
         Vector3 sero = Vector3.forward * diff.z / (rowCount - 1);
+        
+        int[] rndKey = RandomUtil.GetShuffled(imageKeys);
+        
         for (int x = 0; x < columnCount; x++)
         {
             for (int z = 0; z < rowCount; z++)
             {
-                var tile = Runner.Spawn(selectingTilePrefab, offset + start + garo * x + sero * z);
-                selectingTiles[z + x * rowCount] = tile.GetComponent<SelectingTile>();
+                int index = z + x * rowCount;
+                int imageKey = rndKey[index];
+                
+                var netObj = Runner.Spawn(selectingTilePrefab, offset + start + garo * x + sero * z);
+                selectingTiles[index] = netObj.GetComponent<SelectingTile>();
+                //GameManager.Instance.RPC_AddDictionary(netObj.Id, new TileInfo(ETileType.Selecting, index, imageKey));
+                selectingTiles[index].SetImage(imageKey, tileTextures[imageKey]);
             }
         }
     }
 
     public void InitPlayerPieces()
     {
-        
         PlayerRef[] players = Runner.ActivePlayers.ToArray();
         int playerCount = players.Length;
 
