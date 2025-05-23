@@ -8,24 +8,16 @@ public class RuleManager : DontDestroyOnNetwork<RuleManager>, IToRule
     private static RuleManager mInstance;
     
     private SteppingTile mNextTile;
-    /*
-        할일 목록
-        - 1. 플레이어를 앞질렀는지 판별( + 대기 플레이어의 꽁지 여부 확인)
-        - 2. 획득한 꽁지로 승리 판별
-        - 3. 액티브 플레이어에게 선택 타일을 전달 받고 뒤집어 보여주며 성공 / 실패 판별
-    */
-    
-    /*
-    public IToMap NextTlieInfo()
-    // A : SteppingTile의 .Next 프로퍼티를 사용하세요.
-    
-    public PlayerRef OnPlayerInfo()
-    // A : SteppingTile의 .StandingPlayer 프로퍼티를 사용하세요.
+    public NetworkPlayer mNetworkPlayer;
 
-    public bool EqualTile(IToPlayer tile)
-    // A : Tile의 .IsSamePicture(Tile tile) 메소드를 사용하세요.
-    */
-    
+    private void Awake()
+    {
+        if (mInstance == null)
+        {
+            mInstance = this;
+        }
+    }
+
     // 1. 플레이어 앞질렀는지 판별 함수 => 앞질렀는지 여부를 액티브 플레이어에게 전달해줘야됨
     // ps. 앞지른 플레이어가 꽁지를 가지고 있는지도 확인해야 함 => 앞지른 플레이어의 꽁지 정보 받아오기
     public int PassPlayer() // 플레이어를 앞질렀는지 확인하고 앞질렀으면 가져가게 될 꽁지 개수 리턴;
@@ -46,9 +38,8 @@ public class RuleManager : DontDestroyOnNetwork<RuleManager>, IToRule
     // ps. 승리 판정이 나면 다른 플레이어들은 패배 판정
     public bool CheckTail() //이 함수가 true면 승리, false면 진행 혹은 패배
     {
-        IToPlayer CheckTailInfo = null;
         // 사전 작업: PassPlayer로 꽁지 개수 플레이어에게 전달해주기
-        if (CheckTailInfo != null) // 플레이어 꽁지 개수 확인, 후에 == 4로 변경 예정
+        if (mNetworkPlayer.CheckTailInfo() == 4) // 플레이어 꽁지 개수 확인, 후에 == 4로 변경 예정
         {
             return true; // 꽁지가 4개면 true 리턴
         }
