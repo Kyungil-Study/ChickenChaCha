@@ -10,3 +10,5 @@ Assets/Firebase/Plugins/x86_64/FirebaseCppApp-12_8_0.dll filter=lfs diff=lfs mer
 Assets/TextMesh[[:space:]]Pro/Resources/Fonts[[:space:]]&[[:space:]]Materials/LiberationSans[[:space:]]SDF.asset filter=lfs diff=lfs merge=lfs -text
 Assets/TextMesh[[:space:]]Pro/Resources/Fonts[[:space:]]&[[:space:]]Materials/LiberationSans[[:space:]]SDF.asset filter=lfs diff=lfs merge=lfs -text
 Assets/Fonts/LiberationSansSDF.asset filter=lfs diff=lfs merge=lfs -text
+Assets/Fonts/MaplestoryLightSDF.asset filter=lfs diff=lfs merge=lfs -text
+Assets/Fonts/MaplestoryBoldSDF.asset filter=lfs diff=lfs merge=lfs -text
