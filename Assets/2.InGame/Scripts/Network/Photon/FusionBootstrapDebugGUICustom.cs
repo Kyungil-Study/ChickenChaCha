@@ -146,14 +146,6 @@ namespace Fusion {
             }
             
             GUILayout.EndHorizontal();
-            
-            GUILayout.BeginHorizontal();
-            {
-              GUILayout.Label("Name:", GUILayout.Height(height), GUILayout.Width(width * .33f));
-              nickName = GUILayout.TextField(nickName, 25, GUILayout.Height(height));
-            }
-            
-            GUILayout.EndHorizontal();
 
             if (GUILayout.Button("Start Shared Client", GUILayout.Height(height))) {
               if (_isMultiplePeerMode) {

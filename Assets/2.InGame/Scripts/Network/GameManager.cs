@@ -1,61 +1,66 @@
+using System;
 using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerLeft, IToNetwork
+public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlayerJoined
 {
-    private List<PlayerInfo> mPlayers;
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<PlayerRef, PlayerInfo> mPlayerInfo => default;
     
-    public override void Spawned()
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_AddPlayer(PlayerRef player)
     {
-        mPlayers = new List<PlayerInfo>();
-    }
-
-    public void SetActivePlayer(PlayerRef player)
-    {
-        PlayerInfo info = GetPlayer(player);
-        info.isActive = false;
-        info.nextPlayer.isActive = true;
-    }
-
-    public void PlayerJoinAddList(PlayerInfo playerInfo)
-    {
-        if (mPlayers.Count == 4)
+        if (mPlayerInfo.Count >= 4)
         {
-            mPlayers[0].isActive = true;
+            Debug.Log("Max player count reached.");
+            return;
         }
-        mPlayers.Add(playerInfo);
+
+        PlayerInfo playerInfo = new PlayerInfo(player, false, 1);
+        Debug.Log($"{playerInfo.player} , {playerInfo.isActive}, {playerInfo.score}");
+        mPlayerInfo.Add(player, playerInfo);
     }
-    
-    public PlayerInfo GetPlayer(PlayerRef player)
+
+    public PlayerInfo? GetPlayerInfoOrNull(PlayerRef player)
     {
-        foreach (var playerInfo in mPlayers)
+        foreach (KeyValuePair<PlayerRef, PlayerInfo> playerInfo in mPlayerInfo)
         {
-            if (playerInfo.player == player)
+            if (playerInfo.Key == player)
             {
-                return playerInfo;
+                return playerInfo.Value;
             }
         }
-
         return null;
     }
 
-    public void PlayerLeft(PlayerRef player)
+    public PlayerRef GetLocalPlayer()
     {
-        int removedPlayersScore = mPlayers.Find(p => p.player == player).score;
-        mPlayers.Remove(mPlayers.Find(p => p.player == player));
+        return Runner.LocalPlayer;
     }
 
-    public List<PlayerInfo> GetPlayersInfo()
+    public List<PlayerRef> GetPlayersInfo()
     {
-        return mPlayers;
+        List<PlayerRef> players = new List<PlayerRef>();
+        foreach (KeyValuePair<PlayerRef, PlayerInfo> playerInfo in mPlayerInfo)
+        {
+            players.Add(playerInfo.Key);
+        }
+        return players;
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_DebugList()
+    {
+        
     }
     
-    // [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    // public void RPC_AddScore()
-    // {
-    //     
-    // }
+    public void PlayerJoined(PlayerRef player)
+    {
+        RPC_AddPlayer(player);
+    }
+    
     // public void ColorChanged(MeshRenderer renderer, Color color)
     // {
     //     renderer.material.color = color;
@@ -82,4 +87,5 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerLeft, IToNe
     //         }
     //     }
     // }
+    
 }
