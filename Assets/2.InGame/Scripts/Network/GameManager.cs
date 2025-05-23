@@ -131,4 +131,14 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     // }
 
     #endregion
+
+    public void SendSelectedTile(SelectingTile tile)
+    {
+        throw new NotImplementedException();
+    }
+
+    public SelectingTile GetSelectedTile()
+    {
+        throw new NotImplementedException();
+    }
 }
