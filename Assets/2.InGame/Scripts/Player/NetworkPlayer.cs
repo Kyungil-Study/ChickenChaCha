@@ -72,6 +72,9 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
             Runner.SetPlayerObject(Runner.LocalPlayer, Object); // 게임 매니저가 이 오브젝트(Player)를 찾을 수 있도록하는 코드
         }
         inputHandler = GetComponent<InputHandler>();
+        
+        // 타일 선택 동작 위임 : 이벤트
+        inputHandler.OnTileSelected = HandleTileSelected;
         SetState(new WaitingState()); // 초기 상태는 대기로
     }
     
@@ -88,6 +91,15 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
         currentState?.Update(this);
     }
 
+    // 타일 선택 처리 (상태가 Active일 때만 처리)
+    private void HandleTileSelected(SelectingTile tile)
+    {
+        if (currentState is ActiveState)
+        {
+            GameManager.Instance.SendSelectedTile(tile);  // 인터페이스로 연결되어 있을 것
+        }
+    }
+    
     // 외부 매니저 클래스에서 상태 변경 가능하도록하는 메서드
     public void MovePlayer(Vector3 position)
     {
@@ -101,4 +113,5 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
         else
             SetState(new WaitingState());
     }
+    
 }
