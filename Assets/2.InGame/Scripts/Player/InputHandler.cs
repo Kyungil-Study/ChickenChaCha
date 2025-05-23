@@ -4,42 +4,42 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 using UnityEngine.Serialization;
-
-// 플레이어 입력 처리 받는 스크립트
-
 public class InputHandler : NetworkBehaviour
 {
-    private Camera camera;
     [SerializeField] private LayerMask clickLayer;
-
-    public Tile selectedTile;
     
-    private bool IsMyTurn = false;
+    public SelectingTile selectedTile;
+    public bool bCanInput = false;
+    
+    private Camera camera;
     private bool bClicked;
     
     public override void Spawned()
     {
         camera = Camera.main;
         bClicked = false;
-        
-        // networkPlayer = GetComponent<NetworkPlayer>();
     }
     
     void Update()
     {
-        // if (IsMyTurn == false) return;   // 내 턴일때만 입력 가능하게 예외처리
+        if (bCanInput == false) return;   // 내 턴일때만 입력 가능하게 예외처리
         
         if (Input.GetKey(KeyCode.Mouse0))
         {
             bClicked = true;
         }
 
-        if (Input.GetKey(KeyCode.Alpha1))
+        if (Input.GetKey(KeyCode.Alpha1))   // 단축키로 선택한 타일 확인하기
         {
             Debug.Log(selectedTile);
         }
     }
     public override void FixedUpdateNetwork()
+    {
+        SelectTileInfo();
+    }
+    
+    public void SelectTileInfo()
     {
         if (bClicked)
         {
@@ -48,10 +48,14 @@ public class InputHandler : NetworkBehaviour
             Ray ray = camera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out var hit, Mathf.Infinity, clickLayer))
             {
-                var tile = hit.collider.gameObject.GetComponent<Tile>();
-                Debug.Log($"[클릭 성공] {hit.collider.name}");
+                var tile = hit.collider.gameObject.GetComponent<SelectingTile>();
+                Debug.Log($"[클릭한 타일] {hit.collider.name}");
                 
-                SelectTileInfo(tile);
+                if (tile != null)
+                {
+                    selectedTile = tile;
+                    GetComponent<NetworkPlayer>()?.SetSelectedTile(tile);
+                }
             }
             else
             {
@@ -60,14 +64,8 @@ public class InputHandler : NetworkBehaviour
         }
     }
     
-    public void SelectTileInfo(Tile tile)
-    {
-        selectedTile = tile;
-        Debug.Log("선택된 타일 : " + selectedTile?.name);
-    }
-    
     private void OnGUI()
     {
-        GUI.Label(new Rect(20, 20, 250, 30), $"Click Handled: {bClicked}");
+        GUI.Label(new Rect(20, 300, 250, 30), $"Click Handled: {bClicked}");
     }
 }
