@@ -5,26 +5,38 @@ using UnityEngine;
 
 public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlayerJoined
 {
+    
+    
+
+    #region TileData
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<Tile, SteppingTile> mSteppingTileInfo => default;
+
+    public void AddTile(Tile t, SteppingTile tile)
+    {
+        mSteppingTileInfo.Add(t, tile);
+    }
+    
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<Tile, SelectingTile> mSelectingTileInfo => default;
+    
+
+    #endregion
+    
+    #region PlayerData
+    
     [Networked] 
     [UnitySerializeField]
     private NetworkDictionary<PlayerRef, PlayerInfo> mPlayerInfo => default;
-    
-    [Networked] 
-    [UnitySerializeField]
-    private NetworkArray<PlayerRef> mPlayers => default;
-    
-    // [Networked] 
-    // [UnitySerializeField]
-    // private NetworkDictionary<Tile, Tile> mTileInfo => default;
-    
-    
     
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_AddPlayer(PlayerRef player)
     {
         if (mPlayerInfo.Count >= 4)
         {
-            Debug.Log("Max player count reached.");
+            Debug.Log("더 이상 추가 할 수 없습니다.");
             
             return;
         }
@@ -36,31 +48,41 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
 
     public PlayerInfo? GetPlayerInfoOrNull(PlayerRef player)
     {
-        foreach (KeyValuePair<PlayerRef, PlayerInfo> playerInfo in mPlayerInfo)
+        if(mPlayerInfo.TryGet(player, out var value))
         {
-            if (playerInfo.Key == player)
-            {
-                return playerInfo.Value;
-            }
+            return value;
         }
         return null;
     }
 
-    public PlayerRef GetLocalPlayer()
+    public PlayerInfo? GetLocalPlayerOrNull()
     {
-        return Runner.LocalPlayer;
+        if(mPlayerInfo.TryGet(Runner.LocalPlayer, out var value))
+        {
+            return value;
+        }
+        return null;
     }
 
     public List<PlayerRef> GetPlayersInfo()
     {
         List<PlayerRef> players = new List<PlayerRef>();
-        foreach (KeyValuePair<PlayerRef, PlayerInfo> playerInfo in mPlayerInfo)
+        foreach (var playerInfo in mPlayerInfo)
         {
             players.Add(playerInfo.Key);
         }
         return players;
     }
     
+    public void SetPlayerState(PlayerRef Player, bool isActive)
+    {
+        if(Runner.TryGetPlayerObject(Player, out NetworkObject netObj))
+        {
+            netObj.GetComponent<NetworkPlayer>();
+        }
+        // mPlayerInfo.Set(nextPlayer,
+        //     new PlayerInfo(mPlayerInfo[nextPlayer].player, isActive, mPlayerInfo[nextPlayer].score));
+    }
     
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -74,6 +96,13 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
         RPC_AddPlayer(player);
     }
     
+
+    #endregion
+
+    #region TestScripts
+// [Networked] 
+    // [UnitySerializeField]
+    // private NetworkDictionary<Tile, Tile> mTileInfo => default;
     // public void ColorChanged(MeshRenderer renderer, Color color)
     // {
     //     renderer.material.color = color;
@@ -100,5 +129,6 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     //         }
     //     }
     // }
-    
+
+    #endregion
 }
