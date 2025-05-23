@@ -60,6 +60,8 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
         }
         return players;
     }
+    
+    
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_DebugList()
