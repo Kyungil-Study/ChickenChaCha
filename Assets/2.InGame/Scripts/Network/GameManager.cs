@@ -8,25 +8,28 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
 
     [Networked] 
     [UnitySerializeField]
-    private NetworkDictionary<NetworkId, int> mNetworkDictionary => default;
-    //
-    // public void SendSelectedTile(SelectingTile tile)
-    // {
-    //     throw new NotImplementedException();
-    // }
-    //
-    // public SelectingTile GetSelectedTile()
-    // {
-    //     throw new NotImplementedException();
-    // }
-    //
+    private NetworkDictionary<NetworkId, PlayerInfo> mNetworkPlayerDictionary => default;
+    
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<NetworkId, TileInfo> mNetworkTileDictionary => default;
+    
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_AddDictionary(NetworkId networkId, int networkStruct)
+    public void RPC_AddDictionary<T>(NetworkId id, INetworkStruct networkStruct) where T : INetworkStruct
     {
-        mNetworkDictionary.Add(networkId, networkStruct);
-        Debug.Log("Added to dictionary: " + networkId);
+        
+        if (networkStruct is PlayerInfo playerInfo)
+        { 
+            mNetworkPlayerDictionary.Add(id, playerInfo);
+        }
+
+        if (networkStruct is TileInfo tileInfo)
+        {
+            mNetworkTileDictionary.Add(id, tileInfo);
+        }
+        Debug.Log("Added to dictionary: " + id);
     }
-    //  
+     
     public void SetPlayerState(PlayerRef Player, bool isActive)
     {
         if(Runner.TryGetPlayerObject(Player, out NetworkObject netObj))
@@ -36,6 +39,28 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         // mPlayerInfo.Set(nextPlayer,
         //     new PlayerInfo(mPlayerInfo[nextPlayer].player, isActive, mPlayerInfo[nextPlayer].score));
     }
+    
+    public INetworkStruct GetNetWorkStrut <T>(NetworkId id)
+    {
+        if (typeof(T) == typeof(PlayerInfo))
+        {
+            if (mNetworkPlayerDictionary.TryGet(id, out PlayerInfo networkStruct))
+            {
+                return networkStruct;
+            }
+        }
+
+        if (typeof(T) == typeof(TileInfo))
+        {
+            if (mNetworkTileDictionary.TryGet(id, out TileInfo networkStruct))
+            {
+                return networkStruct;
+            }
+        }
+        return null;
+    }
+    
+    
     
     // public PlayerInfo? GetPlayerInfoOrNull(PlayerRef player)
     // {
@@ -60,13 +85,4 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
     //      }
     //      return null;
     //  }
-
-    // public T? GetNetWorkStrut <T>(NetworkId id) where T : INetworkStruct
-    // {
-    //     if (mNetworkDictionary.TryGet(id, out INetworkStruct networkStruct))
-    //     {
-    //         return networkStruct as T;
-    //     }
-    //     return null;
-    // }
 }
