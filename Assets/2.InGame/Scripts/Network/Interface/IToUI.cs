@@ -11,7 +11,7 @@ public interface IToUI
     // 매니저
     void SetLocalPlayerName(string playerName);
     void SetTurnPlayerName(string playerName);
-    void UpdatePlayerScore(List<UIPlayerScoreData> playerScores);
+    //void UpdatePlayerScore(List<UIPlayerScoreData> playerScores);
 
     #endregion
 
