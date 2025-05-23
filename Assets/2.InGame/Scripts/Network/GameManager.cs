@@ -5,9 +5,6 @@ using UnityEngine;
 
 public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlayerJoined
 {
-    
-    
-
     #region TileData
     [Networked] 
     [UnitySerializeField]
@@ -22,7 +19,21 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     [UnitySerializeField]
     private NetworkDictionary<Tile, SelectingTile> mSelectingTileInfo => default;
     
+    public void SendSelectedTile(PlayerRef player, SelectingTile tile)
+    {
+        bool result = RuleManager.Instance.OpenTile(new SteppingTile(), tile);
+        SetPlayerState(player, result);
+    }
 
+    public void SendSelectedTile(SelectingTile tile)
+    {
+        throw new NotImplementedException();
+    }
+
+    public SelectingTile GetSelectedTile()
+    {
+        throw new NotImplementedException();
+    }
     #endregion
     
     #region PlayerData
@@ -132,13 +143,5 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
 
     #endregion
 
-    public void SendSelectedTile(SelectingTile tile)
-    {
-        throw new NotImplementedException();
-    }
 
-    public SelectingTile GetSelectedTile()
-    {
-        throw new NotImplementedException();
-    }
 }
