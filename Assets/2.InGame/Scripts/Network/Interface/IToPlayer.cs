@@ -17,32 +17,35 @@ public interface IToPlayer
     #region From 기술 리드_김우태
     // 기술
 
-    public void ReceiveMovePermission(bool allowed);
+    public void ReceiveMovePermission(bool allowed); // 말 이동 가능한지 여부
+
+    public void SetState(IPlayerState newState);    // 향후 확장을 고려해서 플레이어 상태 변경 가능하도록 작성한 메서드
+    
     // 
-    
+
     #endregion
-    
+
     #region FromA
+
     // 팀원 A
 
     #endregion
-    
+
     #region FromB
+
     // 팀원 B
 
     #endregion
-    
+
     #region FromC
+
     // 팀원 C
 
     #endregion
-    
+
     #region FromRule_ 문현승
 
-    // 플레이어가 현재 가지고 있는 꽁지 개수를 리턴하는 메소드가 필요합니다.
-
-    // 플레이어가 현재 선택한 타일을 확인할 수 있는 메소드가 필요합니다.
-    // NetworkPlayer.cs에서 public SelectingTile selectedTile; 가져가면 됩니다.
+    // 게임 매니저에 있는 데이터 가져가기로
 
     #endregion
 }
