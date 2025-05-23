@@ -11,6 +11,9 @@ public class InputHandler : NetworkBehaviour
     public SelectingTile selectedTile;
     public bool bCanInput = false;
     
+    // 타일 선택 콜백 처리 -> NetworkPlayer에게 보내기
+    public Action<SelectingTile> OnTileSelected;
+    
     private Camera camera;
     private bool bClicked;
     
@@ -54,7 +57,8 @@ public class InputHandler : NetworkBehaviour
                 if (tile != null)
                 {
                     selectedTile = tile;
-                    GameManager.Instance.SendSelectedTile(selectedTile);
+                    // 콜백으로 처리 (직접 GameManager 호출 안 함)
+                    OnTileSelected?.Invoke(tile);
                 }
             }
             else

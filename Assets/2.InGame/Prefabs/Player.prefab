@@ -70,6 +70,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   selectedTile: {fileID: 0}
+  bCanInput: 0
 --- !u!114 &-7790748893127396158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,3 +83,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8549b5ffcfb00345abc0ac8abfb912a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputHandler: {fileID: 0}
+  tailModel: {fileID: 0}
+  _networkedTailCount: 0
