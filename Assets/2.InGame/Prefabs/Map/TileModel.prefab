@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 5420843197128971019}
   - component: {fileID: 2704894601819457410}
   - component: {fileID: 1919328639158258051}
+  - component: {fileID: 7146048274291157060}
+  - component: {fileID: 7499330065028618869}
   m_Layer: 0
   m_Name: TileModel
   m_TagString: Untagged
@@ -230,10 +232,10 @@ MonoBehaviour:
   - {x: -0, y: -1, z: 0, w: 1}
   - {x: -0, y: -1, z: 0, w: 1}
   - {x: -0, y: -1, z: 0, w: 1}
-  - {x: 0.99862957, y: 0, z: 0.052335866, w: -1}
-  - {x: 0.99862957, y: 0, z: 0.052335896, w: -1}
-  - {x: 0.99862957, y: 0, z: 0.052335896, w: -1}
-  - {x: 0.9986295, y: 0, z: 0.052335918, w: -1}
+  - {x: 0.70710665, y: 0, z: -0.70710695, w: -1}
+  - {x: 0.70710665, y: 0, z: -0.70710695, w: -1}
+  - {x: 0.70710665, y: 0, z: -0.70710695, w: -1}
+  - {x: 0.70710665, y: 0, z: -0.7071069, w: -1}
   - {x: 1, y: 0, z: 0, w: 1}
   - {x: 1, y: 0, z: 0, w: 1}
   - {x: 1, y: 0, z: 0, w: 1}
@@ -247,7 +249,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 832
+  m_VersionIndex: 835
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -324,3 +326,39 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!114 &7146048274291157060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2852087397471399347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateAuthorityChangeErrorCorrectionDelta: 0
+  SyncScale: 0
+  SyncParent: 0
+  _autoAOIOverride: 1
+  DisableSharedModeInterpolation: 0
+--- !u!114 &7499330065028618869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2852087397471399347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 3170575465
+  ObjectInterest: 1
+  Flags: 1
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 7146048274291157060}
+  ForceRemoteRenderTimeframe: 0

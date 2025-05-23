@@ -48,8 +48,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SortKey: 1215360658
   ObjectInterest: 1
-  Flags: 262145
-  NestedObjects: []
+  Flags: 1
+  NestedObjects:
+  - {fileID: 1015385960924293734}
   NetworkedBehaviours:
   - {fileID: 5950074524790624328}
   ForceRemoteRenderTimeframe: 0
@@ -130,11 +131,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7177106554857667386, guid: 112aeeb233254c94d94a92eeee278919,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 838
+      objectReference: {fileID: 0}
+    - target: {fileID: 7499330065028618869, guid: 112aeeb233254c94d94a92eeee278919,
+        type: 3}
+      propertyPath: SortKey
+      value: 4091920263
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 112aeeb233254c94d94a92eeee278919, type: 3}
+--- !u!114 &1015385960924293734 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7499330065028618869, guid: 112aeeb233254c94d94a92eeee278919,
+    type: 3}
+  m_PrefabInstance: {fileID: 7351449989458931731}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!23 &3260374109343228696 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 5420843197128971019, guid: 112aeeb233254c94d94a92eeee278919,
