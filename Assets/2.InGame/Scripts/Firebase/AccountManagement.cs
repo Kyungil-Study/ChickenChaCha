@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -7,7 +6,6 @@ using Firebase;
 using Firebase.Firestore;
 using Firebase.Auth;
 using Firebase.Extensions;
-using TMPro;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -28,7 +26,7 @@ public class AccountManagement : MonoBehaviour
     [FormerlySerializedAs("buttonSignUp")] [SerializeField] private Button mButtonSignUp;
     
     //[FormerlySerializedAs("loginButton")] [SerializeField] private LoginButton mLoginButton;
-    [FormerlySerializedAs("NotificationText")] [SerializeField] private TMP_Text mNotificationText;
+    //[FormerlySerializedAs("NotificationText")] [SerializeField] private TMP_Text mNotificationText;
     
     private Dictionary<string, FirebaseAuth> mPlayerAuths = new Dictionary<string, FirebaseAuth>();
     private Dictionary<string, FirebaseFirestore> mPlayerFirestore = new Dictionary<string, FirebaseFirestore>();
@@ -143,8 +141,8 @@ public class AccountManagement : MonoBehaviour
                 else
                 {
                     mStatusMessage = "회원가입 실패: " + task.Exception?.Message;
-                    mNotificationText.gameObject.SetActive(true);
-                    mNotificationText.text = "already ID exist";
+                    //mNotificationText.gameObject.SetActive(true);
+                    //mNotificationText.text = "already ID exist";
                     Debug.Log(mStatusMessage);
                 }
             });
@@ -234,19 +232,19 @@ public class AccountManagement : MonoBehaviour
                         // 이메일이 없을 때
                         if (errorCode == (int)AuthError.UserNotFound)
                         {
-                            mNotificationText.gameObject.SetActive(true);
-                            mNotificationText.text = "Email not found";
+                            //mNotificationText.gameObject.SetActive(true);
+                            //mNotificationText.text = "Email not found";
                         }
                         // 비밀번호가 틀렸을 때
                         else if (errorCode == (int)AuthError.WrongPassword)
                         {
-                            mNotificationText.gameObject.SetActive(true);
-                            mNotificationText.text = "Password is incorrect";
+                            //mNotificationText.gameObject.SetActive(true);
+                            //mNotificationText.text = "Password is incorrect";
                         }
                         else
                         {
-                            mNotificationText.gameObject.SetActive(true);
-                            mNotificationText.text = "ex";
+                            //mNotificationText.gameObject.SetActive(true);
+                            //mNotificationText.text = "ex";
                             Debug.LogError("로그인 중 예외 발생: " + firebaseEx.Message);
                         }
                     }
