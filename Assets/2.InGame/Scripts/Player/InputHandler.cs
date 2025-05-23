@@ -36,6 +36,19 @@ public class InputHandler : NetworkBehaviour
         {
             Debug.Log(selectedTile);
         }
+        
+        if (HasStateAuthority && Input.GetKeyDown(KeyCode.E))
+        {
+            Debug.Log("E");
+            NetworkObject netObj = GetComponent<NetworkObject>();
+            NetworkId id = netObj.Id;
+            
+            
+            GameManager.Instance.AddDictionary<PlayerInfo> (
+                id, new PlayerInfo(Runner.LocalPlayer, false, 1, id)
+            );
+            Debug.Log("Added to dictionary: " + id);
+        }
     }
     public override void FixedUpdateNetwork()
     {

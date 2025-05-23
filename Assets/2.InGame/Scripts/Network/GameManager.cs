@@ -7,15 +7,12 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
 {
 
     [Networked] 
-    [UnitySerializeField]
     private NetworkDictionary<NetworkId, PlayerInfo> mNetworkPlayerDictionary => default;
     
     [Networked] 
-    [UnitySerializeField]
     private NetworkDictionary<NetworkId, TileInfo> mNetworkTileDictionary => default;
     
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_AddDictionary<T>(NetworkId id, INetworkStruct networkStruct) where T : INetworkStruct
+    public void AddDictionary<T>(NetworkId id, INetworkStruct networkStruct) where T : INetworkStruct
     {
         
         if (networkStruct is PlayerInfo playerInfo)

@@ -15,5 +15,4 @@ public struct PlayerInfo : INetworkStruct
         this.score = score; 
         this.steppingTile = steppingTile;
     }
-    
 }
