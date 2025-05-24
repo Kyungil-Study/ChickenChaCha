@@ -104,10 +104,11 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
         Debug.Log("HandleTileSelected");
         if (currentState is ActiveState)
         {
+            var matchTile = GameManager.Instance.GetMatchTile(currentTile);
             bool isSuccess = GameManager.Instance.OpenTile(currentTile, tile);
             if (isSuccess)
             {
-                MovePlayer(currentTile.Next);
+                MovePlayer(matchTile.Next);
             }
         }
     }
