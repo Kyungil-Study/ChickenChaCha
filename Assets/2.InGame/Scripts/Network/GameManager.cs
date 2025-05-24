@@ -59,6 +59,15 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
         }
     }
     
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_MoveTo(SteppingTile targetTile, SteppingTile currentSteppingTile)
+    {
+        // 현재 타일, 다음 타일, 플레이어
+        targetTile.StandingPlayer = Runner.LocalPlayer;
+        currentSteppingTile.StandingPlayer = PlayerRef.None;
+
+    }
+    
     public void PlayerJoined(PlayerRef player)
     {
         // UI에게 새로 접속한 플레이어 정보 전달

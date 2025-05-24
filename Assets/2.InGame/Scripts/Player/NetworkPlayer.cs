@@ -135,11 +135,11 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     {
         if (currentState is ActiveState)
         {
-            var matchTile = GameManager.Instance.GetMatchTile(CurrentSteppingTile);
+            var targetTile = GameManager.Instance.GetMatchTile(CurrentSteppingTile);
             bool isSuccess = GameManager.Instance.OpenTile(CurrentSteppingTile, tile);
             if (isSuccess)
             {
-                MoveTo(matchTile);
+                MoveTo(targetTile);
             }
         }
     }
@@ -148,10 +148,7 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     public void MoveTo(SteppingTile targetTile)
     {
         transform.position = targetTile.transform.position;
-        
-        // 현재 타일, 다음 타일, 플레이어
-        targetTile.StandingPlayer = CurrentSteppingTile.StandingPlayer;
-        CurrentSteppingTile.StandingPlayer = PlayerRef.None;
+        GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile);
         CurrentSteppingTile = targetTile;
     }
 
