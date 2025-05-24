@@ -54,6 +54,9 @@ public class WaitingState : IPlayerState
 
 public class NetworkPlayer : NetworkBehaviour//, IToPlayer
 {
+    public int tailCount;
+    public int playerIndex;
+    
     public InputHandler inputHandler;
     public IPlayerState currentState;
     public SteppingTile currentTile;
@@ -68,15 +71,17 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
 
     public override void Spawned()
     {
-        // if (HasStateAuthority)
-        // {
-        //     Runner.SetPlayerObject(Runner.LocalPlayer, Object); // 게임 매니저가 이 오브젝트(Player)를 찾을 수 있도록하는 코드
-        // }
+        base.Spawned();
         inputHandler = GetComponent<InputHandler>();
         
         // 타일 선택 동작 위임 : 이벤트
         inputHandler.OnTileSelected = HandleTileSelected;
         SetState(new WaitingState()); // 초기 상태는 대기로
+        
+        if (Runner.IsSharedModeMasterClient == false)
+        {
+            GameManager.Instance.players[playerIndex] = this;
+        }
     }
     
     // 상태 확장을 고려해서 플레이어 상태 변경
@@ -98,8 +103,7 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
         Debug.Log("HandleTileSelected");
         if (currentState is ActiveState)
         {
-            Debug.Log("if ActiveState");
-            GameManager.Instance.Showdown(Runner.LocalPlayer, tile);  // 인터페이스로 연결되어 있을 것
+            
         }
     }
     
@@ -121,5 +125,4 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
         else
             SetState(new WaitingState());
     }
-    
 }

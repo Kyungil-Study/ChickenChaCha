@@ -2,13 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Fusion;
 using UnityEngine;
 
-public class BoardManager : NetworkBehaviour
+public class BoardManager : DontDestroyOnNetwork<BoardManager>
 {
-    public static BoardManager Instance;
-    
     public GameObject steppingTilePrefab;
     public GameObject selectingTilePrefab;
     public GameObject playerPrefab;
@@ -19,19 +18,16 @@ public class BoardManager : NetworkBehaviour
 
     private readonly int[] imageKeys = new int[12] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
-    private void Awake()
+    public SteppingTile[] GetSteppingTiles()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Runner.Despawn(Object);
-        }
+        return steppingTiles;
     }
-
-    public void InitBoard(PlayerRef[] players)
+    
+    public SelectingTile[] GetSelectingTiles()
+    {
+        return selectingTiles;
+    }
+    public void InitBoard(NetworkPlayer[] players)
     {
         SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
         SpawnSelectingTiles(4,3,transform.position, new Vector3(-3, 2.5f, -3),new Vector3(3, 2.5f, 3));
@@ -62,7 +58,6 @@ public class BoardManager : NetworkBehaviour
                 
                 TileInfo info = new TileInfo(ETileType.Stepping, index, imageKey);
                 steppingTiles[index].Info = info;
-                GameManager.Instance.AddDictionary<TileInfo>(netObj.Id, info);
                 
                 initPosition += direction * 2;
                 index++;
@@ -98,27 +93,14 @@ public class BoardManager : NetworkBehaviour
                 
                 TileInfo info = new TileInfo(ETileType.Selecting, index, imageKey);
                 selectingTiles[index].Info = info;
-                GameManager.Instance.AddDictionary<TileInfo>(netObj.Id, info);
             }
         }
     }
 
-    public void InitPlayerPieces(PlayerRef[] players)
+    
+    public void InitPlayerPieces(NetworkPlayer[] players)
     {
-        int playerCount = players.Length;
-
-        int div = steppingTiles.Length / playerCount;
-
-        for (int i = 0; i < playerCount; i++)
-        {
-            SteppingTile tile = steppingTiles[i * div];
-            PlayerRef player = players[i];
-            tile.StandingPlayer = player;
-
-            var obj = SpawnPlayer(player, tile.transform.position);
-            var y = obj.GetComponent<NetworkPlayer>();
-            y.currentTile = tile;
-        }
+        
     }
 
     private NetworkObject SpawnPlayer(PlayerRef player, Vector3 position)

@@ -9,12 +9,11 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 
     public GameObject playerPrefab;
     public NetworkPrefabRef gameManagerPrefab;
-    public DataBase dataBase;
     
     public void PlayerJoined(PlayerRef player)
     {
         GameManagerSpawn();
-        // PlayerSpawn(player);
+        PlayerSpawn(player);
     }
 
     private void GameManagerSpawn()
@@ -30,21 +29,16 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
             Runner.Spawn(gameManagerPrefab);
         }
     }
-    
-    private void DataBaseSpawn(PlayerRef player)
-    {
-        if (player == Runner.LocalPlayer)
-        {
-            Runner.Spawn(dataBase);
-        }
-    }
 
     private void PlayerSpawn(PlayerRef player)
     {
         if (player == Runner.LocalPlayer)
         {
-            Runner.Spawn(playerPrefab);
+            var playerObj = Runner.Spawn(playerPrefab);
+            playerObj.GetComponent<NetworkPlayer>().playerIndex = player.AsIndex - 1;
+            Runner.SetPlayerObject(player, playerObj);
         }
+        
     }
 
     public void PlayerLeft(PlayerRef player)

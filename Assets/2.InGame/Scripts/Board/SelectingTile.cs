@@ -26,5 +26,14 @@ public class SelectingTile : Tile, IPointerClickHandler
     {
         anim.SetTrigger(HIDE_FACE);
     }
+    
+    public override void Spawned()
+    {
+        base.Spawned();
+        if (Runner.IsSharedModeMasterClient == false)
+        {
+            BoardManager.Instance.selectingTiles[Info.index] = this;
+        }
+    }
 
 }
