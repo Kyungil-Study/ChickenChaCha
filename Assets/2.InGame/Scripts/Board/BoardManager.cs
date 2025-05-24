@@ -18,6 +18,42 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
 
     private readonly int[] imageKeys = new int[12] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
+    public override void Spawned()
+    {
+        base.Spawned();
+        StartCoroutine(LinkSteppingTiles());
+    }
+    
+    private IEnumerator LinkSteppingTiles()
+    {
+        bool isAllReady = false;
+        while (isAllReady == false)
+        {
+            yield return null;
+            foreach (var tile in steppingTiles)
+            {
+                if (tile == null)
+                {
+                    break;
+                }
+
+                isAllReady = true;
+            }
+        }
+
+        int len = steppingTiles.Length;
+        for (int i = 0; i < len; i++)
+        {
+            int next = i == len - 1 ? 0 : i + 1;
+            int prev = i == 0 ? len - 1 : i - 1;
+            
+            SteppingTile tile = steppingTiles[i];
+            tile.Next = steppingTiles[next];
+            //tile.Prev = steppingTiles[prev];
+        }
+        Debug.Log("Linked all stepping tiles.");
+    }
+
     public void InitBoard(NetworkPlayer[] players)
     {
         SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
