@@ -49,7 +49,7 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
             
             SteppingTile tile = steppingTiles[i];
             tile.Next = steppingTiles[next];
-            //tile.Prev = steppingTiles[prev];
+            tile.Prev = steppingTiles[prev];
         }
         Debug.Log("Linked all stepping tiles.");
     }
@@ -129,6 +129,7 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
             NetworkPlayer player = players[i];
             player.transform.position = tile.transform.position;
             player.currentTile = tile;
+            tile.StandingPlayer = player.playerRef;
         }
     }
 

@@ -9,8 +9,8 @@ public class InputHandler : NetworkBehaviour
     [SerializeField] private LayerMask clickLayer;
     
     public SelectingTile selectedTile;
-    public bool bCanInput = false;
-    
+    [Networked] public bool bCanInput { get; set; } = false;
+
     // 타일 선택 콜백 처리 -> NetworkPlayer에게 보내기
     public Action<SelectingTile> OnTileSelected;
     
@@ -71,6 +71,6 @@ public class InputHandler : NetworkBehaviour
     
     private void OnGUI()
     {
-        GUI.Label(new Rect(20, 300, 250, 30), $"Click Handled: {bClicked}");
+        GUI.Label(new Rect(20, 300, 250, 30), $"Clicked: {bClicked}");
     }
 }

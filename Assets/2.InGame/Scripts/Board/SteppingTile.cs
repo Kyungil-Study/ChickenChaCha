@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class SteppingTile : Tile, IAfterSpawned
 {
-    public SteppingTile Next ;
-    public SteppingTile Prev ;
+    public SteppingTile Next { get; set; }
+    public SteppingTile Prev { get; set; }
     public PlayerRef StandingPlayer { get; set; }
 
     public override void Spawned()

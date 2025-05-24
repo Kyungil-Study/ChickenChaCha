@@ -58,7 +58,6 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     public int playerIndex;
     public int tailCount;
     
-    
     public InputHandler inputHandler;
     public IPlayerState currentState;
     public SteppingTile currentTile;
