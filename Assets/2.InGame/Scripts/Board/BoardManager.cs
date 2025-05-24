@@ -18,15 +18,6 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
 
     private readonly int[] imageKeys = new int[12] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
-    public SteppingTile[] GetSteppingTiles()
-    {
-        return steppingTiles;
-    }
-    
-    public SelectingTile[] GetSelectingTiles()
-    {
-        return selectingTiles;
-    }
     public void InitBoard(NetworkPlayer[] players)
     {
         SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
@@ -52,12 +43,13 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
             for (int i = 0; i < 6; i++)
             {
                 int imageKey = rndKey[index];
-                var netObj = Runner.Spawn(steppingTilePrefab, initPosition);
-                steppingTiles[index] = netObj.GetComponent<SteppingTile>();
-                steppingTiles[index].SetImage(imageKey);
                 
                 TileInfo info = new TileInfo(ETileType.Stepping, index, imageKey);
-                steppingTiles[index].Info = info;
+                var netObj = Runner.Spawn(steppingTilePrefab, initPosition, onBeforeSpawned: (runner, o) =>
+                {
+                    Tile tile = o.GetComponent<Tile>();
+                    tile.Info = info;
+                });
                 
                 initPosition += direction * 2;
                 index++;
@@ -87,27 +79,23 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
                 int index = z + x * rowCount;
                 int imageKey = rndKey[index];
                 
-                var netObj = Runner.Spawn(selectingTilePrefab, offset + start + garo * x + sero * z);
-                selectingTiles[index] = netObj.GetComponent<SelectingTile>();
-                selectingTiles[index].SetImage(imageKey);
-                
                 TileInfo info = new TileInfo(ETileType.Selecting, index, imageKey);
-                selectingTiles[index].Info = info;
+                var netObj = Runner.Spawn(selectingTilePrefab, offset + start + garo * x + sero * z, onBeforeSpawned: (runner, o) =>
+                {
+                    Tile tile = o.GetComponent<Tile>();
+                    tile.Info = info;
+                });
             }
         }
     }
-
     
     public void InitPlayerPieces(NetworkPlayer[] players)
     {
-        
-    }
-
-    private NetworkObject SpawnPlayer(PlayerRef player, Vector3 position)
-    {
-        var obj = Runner.Spawn(playerPrefab, position, Quaternion.identity, player);
-        Runner.SetPlayerObject(player, obj);
-        return obj;
+        int div = steppingTiles.Length / players.Length;
+        for (int i = 0; i < players.Length; i++)
+        {
+            players[i].transform.position = steppingTiles[i * div].transform.position;
+        }
     }
 
     public void SubscribeAllSelectingTiles(Action<Tile> callback)

@@ -4,6 +4,7 @@ using Fusion;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 public enum ETileType
 {
@@ -27,10 +28,9 @@ public struct TileInfo : INetworkStruct
 
 public abstract class Tile : NetworkBehaviour
 {
-    private int ImageKey { get; set; }
-    [SerializeField] private Renderer renderer;
+    [FormerlySerializedAs("renderer")] [SerializeField] private new Renderer mRenderer;
     [Networked] public TileInfo Info { get; set; }
-
+    
     public override void Spawned()
     {
         SetImage(Info.imageKey);
@@ -38,12 +38,11 @@ public abstract class Tile : NetworkBehaviour
 
     public void SetImage(int key)
     {
-        renderer.material.mainTexture = BoardManager.Instance.tileTextures[key];
-        ImageKey = key;
+        mRenderer.material.mainTexture = BoardManager.Instance.tileTextures[key];
     }
 
     public bool IsSamePicture(Tile tile)
     {
-        return ImageKey == tile.ImageKey;
+        return Info.imageKey == tile.Info.imageKey;
     }
 }

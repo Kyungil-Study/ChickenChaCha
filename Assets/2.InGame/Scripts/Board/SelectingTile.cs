@@ -10,13 +10,14 @@ public class SelectingTile : Tile, IPointerClickHandler
     
     private static readonly int SHOW_FACE = Animator.StringToHash("ShowFace");
     private static readonly int HIDE_FACE = Animator.StringToHash("HideFace");
-    
 
     public Action<Tile> onClick;
+    
     public void OnPointerClick(PointerEventData eventData)
     {
         onClick?.Invoke(this);
     }
+    
     public void ShowFace()
     {
         anim.SetTrigger(SHOW_FACE);
@@ -30,10 +31,6 @@ public class SelectingTile : Tile, IPointerClickHandler
     public override void Spawned()
     {
         base.Spawned();
-        if (Runner.IsSharedModeMasterClient == false)
-        {
-            BoardManager.Instance.selectingTiles[Info.index] = this;
-        }
+        BoardManager.Instance.selectingTiles[Info.index] = this;
     }
-
 }

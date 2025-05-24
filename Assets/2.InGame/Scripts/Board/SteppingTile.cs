@@ -12,9 +12,6 @@ public class SteppingTile : Tile
     public override void Spawned()
     {
         base.Spawned();
-        if (Runner.IsSharedModeMasterClient == false)
-        {
-            BoardManager.Instance.steppingTiles[Info.index] = this;
-        }
+        BoardManager.Instance.steppingTiles[Info.index] = this;
     }
 }
