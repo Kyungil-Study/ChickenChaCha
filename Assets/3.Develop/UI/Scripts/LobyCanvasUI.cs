@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -11,9 +12,10 @@ public class LobyCanvasUI : MonoBehaviour
     [SerializeField] private GameObject createPanel;
     [Header("WaitImages")]
     [SerializeField] private GameObject[] waitImage;
-    
     [Header("NotifyText")]
     [SerializeField] private TextMeshProUGUI notifyText;
+    [Header("PartyMember")]
+    [SerializeField] private TextMeshProUGUI[] partyMemberText;
     
     private void Start()
     {
@@ -40,5 +42,10 @@ public class LobyCanvasUI : MonoBehaviour
     {
         // waitImage : 파티원에 따라 이미지 SetActive(true) 시킬 수 있도록
         // notifyText : 파티원 수에 따라 몇 명인지, 시간에 따라 ... 표시할 수 있도록
+    }
+
+    public void SetPartyMemberText(string partyMemberArgs)
+    {
+        // 파티 멤버 바뀌면 멤버 패널 바뀔 수 있도록
     }
 }
