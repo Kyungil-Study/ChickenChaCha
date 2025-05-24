@@ -64,11 +64,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
             tailPlayers = new List<NetworkPlayer>();
             var netObj = Runner.GetPlayerObject(tile.Next.StandingPlayer);
             var netPlayer = netObj.GetComponent<NetworkPlayer>();
-            if (netPlayer.tailCount != 0)
-            {
-                tailPlayers.Add(netPlayer);
-            }
-            
+            tailPlayers.Add(netPlayer);
             tile = tile.Next; // 있으면 그 다음 발판 확인
         }
         return tile;
