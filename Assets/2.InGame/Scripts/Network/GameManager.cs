@@ -6,8 +6,16 @@ using UnityEngine;
 
 public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlayerJoined
 {
-    public NetworkPlayer[] players;
-    private NetworkPlayer mActivePlayer;
+    public NetworkPlayer[] players = new NetworkPlayer[4];
+    public int playerCount = 0; // 현재 플레이어 수
+
+    [Networked] private int ActivePlayerIndex { get; set; }
+
+    private NetworkPlayer ActivePlayer
+    {
+        get => players[ActivePlayerIndex];
+        set => ActivePlayerIndex = value.PlayerIndex;
+    }
     private List<NetworkPlayer> mTailPlayers; // 여기 있는 애들한테 꼬리 뺐으면 됌.
 
     #region GameManager
@@ -27,11 +35,12 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     {
         Debug.Log("게임 시작");
         BoardManager.Instance.InitBoard(players);
-        players[0].ReceiveMovePermission(true);
-        mActivePlayer = players[0];
+        players[0].RPC_ReceiveMovePermission(true);
+        ActivePlayer = players[0];
     }
 
-    public void OpenTileResult(bool result)
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_OpenTileResult(bool result)
     {
         if (result)
         {
@@ -43,8 +52,10 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
             Debug.Log("오답입니다.");
             // 액티브 플레이어에게 오답 처리
             // 다음 턴으로 넘기기
-            mActivePlayer = players[(mActivePlayer.playerIndex + 1) % players.Length];
-            mActivePlayer.ReceiveMovePermission(true);
+            Debug.Log($"index : {ActivePlayer.PlayerIndex} / count : {playerCount}");
+            ActivePlayer.RPC_ReceiveMovePermission(false);
+            ActivePlayer = players[(ActivePlayer.PlayerIndex + 1) % playerCount];
+            ActivePlayer.RPC_ReceiveMovePermission(true);
         }
     }
     
@@ -84,12 +95,12 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
         //SteppingTile tile = null; //게임매니저에게서 발판 정보 받아오기
         //Tile selectTileInfo = null; //플레이어에게 선택 타일 정보 받아오기
         tile = GetMatchTile(tile);
-        if (tile.Next.IsSamePicture(selectTileInfo))
+        if (tile.IsSamePicture(selectTileInfo))
         {
-            OpenTileResult(true);
+            RPC_OpenTileResult(true);
             return true;
         }
-        OpenTileResult(false);
+        RPC_OpenTileResult(false);
         return false;
     }
     
@@ -97,14 +108,17 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     // 3. 뭘 맞춰야 하는지 확인 하는 코드
     public SteppingTile GetMatchTile(SteppingTile tile)
     {
-        while (tile.Next.StandingPlayer != PlayerRef.None) // 다음 발판의 사람이 있는지 여부
+        mTailPlayers = new List<NetworkPlayer>();
+        while (tile.StandingPlayer != PlayerRef.None)
         {
-            mTailPlayers = new List<NetworkPlayer>();
-            var netObj = Runner.GetPlayerObject(tile.Next.StandingPlayer);
+            var netObj = Runner.GetPlayerObject(tile.StandingPlayer);
+            Debug.Log(tile.StandingPlayer);
+            Debug.Log(netObj);
             var netPlayer = netObj.GetComponent<NetworkPlayer>();
             mTailPlayers.Add(netPlayer);
             tile = tile.Next; // 있으면 그 다음 발판 확인
         }
+        
         return tile;
     }
 

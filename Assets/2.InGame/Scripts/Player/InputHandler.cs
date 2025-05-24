@@ -8,7 +8,6 @@ public class InputHandler : NetworkBehaviour
 {
     [SerializeField] private LayerMask clickLayer;
     
-    public SelectingTile selectedTile;
     [Networked] public bool bCanInput { get; set; } = false;
 
     // 타일 선택 콜백 처리 -> NetworkPlayer에게 보내기
@@ -31,12 +30,6 @@ public class InputHandler : NetworkBehaviour
         {
             bClicked = true;
         }
-
-        if (Input.GetKey(KeyCode.Alpha1))   // 단축키로 선택한 타일 확인하기
-        {
-            Debug.Log(selectedTile);
-        }
-        
     }
     public override void FixedUpdateNetwork()
     {
@@ -53,11 +46,9 @@ public class InputHandler : NetworkBehaviour
             if (Physics.Raycast(ray, out var hit, Mathf.Infinity, clickLayer))
             {
                 var tile = hit.collider.gameObject.GetComponent<SelectingTile>();
-                Debug.Log($"[클릭한 타일] {hit.collider.name}");
                 
                 if (tile != null)
                 {
-                    selectedTile = tile;
                     // 콜백으로 처리 (직접 GameManager 호출 안 함)
                     OnTileSelected?.Invoke(tile);
                 }
