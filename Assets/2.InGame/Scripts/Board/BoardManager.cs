@@ -56,6 +56,10 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
 
     public void InitBoard(NetworkPlayer[] players)
     {
+        if (players.Length == 0)
+        {
+            players = FindObjectsByType<NetworkPlayer>(FindObjectsSortMode.InstanceID);
+        }
         SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
         SpawnSelectingTiles(4,3,transform.position, new Vector3(-3, 2.5f, -3),new Vector3(3, 2.5f, 3));
         InitPlayerPieces(players);
@@ -122,14 +126,23 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
     
     public void InitPlayerPieces(NetworkPlayer[] players)
     {
-        int div = steppingTiles.Length / players.Length;
-        for (int i = 0; i < players.Length; i++)
+        int playerCount = GameManager.Instance.playerCount;
+        int div = steppingTiles.Length / playerCount;
+        for (int i = 0; i < playerCount; i++)
         {
             SteppingTile tile = steppingTiles[i * div];
             NetworkPlayer player = players[i];
-            player.transform.position = tile.transform.position;
-            player.currentTile = tile;
-            tile.StandingPlayer = player.playerRef;
+
+            if (player == null)
+            {
+                break;
+            }
+            
+            player.RPC_TeleportTo(tile.transform.position);
+            
+            player.CurrentSteppingTile = tile;
+            Debug.Log($" {player.Ref}.CurrentSteppingTile : {tile.Info.index}");
+            tile.StandingPlayer = player.Ref;
         }
     }
 

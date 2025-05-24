@@ -39,6 +39,7 @@ public abstract class Tile : NetworkBehaviour
     public void SetImage(int key)
     {
         mRenderer.material.mainTexture = BoardManager.Instance.tileTextures[key];
+        Info = new TileInfo(Info.type, Info.index, key);
     }
 
     public bool IsSamePicture(Tile tile)
