@@ -11,7 +11,7 @@ public class UIFriendRequestItem : MonoBehaviour
     [SerializeField] private Toggle mAcceptToggle;
     [SerializeField] private Text mEmailText;
 
-    public UnityEvent<bool> OnAcceptToggleChanged = new UnityEvent<bool>();
+    public UnityEvent<bool, string> OnAcceptToggleChanged = new UnityEvent<bool, string>();
 
     public void Reset()
     {
@@ -24,7 +24,7 @@ public class UIFriendRequestItem : MonoBehaviour
         mEmailText.text = email;
     }
     
-    public void BindListner(UnityAction<bool> callback)
+    public void BindListner(UnityAction<bool,string> callback)
     {
         OnAcceptToggleChanged.RemoveAllListeners();
         mAcceptToggle.isOn = false;
@@ -38,7 +38,7 @@ public class UIFriendRequestItem : MonoBehaviour
 
     private void OnAcceptToggleValueChanged(bool value)
     {
-        OnAcceptToggleChanged?.Invoke(value);
+        OnAcceptToggleChanged?.Invoke(value, mEmailText.text);
     }
 
     

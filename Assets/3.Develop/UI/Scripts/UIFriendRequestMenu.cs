@@ -12,21 +12,28 @@ public class UIFriendRequestMenu : UISingleton<UIFriendRequestMenu>
     [SerializeField] private TMP_InputField mSearchInputField;
     
     [SerializeField] private Button mSearchButton;
-    public Button SearchButton => mSearchButton;
     [SerializeField] private TMP_Text mSearchLogText;
-    public TMP_Text SearchLogText => mSearchLogText;
     
     [SerializeField] private Button mRequestButton;
-    public Button RequestButton => mRequestButton;
     [SerializeField] private TMP_Text mRequestLogText;
-    public TMP_Text RequestLogText => mRequestLogText;
 
     public event Action<string> OnSearchButtonClicked;
+    public event Action OnRequestClicked;
 
     private void OnEnable()
     {
         UpdateSearchLog("");
         UpdateRequestLog("");
+    }
+    
+    void Start()
+    {
+        mSearchButton.onClick.AddListener(OnClickedSearchButton);
+    }
+
+    void OnClickedRequestButton()
+    {
+        OnRequestClicked?.Invoke();
     }
 
     void OnClickedSearchButton()
@@ -45,15 +52,4 @@ public class UIFriendRequestMenu : UISingleton<UIFriendRequestMenu>
         mRequestLogText.text = log;
     }
     
-    // Start is called before the first frame update
-    void Start()
-    {
-        mSearchButton.onClick.AddListener(OnClickedSearchButton);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
