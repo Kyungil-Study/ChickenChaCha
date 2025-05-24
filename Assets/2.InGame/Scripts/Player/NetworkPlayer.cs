@@ -58,7 +58,7 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
     public IPlayerState currentState;
     
     public GameObject tailModel;// 꽁지 모델 관리 오브젝트
-    [Networked, OnChangedRender(nameof(OnChangedTailCount))] public int NetworkedTailCount { get; set; }
+    [Networked, OnChangedRender(nameof(OnChangedTailCount))] public int networkedTailCount { get; set; }
 
     void OnChangedTailCount()
     {
@@ -96,7 +96,7 @@ public class NetworkPlayer : NetworkBehaviour, IToPlayer
     {
         if (currentState is ActiveState)
         {
-            GameManager.Instance.Showdown(Runner.LocalPlayer, tile);  // 인터페이스로 연결되어 있을 것
+            GameManager.Instance.SendSelectedTile(tile);  // 인터페이스로 연결되어 있을 것
         }
     }
     

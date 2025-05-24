@@ -10,7 +10,7 @@ public class RuleManager : DontDestroyOnNetwork<RuleManager>, IToRule
     public int PassPlayer(SteppingTile tile) // 플레이어를 앞질렀는지 확인하고 앞질렀으면 가져가게 될 꽁지 개수 리턴;
     {
         int tail = 0;
-        while (tile.Next.StandingPlayer != PlayerRef.None) // 다음 발판의 사람이 있는지 여부
+        while (tile.Next.StandingPlayer != null) // 다음 발판의 사람이 있는지 여부
         {
             tail += tile.StandingPlayer.PlayerId /*임시로 지정, 나중에 꼬리 개수를 확인하는 변수로 변환 예정*/;
             //tile.StandingPlayer.PlayerId = 0; // **꽁지 개수 0으로 변경하는 코드 작성 필요**

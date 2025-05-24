@@ -3,30 +3,95 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>
+public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlayerJoined
 {
+    
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<Tile, SteppingTile> mSteppingTileInfo => default;
 
-    [Networked] 
-    private NetworkDictionary<NetworkId, PlayerInfo> mNetworkPlayerDictionary => default;
-    
-    [Networked] 
-    private NetworkDictionary<NetworkId, TileInfo> mNetworkTileDictionary => default;
-    
-    public void AddDictionary<T>(NetworkId id, INetworkStruct networkStruct) where T : INetworkStruct
+    public void AddTile(Tile t, SteppingTile tile)
     {
-        
-        if (networkStruct is PlayerInfo playerInfo)
-        { 
-            mNetworkPlayerDictionary.Add(id, playerInfo);
+        mSteppingTileInfo.Add(t, tile);
+    }
+    
+    
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<Tile, SelectingTile> mSelectingTileInfo => default;
+    
+    
+    public void SendSelectedTile(PlayerRef player, SelectingTile tile)
+    {
+        bool result = RuleManager.Instance.OpenTile(new SteppingTile(), tile);
+        //SetPlayerState(player, result);
+    }
+    
+    public void SendSelectedTile(SelectingTile tile)
+    {
+        throw new NotImplementedException();
+    }
+
+    public SelectingTile GetSelectedTile()
+    {
+        throw new NotImplementedException();
+    }
+    
+    
+    // 에러 코드 주석 처리
+    // 에러코드 수정후
+    // 아래 파일 호출부도 복원해주세요.
+    // ScoreBoaurUI
+    // PlayerController 
+    /*
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<PlayerRef, PlayerInfo> mPlayerInfo => default;
+    
+    
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_AddPlayer(PlayerRef player)
+    {
+        if (mPlayerInfo.Count >= 4)
+        {
+            Debug.Log("더 이상 추가 할 수 없습니다.");
+            
+            return;
         }
 
-        if (networkStruct is TileInfo tileInfo)
-        {
-            mNetworkTileDictionary.Add(id, tileInfo);
-        }
-        Debug.Log("Added to dictionary: " + id);
+        PlayerInfo playerInfo = new PlayerInfo(player, false, 1);
+        Debug.Log($"{playerInfo.player} , {playerInfo.isActive}, {playerInfo.score}");
+        mPlayerInfo.Add(player, playerInfo);
     }
-     
+
+    public PlayerInfo? GetPlayerInfoOrNull(PlayerRef player)
+    {
+        if(mPlayerInfo.TryGet(player, out var value))
+        {
+            return value;
+        }
+        return null;
+    }
+
+    public PlayerInfo? GetLocalPlayerOrNull()
+    {
+        if(mPlayerInfo.TryGet(Runner.LocalPlayer, out var value))
+        {
+            return value;
+        }
+        return null;
+    }
+
+    public List<PlayerRef> GetPlayersInfo()
+    {
+        List<PlayerRef> players = new List<PlayerRef>();
+        foreach (var playerInfo in mPlayerInfo)
+        {
+            players.Add(playerInfo.Key);
+        }
+        return players;
+    }
+    
     public void SetPlayerState(PlayerRef Player, bool isActive)
     {
         if(Runner.TryGetPlayerObject(Player, out NetworkObject netObj))
@@ -37,107 +102,15 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         //     new PlayerInfo(mPlayerInfo[nextPlayer].player, isActive, mPlayerInfo[nextPlayer].score));
     }
     
-    public INetworkStruct GetNetWorkStrut <T>(NetworkId id)
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_DebugList()
     {
-        if (typeof(T) == typeof(PlayerInfo))
-        {
-            if (mNetworkPlayerDictionary.TryGet(id, out PlayerInfo networkStruct))
-            {
-                return networkStruct;
-            }
-        }
-
-        if (typeof(T) == typeof(TileInfo))
-        {
-            if (mNetworkTileDictionary.TryGet(id, out TileInfo networkStruct))
-            {
-                return networkStruct;
-            }
-        }
-        return null;
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            GameStart();
-        }
-    }
-
-    public void GameStart()
-    {
-        BoardManager bm = BoardManager.Instance;
-        bm.InitBoard();
-    }
-
-    private Tile FindTargetTile(PlayerRef player)
-    {
-        PlayerInfo pInfo = (PlayerInfo)GetNetWorkStrut<PlayerInfo>(Runner.GetPlayerObject(player));
-        TileInfo tInfo = (TileInfo)GetNetWorkStrut<TileInfo>(pInfo.steppingTile);
-        SteppingTile standing = BoardManager.Instance.steppingTiles[tInfo.index];
-
-        while (standing.StandingPlayer != PlayerRef.None)
-        {
-            standing = standing.Next;
-        }
-
-        return standing;
-    }
-
-    public void Showdown(PlayerRef player, Tile select)
-    {
-        Tile target = FindTargetTile(player);
-        if (target.IsSamePicture(select))
-        {
-            Success();
-        }
-        else
-        {
-            Fail();
-        }
-        void Success()
-        {
-            Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>().MovePlayer(target.transform.position);
-            
-            Debug.Log("Suck");
-        }
-
-        void Fail()
-        {
-            SetPlayerState(player, false);
         
-            PlayerRef nextPlayer = PlayerRef.None;
-            SetPlayerState(nextPlayer, true);
-            
-            Debug.Log("Fuck");
-        }
     }
-    
-    
-    
-    
-    // public PlayerInfo? GetPlayerInfoOrNull(PlayerRef player)
-    // {
-    //     foreach (var data in mNetworkDictionary)
-    //     {
-    //         if (data.Value is PlayerInfo playerInfo)
-    //         {
-    //             if (playerInfo.player == player)
-    //             {
-    //                 return playerInfo;
-    //             }
-    //         }
-    //     }
-    //        return null;
-    // }
-    //  
-    //  public INetworkStruct GetNetWorkStrut (NetworkId id)
-    //  {
-    //      if (mNetworkDictionary.TryGet(id, out INetworkStruct networkStruct))
-    //      {
-    //          return networkStruct;
-    //      }
-    //      return null;
-    //  }
+    */
+    public void PlayerJoined(PlayerRef player)
+    {
+        //RPC_AddPlayer(player);
+    }
 }
