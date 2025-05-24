@@ -14,7 +14,7 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
     public void PlayerJoined(PlayerRef player)
     {
         GameManagerSpawn();
-        // PlayerSpawn(player);
+        PlayerSpawn(player);
     }
 
     private void GameManagerSpawn()

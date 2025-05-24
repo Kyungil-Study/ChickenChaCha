@@ -4,18 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using Fusion;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 public class BoardManager : NetworkBehaviour
 {
     public static BoardManager Instance;
-    
     public GameObject steppingTilePrefab;
     public GameObject selectingTilePrefab;
-    public GameObject playerPrefab;
     public Texture2D[] tileTextures;
-    
     public SteppingTile[] steppingTiles = new SteppingTile[24];
     public SelectingTile[] selectingTiles = new SelectingTile[12];
+    public GameObject playerPrefab;
 
     private readonly int[] imageKeys = new int[12] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
@@ -31,11 +31,11 @@ public class BoardManager : NetworkBehaviour
         }
     }
 
-    public void InitBoard(PlayerRef[] players)
+    public void InitBoard()
     {
         SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
         SpawnSelectingTiles(4,3,transform.position, new Vector3(-3, 2.5f, -3),new Vector3(3, 2.5f, 3));
-        InitPlayerPieces(players);
+        InitPlayerPieces();
     }
 
     public void SpawnSteppingTiles(Vector3 zeroPosition)
@@ -55,25 +55,20 @@ public class BoardManager : NetworkBehaviour
         {
             for (int i = 0; i < 6; i++)
             {
-                int imageKey = rndKey[index];
                 var netObj = Runner.Spawn(steppingTilePrefab, initPosition);
                 steppingTiles[index] = netObj.GetComponent<SteppingTile>();
-                steppingTiles[index].SetImage(imageKey);
+                int imageKey = rndKey[index];
                 
+                steppingTiles[index].SetImage(imageKey);
                 TileInfo info = new TileInfo(ETileType.Stepping, index, imageKey);
                 steppingTiles[index].Info = info;
-                GameManager.Instance.AddDictionary<TileInfo>(netObj.Id, info);
+                //GameManager.Instance.RPC_AddDictionary(netObj.Id,info);
                 
                 initPosition += direction * 2;
                 index++;
             }
 
             return initPosition;
-        }
-        for (int i = 0; i < steppingTiles.Length; i++)
-        {
-            steppingTiles[i].Next = steppingTiles[(i + 1) % steppingTiles.Length];
-            steppingTiles[i].Prev = steppingTiles[(i - 1 + steppingTiles.Length) % steppingTiles.Length];
         }
     }
 
@@ -94,17 +89,15 @@ public class BoardManager : NetworkBehaviour
                 
                 var netObj = Runner.Spawn(selectingTilePrefab, offset + start + garo * x + sero * z);
                 selectingTiles[index] = netObj.GetComponent<SelectingTile>();
+                //GameManager.Instance.RPC_AddDictionary(netObj.Id, new TileInfo(ETileType.Selecting, index, imageKey));
                 selectingTiles[index].SetImage(imageKey);
-                
-                TileInfo info = new TileInfo(ETileType.Selecting, index, imageKey);
-                selectingTiles[index].Info = info;
-                GameManager.Instance.AddDictionary<TileInfo>(netObj.Id, info);
             }
         }
     }
 
-    public void InitPlayerPieces(PlayerRef[] players)
+    public void InitPlayerPieces()
     {
+        PlayerRef[] players = Runner.ActivePlayers.ToArray();
         int playerCount = players.Length;
 
         int div = steppingTiles.Length / playerCount;
@@ -113,19 +106,15 @@ public class BoardManager : NetworkBehaviour
         {
             SteppingTile tile = steppingTiles[i * div];
             PlayerRef player = players[i];
-            tile.StandingPlayer = player;
 
-            var obj = SpawnPlayer(player, tile.transform.position);
-            var y = obj.GetComponent<NetworkPlayer>();
-            y.currentTile = tile;
+            SpawnPlayer(player, tile.transform.position + transform.position);
+            tile.StandingPlayer = player;
         }
     }
 
-    private NetworkObject SpawnPlayer(PlayerRef player, Vector3 position)
+    private void SpawnPlayer(PlayerRef player, Vector3 position)
     {
-        var obj = Runner.Spawn(playerPrefab, position, Quaternion.identity, player);
-        Runner.SetPlayerObject(player, obj);
-        return obj;
+        Runner.Spawn(playerPrefab, position, Quaternion.identity, player);
     }
 
     public void SubscribeAllSelectingTiles(Action<Tile> callback)

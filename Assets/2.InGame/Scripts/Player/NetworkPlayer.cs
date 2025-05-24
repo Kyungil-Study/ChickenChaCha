@@ -52,11 +52,10 @@ public class WaitingState : IPlayerState
     }
 }
 
-public class NetworkPlayer : NetworkBehaviour//, IToPlayer
+public class NetworkPlayer : NetworkBehaviour, IToPlayer
 {
     public InputHandler inputHandler;
     public IPlayerState currentState;
-    public SteppingTile currentTile;
     
     public GameObject tailModel;// 꽁지 모델 관리 오브젝트
     [Networked, OnChangedRender(nameof(OnChangedTailCount))] public int NetworkedTailCount { get; set; }
@@ -68,10 +67,10 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
 
     public override void Spawned()
     {
-        // if (HasStateAuthority)
-        // {
-        //     Runner.SetPlayerObject(Runner.LocalPlayer, Object); // 게임 매니저가 이 오브젝트(Player)를 찾을 수 있도록하는 코드
-        // }
+        if (HasStateAuthority)
+        {
+            Runner.SetPlayerObject(Runner.LocalPlayer, Object); // 게임 매니저가 이 오브젝트(Player)를 찾을 수 있도록하는 코드
+        }
         inputHandler = GetComponent<InputHandler>();
         
         // 타일 선택 동작 위임 : 이벤트
@@ -95,23 +94,16 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     // 타일 선택 처리 (상태가 Active일 때만 처리)
     private void HandleTileSelected(SelectingTile tile)
     {
-        Debug.Log("HandleTileSelected");
         if (currentState is ActiveState)
         {
-            Debug.Log("if ActiveState");
             GameManager.Instance.Showdown(Runner.LocalPlayer, tile);  // 인터페이스로 연결되어 있을 것
         }
     }
     
     // 외부 매니저 클래스에서 상태 변경 가능하도록하는 메서드
-    public void MovePlayer(SteppingTile target)
+    public void MovePlayer(Vector3 position)
     {
-        transform.position = target.transform.position;
-        
-        // 현재 타일, 다음 타일, 플레이어
-        target.StandingPlayer = currentTile.StandingPlayer;
-        currentTile.StandingPlayer = PlayerRef.None;
-        currentTile = target;
+        transform.position = position;
     }
 
     public void ReceiveMovePermission(bool allowed)
