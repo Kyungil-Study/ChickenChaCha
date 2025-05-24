@@ -54,8 +54,10 @@ public class WaitingState : IPlayerState
 
 public class NetworkPlayer : NetworkBehaviour//, IToPlayer
 {
-    public int tailCount;
+    public PlayerRef playerRef;
     public int playerIndex;
+    public int tailCount;
+    
     
     public InputHandler inputHandler;
     public IPlayerState currentState;
@@ -103,7 +105,11 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
         Debug.Log("HandleTileSelected");
         if (currentState is ActiveState)
         {
-            
+            bool isSuccess = GameManager.Instance.OpenTile(currentTile, tile);
+            if (isSuccess)
+            {
+                MovePlayer(currentTile.Next);
+            }
         }
     }
     

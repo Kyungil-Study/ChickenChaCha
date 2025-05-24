@@ -35,7 +35,11 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
         if (player == Runner.LocalPlayer)
         {
             var playerObj = Runner.Spawn(playerPrefab);
-            playerObj.GetComponent<NetworkPlayer>().playerIndex = player.AsIndex - 1;
+            var netPlayer = playerObj.GetComponent<NetworkPlayer>();
+            netPlayer.playerRef = player;
+            netPlayer.playerIndex = player.AsIndex - 1;
+            netPlayer.tailCount = 1; // 초기 꼬리 개수 설정
+            netPlayer.ReceiveMovePermission(false);
             Runner.SetPlayerObject(player, playerObj);
         }
         
