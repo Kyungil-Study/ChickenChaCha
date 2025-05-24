@@ -90,6 +90,7 @@ GameObject:
   - component: {fileID: 4916665538084485777}
   - component: {fileID: 4424117316965942667}
   - component: {fileID: 4958942203988874128}
+  - component: {fileID: -5726844434365654014}
   m_Layer: 5
   m_Name: FriendRequestItem
   m_TagString: Untagged
@@ -155,6 +156,23 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &-5726844434365654014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3909455077174280644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c7e361ad596a9d4c9fa13e80d79dfe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mAcceptToggle: {fileID: 5264162487194634127}
+  mEmailText: {fileID: 4250922246718103606}
+  OnAcceptToggleChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &8119800379834319408
 GameObject:
   m_ObjectHideFlags: 0

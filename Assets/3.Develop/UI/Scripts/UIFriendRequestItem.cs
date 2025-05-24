@@ -18,11 +18,14 @@ public class UIFriendRequestItem : MonoBehaviour
         OnAcceptToggleChanged.RemoveAllListeners();
         mAcceptToggle.isOn = false;
     }
-    
-    public void BindListner(string email, UnityAction<bool> callback)
+
+    public void SetEmailtext(string email)
     {
         mEmailText.text = email;
-        
+    }
+    
+    public void BindListner(UnityAction<bool> callback)
+    {
         OnAcceptToggleChanged.RemoveAllListeners();
         mAcceptToggle.isOn = false;
         OnAcceptToggleChanged.AddListener(callback);
