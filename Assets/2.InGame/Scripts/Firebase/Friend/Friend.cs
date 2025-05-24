@@ -22,36 +22,34 @@ namespace _2.InGame.Scripts.Firebase.Friend
 
         public void OnSendFriendRequest()
         {
-            mFriendManager.SendFriendRequestByEmail(mInputFriendID.text, success =>
+            string emailToAdd = mInputFriendID.text;
+            mFriendManager.AddFriendByEmail(emailToAdd, success =>
             {
-                if (success) Debug.Log("요청 성공!");
-                else Debug.Log("요청 실패!");
+                Debug.Log(success ? "친구 추가 성공" : "친구 추가 실패");
             });
         }
     
         public void OnAcceptFriendRequest()
         {
-            mFriendManager.AcceptFriendRequestByEmail("상대 UID", success =>
-            {
-                if (success) Debug.Log("수락 완료!");
-            });
+            
         }
 
         public void OnRemoveFriend()
         {
-            mFriendManager.RemoveFriendByEmail(mInputFriendID.text, success =>
+            string emailToRemove = mInputFriendID.text;
+            mFriendManager.RemoveFriendByEmail(emailToRemove, success =>
             {
-                if (success) Debug.Log("삭제 완료!");
+                Debug.Log(success ? "친구 삭제 성공" : "친구 삭제 실패");
             });
         }
 
         public void OnGetFriendList()
         {
-            mFriendManager.GetFriendList(friendList =>
+            mFriendManager.GetFriendList(friendEmails =>
             {
-                foreach (var uid in friendList)
+                foreach (var email in friendEmails)
                 {
-                    Debug.Log("친구 UID: " + uid);
+                    Debug.Log("친구 이메일: " + email);
                 }
             });
         }

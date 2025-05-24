@@ -264,7 +264,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1867789317}
+      objectReference: {fileID: 0}
     - target: {fileID: 8663550698444813502, guid: 3828aa308ba8fd5469dd05cfef4d8b48,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -702,9 +702,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 568514319}
-        m_TargetAssemblyTypeName: _2.InGame.Scripts.Firebase.Friend.Friend, Assembly-CSharp
-        m_MethodName: OnRemoveFriend
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: AccountManagement, Assembly-CSharp
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -776,7 +776,6 @@ GameObject:
   - component: {fileID: 568514317}
   - component: {fileID: 568514316}
   - component: {fileID: 568514315}
-  - component: {fileID: 568514319}
   m_Layer: 5
   m_Name: Friend
   m_TagString: Untagged
@@ -813,7 +812,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -871,20 +870,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &568514319
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 568514314}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90ef3da1189685341b90a6a2e26707e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mFriendManager: {fileID: 1536517267}
-  mInputFriendID: {fileID: 1050456816}
 --- !u!1 &745139676
 GameObject:
   m_ObjectHideFlags: 0
@@ -1087,7 +1072,7 @@ GameObject:
   - component: {fileID: 1050456817}
   - component: {fileID: 1050456816}
   m_Layer: 5
-  m_Name: InputField (TMP)
+  m_Name: FriendInput
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1261,6 +1246,61 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1201945515
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1201945517}
+  - component: {fileID: 1201945516}
+  m_Layer: 0
+  m_Name: UserManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1201945516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201945515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cd7555e80c7ef94285c48698369ef55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputSignUpEmail: {fileID: 346233670}
+  inputSignUpPassword: {fileID: 1141247262}
+  inputSignUpNickname: {fileID: 1966782212}
+  buttonSignUp: {fileID: 1863868736}
+  inputLoginEmail: {fileID: 1737546246}
+  inputLoginPassword: {fileID: 1933674766}
+  buttonLogin: {fileID: 1705924728}
+  inputFriendEmail: {fileID: 1050456816}
+  buttonAddFriend: {fileID: 1354502006}
+  buttonRemoveFriend: {fileID: 257051033}
+  buttonShowFriends: {fileID: 2142578231}
+--- !u!4 &1201945517
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201945515}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1229268870
 GameObject:
   m_ObjectHideFlags: 0
@@ -1613,9 +1653,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 568514319}
-        m_TargetAssemblyTypeName: _2.InGame.Scripts.Firebase.Friend.Friend, Assembly-CSharp
-        m_MethodName: OnSendFriendRequest
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: AccountManagement, Assembly-CSharp
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1868,50 +1908,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   firstInput: {fileID: 1737546246}
---- !u!1 &1536517266
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1536517268}
-  - component: {fileID: 1536517267}
-  m_Layer: 0
-  m_Name: FriendManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1536517267
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1536517266}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d944d3adb5cc7bc40a76dbc5e6986404, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1536517268
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1536517266}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 274.68228, y: 172.49248, z: 401.88492}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1554634136
 GameObject:
   m_ObjectHideFlags: 0
@@ -1995,9 +1991,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 568514319}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: _2.InGame.Scripts.Firebase.Friend.Friend, Assembly-CSharp
-        m_MethodName: OnAcceptFriendRequest
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2216,57 +2212,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &1867789316
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1867789318}
-  - component: {fileID: 1867789317}
-  m_Layer: 0
-  m_Name: Firebase
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1867789317
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1867789316}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7d2d9a1d9f9495d499c2ad238e893496, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mInputLoginEmail: {fileID: 1737546246}
-  mInputLoginPassword: {fileID: 1933674766}
-  mInputSignUpEmail: {fileID: 346233670}
-  mInputSignUpPassword: {fileID: 1141247262}
-  mInputSignUpNickname: {fileID: 1966782212}
-  mButtonLogin: {fileID: 1705924728}
-  mButtonSignUp: {fileID: 1863868736}
---- !u!4 &1867789318
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1867789316}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 320, y: 180, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1933674766 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9030402508346744424, guid: 3828aa308ba8fd5469dd05cfef4d8b48,
@@ -2573,7 +2518,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1867789317}
+      objectReference: {fileID: 0}
     - target: {fileID: 8898412540960430330, guid: a7d216ce111b926479322df6f02dd383,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
@@ -2705,9 +2650,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 568514319}
-        m_TargetAssemblyTypeName: _2.InGame.Scripts.Firebase.Friend.Friend, Assembly-CSharp
-        m_MethodName: OnGetFriendList
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: AccountManagement, Assembly-CSharp
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2764,6 +2709,5 @@ SceneRoots:
   - {fileID: 127255140}
   - {fileID: 2134341802}
   - {fileID: 1421155697}
-  - {fileID: 1867789318}
-  - {fileID: 1536517268}
   - {fileID: 568514318}
+  - {fileID: 1201945517}

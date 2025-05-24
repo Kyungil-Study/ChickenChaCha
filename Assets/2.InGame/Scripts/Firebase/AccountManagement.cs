@@ -31,13 +31,16 @@ public class AccountManagement : MonoBehaviour
     private Dictionary<string, FirebaseAuth> mPlayerAuths = new Dictionary<string, FirebaseAuth>();
     private Dictionary<string, FirebaseFirestore> mPlayerFirestore = new Dictionary<string, FirebaseFirestore>();
     
+    private FriendManager mFriendManager;
+    [SerializeField] private TMP_InputField mInputFriendID;
     
-    private void Start()
+    
+    private void Awake()
     {
         mButtonLogin.interactable = false;
         mButtonSignUp.interactable = false;
         InitFirebase();
-
+        //mFriendManager = gameObject.AddComponent<FriendManager>();
     }
 
     private void InitFirebase()
@@ -70,6 +73,8 @@ public class AccountManagement : MonoBehaviour
         string password = mInputLoginPassword.text;
 
         SignIn(email, password);
+
+        mFriendManager = gameObject.AddComponent<FriendManager>();
 
     }
 
@@ -264,7 +269,10 @@ public class AccountManagement : MonoBehaviour
                     mStatusMessage = "로그인 성공";
                     mIsLoggedIn = true;
                     Debug.Log(mStatusMessage);
-
+                    
+                    Debug.Log("로그인 성공: " + newUser.Email);
+                    FriendManager.MyUid = newUser?.UserId;
+                    Debug.Log("CurrentUser: " + newUser?.Email);
                     LoadUserEmailAndPasswordFromFirestore(newUser.UserId, email);
                     //mLoginButton.OnStartButton();
                 }
@@ -357,6 +365,52 @@ public class AccountManagement : MonoBehaviour
                 {
                     Debug.LogWarning("Firestore에서 사용자 정보를 찾을 수 없습니다.");
                 }
+            }
+        });
+    }
+
+    public void OnSendFriendRequest()
+    {
+        if (mFriendManager == null)
+        {
+            Debug.LogError("FriendManager가 초기화되지 않았습니다.");
+            return;
+        }
+
+        // string friendEmail = mInputFriendID.text;
+        // mFriendManager.AddFriendByEmail(friendEmail, success =>
+        // {
+        //     Debug.Log(success ? "친구 추가 성공" : "친구 추가 실패");
+        // });
+        
+        string emailToAdd = mInputFriendID.text;
+        mFriendManager.AddFriendByEmail(emailToAdd, success =>
+        {
+            Debug.Log(success ? "친구 추가 성공" : "친구 추가 실패");
+        });
+    }
+    
+    public void OnAcceptFriendRequest()
+    {
+            
+    }
+
+    public void OnRemoveFriend()
+    {
+        string emailToRemove = mInputFriendID.text;
+        mFriendManager.RemoveFriendByEmail(emailToRemove, success =>
+        {
+            Debug.Log(success ? "친구 삭제 성공" : "친구 삭제 실패");
+        });
+    }
+
+    public void OnGetFriendList()
+    {
+        mFriendManager.GetFriendList(friendEmails =>
+        {
+            foreach (var email in friendEmails)
+            {
+                Debug.Log("친구 이메일: " + email);
             }
         });
     }
