@@ -57,11 +57,6 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
 
             return initPosition;
         }
-        for (int i = 0; i < steppingTiles.Length; i++)
-        {
-            steppingTiles[i].Next = steppingTiles[(i + 1) % steppingTiles.Length];
-            steppingTiles[i].Prev = steppingTiles[(i - 1 + steppingTiles.Length) % steppingTiles.Length];
-        }
     }
 
     public void SpawnSelectingTiles(int columnCount, int rowCount, Vector3 offset,Vector3 start, Vector3 end)
@@ -94,7 +89,10 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
         int div = steppingTiles.Length / players.Length;
         for (int i = 0; i < players.Length; i++)
         {
-            players[i].transform.position = steppingTiles[i * div].transform.position;
+            SteppingTile tile = steppingTiles[i * div];
+            NetworkPlayer player = players[i];
+            player.transform.position = tile.transform.position;
+            player.currentTile = tile;
         }
     }
 
