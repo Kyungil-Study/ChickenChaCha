@@ -4,10 +4,13 @@ using System.Linq;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>
+public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlayerJoined
 {
     public NetworkPlayer[] players;
-    
+    private NetworkPlayer mActivePlayer;
+    private List<NetworkPlayer> mTailPlayers; // 여기 있는 애들한테 꼬리 뺐으면 됌.
+
+    #region GameManager
     private void Update()
     {
         if (Runner.IsSharedModeMasterClient && Input.GetKeyDown(KeyCode.Space))
@@ -25,8 +28,41 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         Debug.Log("게임 시작");
         BoardManager.Instance.InitBoard(players);
         players[0].ReceiveMovePermission(true);
+        mActivePlayer = players[0];
     }
 
+    public void OpenTileResult(bool result)
+    {
+        if (result)
+        {
+            Debug.Log("정답입니다.");
+            // 액티브 플레이어에게 정답 처리
+        }
+        else
+        {
+            Debug.Log("오답입니다.");
+            // 액티브 플레이어에게 오답 처리
+            // 다음 턴으로 넘기기
+            mActivePlayer = players[(mActivePlayer.playerIndex + 1) % players.Length];
+            mActivePlayer.ReceiveMovePermission(true);
+        }
+    }
+    
+    public void PlayerJoined(PlayerRef player)
+    {
+        // UI에게 새로 접속한 플레이어 정보 전달
+        RPC_PlayerJoined(player);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    private void RPC_PlayerJoined(PlayerRef player)
+    {
+        
+    }
+    
+
+    #endregion
+    
     #region RuleManager
     
     // 1. 획득한 꽁지로 승리 판별 => 액티브 플레이어에게 1번의 정보를 리턴 후 꽁지 정보를 받아와 4개일 시 승리 판정 아닐시 게임 진행
@@ -50,21 +86,23 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         tile = GetMatchTile(tile);
         if (tile.Next.IsSamePicture(selectTileInfo))
         {
+            OpenTileResult(true);
             return true;
         }
+        OpenTileResult(false);
         return false;
     }
     
-    private List<NetworkPlayer> tailPlayers; // 여기 있는 애들한테 꼬리 뺐으면 됌.
+    
     // 3. 뭘 맞춰야 하는지 확인 하는 코드
     public SteppingTile GetMatchTile(SteppingTile tile)
     {
         while (tile.Next.StandingPlayer != PlayerRef.None) // 다음 발판의 사람이 있는지 여부
         {
-            tailPlayers = new List<NetworkPlayer>();
+            mTailPlayers = new List<NetworkPlayer>();
             var netObj = Runner.GetPlayerObject(tile.Next.StandingPlayer);
             var netPlayer = netObj.GetComponent<NetworkPlayer>();
-            tailPlayers.Add(netPlayer);
+            mTailPlayers.Add(netPlayer);
             tile = tile.Next; // 있으면 그 다음 발판 확인
         }
         return tile;
@@ -73,11 +111,15 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
     // 4.  뺏은 꼬리 개수만큼 액티브 플레이어에게 추가
     public void TakeTails(NetworkPlayer netPlayer)
     {
-        netPlayer.tailCount += tailPlayers.Count;
-        foreach (var netplayers in tailPlayers)
+        int takeCount = 0;
+        foreach (var netplayers in mTailPlayers)
         {
-            netplayers.tailCount--;
+            takeCount += netplayers.tailCount; // 꼬리 개수 합산
+            netplayers.tailCount = 0; // 꼬리 개수 초기화
         }
+        netPlayer.tailCount += takeCount; // 액티브 플레이어에게 꼬리 개수 추가
     }
     #endregion
+
+
 }
