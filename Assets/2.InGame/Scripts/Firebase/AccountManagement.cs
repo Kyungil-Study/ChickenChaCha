@@ -17,6 +17,7 @@ using UnityEngine.UI;
 public class AccountManagement : MonoBehaviour
 {
     private FirebaseAuth mAuth;
+    private FirebaseApp mApp;
     private FirebaseFirestore mFirestore;
     private bool mIsInitialized = false;
     private string mStatusMessage = "";
@@ -34,7 +35,6 @@ public class AccountManagement : MonoBehaviour
     //[FormerlySerializedAs("loginButton")] [SerializeField] private LoginButton mLoginButton;
     [FormerlySerializedAs("NotificationText")] [SerializeField] private TMP_Text mNotificationText;
     
-    private FirebaseApp mApp;
     
     private void Start()
     {
