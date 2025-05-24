@@ -1,12 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using Firebase;
 using Firebase.Firestore;
 using Firebase.Auth;
 using Firebase.Extensions;
+using Newtonsoft.Json.Linq;
 using TMPro;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -14,6 +17,7 @@ using UnityEngine.UI;
 public class AccountManagement : MonoBehaviour
 {
     private FirebaseAuth mAuth;
+    private FirebaseFirestore mFirestore;
     private bool mIsInitialized = false;
     private string mStatusMessage = "";
     private bool mIsLoggedIn = false;
@@ -30,42 +34,89 @@ public class AccountManagement : MonoBehaviour
     //[FormerlySerializedAs("loginButton")] [SerializeField] private LoginButton mLoginButton;
     [FormerlySerializedAs("NotificationText")] [SerializeField] private TMP_Text mNotificationText;
     
-    private Dictionary<string, FirebaseAuth> mPlayerAuths = new Dictionary<string, FirebaseAuth>();
-    private Dictionary<string, FirebaseFirestore> mPlayerFirestore = new Dictionary<string, FirebaseFirestore>();
-    
+    private FirebaseApp mApp;
     
     private void Start()
     {
         mButtonLogin.interactable = false;
         mButtonSignUp.interactable = false;
-        InitFirebase();
+        
+        InitFirebaseAsync();
+        //InitFirebase();
 
     }
 
-    private void InitFirebase()
+    private async void InitFirebaseAsync()
     {
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+        DependencyStatus dependencyStatus = await FirebaseApp.CheckAndFixDependenciesAsync();
+
+        if (dependencyStatus != DependencyStatus.Available)
         {
-            if (task.Result == DependencyStatus.Available)
-            {
-                FirebaseApp app = FirebaseApp.DefaultInstance;
-                mAuth = FirebaseAuth.DefaultInstance;
-                mIsInitialized = true;
-                mStatusMessage = "Firebase 초기화 성공";
-                Debug.Log(mStatusMessage);
+            mStatusMessage = $"Firebase 초기화 실패: {dependencyStatus}";
+            Debug.LogError(mStatusMessage);
+            return;
+        }
+        
+        mApp = await LoadFirebaseAppAsync(Guid.NewGuid().ToString());
 
-                // 초기화가 완료되면 버튼 활성화
-                mButtonLogin.interactable = true;
-                mButtonSignUp.interactable = true;
-            }
-            else
-            {
-                mStatusMessage = "Firebase 초기화 실패";
-                Debug.Log(mStatusMessage);
-            }
-        });
+        if (mApp == null)
+        {
+            mStatusMessage = "Firebase App 생성 실패";
+            Debug.LogError(mStatusMessage);
+            return;
+        }
+
+        mAuth = FirebaseAuth.GetAuth(mApp);
+        mFirestore = FirebaseFirestore.GetInstance(mApp);
+
+        mButtonLogin.interactable = true;
+        mButtonSignUp.interactable = true;
+
+        mIsInitialized = true;
     }
+    
+    private async Task<FirebaseApp> LoadFirebaseAppAsync(string appName)
+    {
+        const string jsonFileNameForDesktop = "google-services-desktop.json";
 
+        string jsonFileNameTarget = jsonFileNameForDesktop;
+        string filePath = Path.Combine(Application.streamingAssetsPath, jsonFileNameTarget);
+        
+        if (File.Exists(filePath) == false) 
+        {
+            Debug.LogError($"{jsonFileNameTarget} 없음.");
+            return null;
+        }
+        string jsonText = await File.ReadAllTextAsync(filePath);
+        JObject root = JObject.Parse(jsonText);
+
+        string projectId = root["project_info"]?["project_id"]?.ToString();
+        string storageBucket = root["project_info"]?["storage_bucket"]?.ToString();
+        string projectNumber = root["project_info"]?["project_number"]?.ToString();
+
+        var client = root["client"]?[0];
+        string appId = client?["client_info"]?["mobilesdk_app_id"]?.ToString();
+        string apiKey = client?["api_key"]?[0]?["current_key"]?.ToString();
+
+        if (string.IsNullOrEmpty(projectId) || string.IsNullOrEmpty(appId) || string.IsNullOrEmpty(apiKey))
+        {
+            Debug.LogError($"{jsonFileNameTarget} 파일 확인 필요");
+            return null;
+        }
+        
+        AppOptions options = new AppOptions
+        {
+            ProjectId = projectId,
+            StorageBucket = storageBucket,
+            AppId = appId,
+            ApiKey = apiKey,
+            MessageSenderId = projectNumber
+        };
+        
+        FirebaseApp app = FirebaseApp.Create(options, appName);
+        return app;
+    }
+    
     public void OnLoginButtonClicked()
     {
         string email = mInputLoginEmail.text;
@@ -74,29 +125,6 @@ public class AccountManagement : MonoBehaviour
         SignIn(email, password);
 
     }
-
-    // private void SignIn(string email, string password)
-    // {
-    //     mStatusMessage = "로그인 시도 중..."; 
-    //     Debug.Log(mStatusMessage);
-    //     mAuth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
-    //     {
-    //         if (task.IsCanceled || task.IsFaulted)
-    //         {
-    //             mStatusMessage = "로그인 실패: " + task.Exception?.Message;
-    //             Debug.Log(mStatusMessage);
-    //             return;
-    //         }
-    //
-    //         var result = task.Result;
-    //         FirebaseUser user = result.User;
-    //         MainSystem.Instance.SetUserData(user);
-    //         mIsLoggedIn = true;
-    //         mStatusMessage = $"로그인 성공: {user.Email}";
-    //         Debug.Log(mStatusMessage);
-    //     });
-    // }
-
     public void OnSignUpButtonClicked()
     {
         string email = mInputSignUpEmail.text;
@@ -115,23 +143,7 @@ public class AccountManagement : MonoBehaviour
                 return;
             }
 
-            // 고유한 FirebaseApp 생성 (플레이어마다)
-            FirebaseApp playerApp = FirebaseApp.Create(new AppOptions
-            {
-                ProjectId = FirebaseApp.DefaultInstance.Options.ProjectId,
-                ApiKey = FirebaseApp.DefaultInstance.Options.ApiKey,
-                AppId = FirebaseApp.DefaultInstance.Options.AppId
-            }, email);
-
-            // 각 플레이어의 FirebaseAuth와 Firestore 인스턴스 독립적 관리
-            FirebaseAuth playerAuth = FirebaseAuth.GetAuth(playerApp);
-            FirebaseFirestore firestore = FirebaseFirestore.GetInstance(playerApp);
-
-            // 플레이어 별로 FirebaseAuth, Firestore 저장
-            mPlayerAuths[email] = playerAuth;
-            mPlayerFirestore[email] = firestore;
-
-            playerAuth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
+            mAuth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
             {
                 if (task.IsCompleted && !task.IsFaulted)
                 {
@@ -158,13 +170,8 @@ public class AccountManagement : MonoBehaviour
     private void SaveUserToFirestore(string userId, string email, string hashedPassword, string nickname,
         string playerEmail)
     {
-        if (!mPlayerFirestore.ContainsKey(playerEmail))
-        {
-            Debug.LogError("Firestore 인스턴스를 찾을 수 없습니다.");
-            return;
-        }
 
-        FirebaseFirestore db = mPlayerFirestore[playerEmail];
+        FirebaseFirestore db = mFirestore;
         DocumentReference userDocRef = db.Collection("users").Document(userId);
 
         Dictionary<string, object> userData = new Dictionary<string, object>
@@ -207,22 +214,7 @@ public class AccountManagement : MonoBehaviour
                 return;
             }
 
-            // 고유한 FirebaseApp 생성 (플레이어마다)
-            FirebaseApp playerApp = FirebaseApp.Create(new AppOptions
-            {
-                ProjectId = FirebaseApp.DefaultInstance.Options.ProjectId,
-                ApiKey = FirebaseApp.DefaultInstance.Options.ApiKey,
-                AppId = FirebaseApp.DefaultInstance.Options.AppId
-            }, email);
-
-            // 각 플레이어의 FirebaseAuth와 Firestore 인스턴스 독립적 관리
-            FirebaseAuth playerAuth = FirebaseAuth.GetAuth(playerApp);
-            FirebaseFirestore firestore = FirebaseFirestore.GetInstance(playerApp);
-
-            mPlayerAuths[email] = playerAuth;
-            mPlayerFirestore[email] = firestore;
-
-            playerAuth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
+            mAuth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
             {
 
                 if (task.IsFaulted)
@@ -282,13 +274,13 @@ public class AccountManagement : MonoBehaviour
     // Firestore에서 사용자 이메일과 비밀번호 불러오기 (사용자별 Firestore 사용)
     private void LoadUserEmailAndPasswordFromFirestore(string userId, string email)
     {
-        if (!mPlayerFirestore.ContainsKey(email))
+        if (mFirestore == null)
         {
             Debug.LogError("Firestore 인스턴스를 찾을 수 없습니다.");
             return;
         }
 
-        FirebaseFirestore db = mPlayerFirestore[email];
+        FirebaseFirestore db = mFirestore;
         DocumentReference userDocRef = db.Collection("users").Document(userId);
 
         userDocRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
