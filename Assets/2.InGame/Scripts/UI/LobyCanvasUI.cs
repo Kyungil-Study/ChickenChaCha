@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class PartyCanvasController : MonoBehaviour
+public class LobyCanvasUI : MonoBehaviour
 {
     [Header("Buttons")]
     [SerializeField] private Button createButton;
