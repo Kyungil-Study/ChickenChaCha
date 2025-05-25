@@ -153,6 +153,7 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         transform.position = targetTile.transform.position;
         GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile, Runner.LocalPlayer);
         CurrentSteppingTile = targetTile;
+        transform.forward = targetTile.Next.transform.position - targetTile.transform.position;
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
