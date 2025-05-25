@@ -14,8 +14,25 @@ using TMPro;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
+
+
 public class AccountManagement : MonoBehaviour
 {
+    private static AccountManagement mInstance;
+    public static AccountManagement Instance
+    {
+        get
+        {
+            if (mInstance == null)
+            {
+                mInstance = FindObjectOfType<AccountManagement>();
+            }
+            return mInstance;
+        }
+    }
+
+    public event Action<OnLogInEventArgs> OnLogInEvent;
+    
     private FirebaseAuth mAuth;
     private FirebaseApp mApp;
     private FirebaseFirestore mFirestore;
@@ -23,23 +40,12 @@ public class AccountManagement : MonoBehaviour
     private string mStatusMessage = "";
     private bool mIsLoggedIn = false;
     
-    [FormerlySerializedAs("inputLoginEmail")] [SerializeField] private TMP_InputField mInputLoginEmail; // TMP_InputField로 변경
-    [FormerlySerializedAs("inputLoginPassword")] [SerializeField] private TMP_InputField mInputLoginPassword; // TMP_InputField로 변경
-    [FormerlySerializedAs("inputSignUpEmail")] [SerializeField] private TMP_InputField mInputSignUpEmail; // TMP_InputField로 변경
-    [FormerlySerializedAs("inputSignUpPassword")] [SerializeField] private TMP_InputField mInputSignUpPassword; // TMP_InputField로 변경
-    [FormerlySerializedAs("inputSignUpNickname")] [SerializeField] private TMP_InputField mInputSignUpNickname; // TMP_InputField로 변경
-    
-    [FormerlySerializedAs("buttonStart")] [SerializeField] private Button mButtonLogin;
-    [FormerlySerializedAs("buttonSignUp")] [SerializeField] private Button mButtonSignUp;
-    
-    //[FormerlySerializedAs("loginButton")] [SerializeField] private LoginButton mLoginButton;
     [FormerlySerializedAs("NotificationText")] [SerializeField] private TMP_Text mNotificationText;
-    
     
     private void Start()
     {
-        mButtonLogin.interactable = false;
-        mButtonSignUp.interactable = false;
+        /*mButtonLogin.interactable = false;
+        mButtonSignUp.interactable = false;*/
         
         InitFirebaseAsync();
         //InitFirebase();
@@ -69,8 +75,8 @@ public class AccountManagement : MonoBehaviour
         mAuth = FirebaseAuth.GetAuth(mApp);
         mFirestore = FirebaseFirestore.GetInstance(mApp);
 
-        mButtonLogin.interactable = true;
-        mButtonSignUp.interactable = true;
+        /*mButtonLogin.interactable = true;
+        mButtonSignUp.interactable = true;*/
 
         mIsInitialized = true;
     }
@@ -116,21 +122,24 @@ public class AccountManagement : MonoBehaviour
         FirebaseApp app = FirebaseApp.Create(options, appName);
         return app;
     }
-    
-    public void OnLoginButtonClicked()
-    {
-        string email = mInputLoginEmail.text;
-        string password = mInputLoginPassword.text;
 
-        SignIn(email, password);
+    public void OnLogIn(FirebaseUser user)
+    {
+        OnLogInEventArgs args = new OnLogInEventArgs()
+        {
+            UserID = user.UserId ?? "Unknown User"
+        };
+        OnLogInEvent?.Invoke(args);
+    }
+    
+    public void OnLoginButtonClicked(OnSignInEventArgs args)
+    {
+        SignIn(args.Email, args.Password);
 
     }
-    public void OnSignUpButtonClicked()
+    public void OnSignUpButtonClicked(OnSignUpEventArgs args)
     {
-        string email = mInputSignUpEmail.text;
-        string password = mInputSignUpPassword.text;
-        string nickname = mInputSignUpNickname.text;
-        CreateAccount(email, password, nickname);
+        CreateAccount(args.Email, args.Password, args.Nickname);
     }
 
     private void CreateAccount(string email, string password, string nickname)
@@ -151,6 +160,8 @@ public class AccountManagement : MonoBehaviour
                     mStatusMessage = "회원가입 성공";
 
                     SaveUserToFirestore(newUser.UserId, email, HashPassword(password), nickname, email);
+                    
+                    OnLogIn(newUser);
                 }
                 else
                 {
@@ -260,6 +271,8 @@ public class AccountManagement : MonoBehaviour
                     Debug.Log(mStatusMessage);
 
                     LoadUserEmailAndPasswordFromFirestore(newUser.UserId, email);
+
+                    OnLogIn(newUser);
                     //mLoginButton.OnStartButton();
                 }
 
