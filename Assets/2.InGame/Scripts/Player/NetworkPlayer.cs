@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Fusion;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // 플레이어 데이터, 애니메이션 등 처리하기
 
@@ -60,9 +61,11 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     [Networked] public PlayerRef Ref { get; set; }
     [Networked] public int PlayerIndex { get; set; }
     public NetworkTransform networkTransform;
-    public int tailCount;
+    //public int tailCount;
     public GameObject tailModel;// 꽁지 모델 관리 오브젝트
-    [Networked, OnChangedRender(nameof(OnChangedTailCount))] public int NetworkedTailCount { get; set; }
+    
+    [Networked, OnChangedRender(nameof(OnChangedTailCount))] 
+    public int tailCount{ get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
     
     public InputHandler inputHandler;
     public IPlayerState currentState;
@@ -82,8 +85,16 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
 
     void OnChangedTailCount()
     {
-        
-    }
+        if (GameManager.Instance.CheckTail(tailCount))
+        {
+            Debug.Log("Winning!");
+        }
+        else
+        {
+            Debug.Log("Continue playing...");
+        }
+
+}
 
     private void Update()
     {
@@ -135,11 +146,11 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     {
         if (currentState is ActiveState)
         {
-            var targetTile = GameManager.Instance.GetMatchTile(CurrentSteppingTile);
-            bool isSuccess = GameManager.Instance.OpenTile(CurrentSteppingTile, tile);
+            var currentTile = GameManager.Instance.GetMatchTile(CurrentSteppingTile);
+            bool isSuccess = GameManager.Instance.OpenTile(currentTile, tile);
             if (isSuccess)
             {
-                MoveTo(targetTile);
+                MoveTo(currentTile);
             }
         }
     }

@@ -4,7 +4,7 @@ using System.Linq;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlayerJoined
+public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
 {
     public NetworkPlayer[] players = new NetworkPlayer[4];
     public int playerCount = 0; // 현재 플레이어 수
@@ -16,7 +16,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
         get => players[ActivePlayerIndex];
         set => ActivePlayerIndex = value.PlayerIndex;
     }
-    private List<NetworkPlayer> mTailPlayers; // 여기 있는 애들한테 꼬리 뺐으면 됌.
+    public List<NetworkPlayer> mTailPlayers; // 여기 있는 애들한테 꼬리 뺐으면 됌.
 
     #region GameManager
     private void Update()
@@ -37,6 +37,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
         BoardManager.Instance.InitBoard(players);
         players[0].RPC_ReceiveMovePermission(true);
         ActivePlayer = players[0];
+        mTailPlayers = new List<NetworkPlayer>();
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -90,7 +91,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     public bool CheckTail(int tailCount) //이 함수가 true면 승리, false면 진행 혹은 패배
     {
         // 사전 작업: PassPlayer로 꽁지 개수 플레이어에게 전달해주기
-        if (tailCount >= 4) // 플레이어 꽁지 개수 확인, 후에 == 4로 변경 예정
+        if (tailCount >= players.Count(player => player != null)) // 플레이어 꽁지 개수 확인, 후에 == 4로 변경 예정
         {
             return true; // 꽁지가 4개면 true 리턴
         }
@@ -103,10 +104,18 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     {
         //SteppingTile tile = null; //게임매니저에게서 발판 정보 받아오기
         //Tile selectTileInfo = null; //플레이어에게 선택 타일 정보 받아오기
-        tile = GetMatchTile(tile);
         if (tile.IsSamePicture(selectTileInfo))
         {
             RPC_OpenTileResult(true);
+            //TakeTails(Runner.LocalPlayer);
+            int takeCount = 0;
+            foreach (var netplayers in mTailPlayers)
+            {
+                takeCount += netplayers.tailCount; // 꼬리 개수 합산
+                RPC_ResetTails(netplayers.Ref);
+            }
+            TakeTails(Runner.LocalPlayer, takeCount);
+            //mTailPlayers.Clear();
             return true;
         }
         RPC_OpenTileResult(false);
@@ -117,10 +126,9 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
     // 3. 뭘 맞춰야 하는지 확인 하는 코드
     public SteppingTile GetMatchTile(SteppingTile tile)
     {
-        mTailPlayers = new List<NetworkPlayer>();
-        while (tile.StandingPlayer != PlayerRef.None)
+        while (tile.Next.StandingPlayer != PlayerRef.None) // "나 자신"은 예외 처리 해야 함
         {
-            var netObj = Runner.GetPlayerObject(tile.StandingPlayer);
+            var netObj = Runner.GetPlayerObject(tile.Next.StandingPlayer);
             Debug.Log(tile.StandingPlayer);
             Debug.Log(netObj);
             var netPlayer = netObj.GetComponent<NetworkPlayer>();
@@ -128,19 +136,21 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlaye
             tile = tile.Next; // 있으면 그 다음 발판 확인
         }
         
-        return tile;
+        return tile.Next;
     }
 
     // 4.  뺏은 꼬리 개수만큼 액티브 플레이어에게 추가
-    public void TakeTails(NetworkPlayer netPlayer)
+    public void TakeTails(PlayerRef player, int takeCount)
     {
-        int takeCount = 0;
-        foreach (var netplayers in mTailPlayers)
-        {
-            takeCount += netplayers.tailCount; // 꼬리 개수 합산
-            netplayers.tailCount = 0; // 꼬리 개수 초기화
-        }
+        var netPlayer = Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>();
         netPlayer.tailCount += takeCount; // 액티브 플레이어에게 꼬리 개수 추가
+    }
+    
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_ResetTails(PlayerRef resetPlayer)
+    {
+        var resetNetPlayer = Runner.GetPlayerObject(resetPlayer).GetComponent<NetworkPlayer>();
+        resetNetPlayer.tailCount = 0;
     }
     #endregion
 
