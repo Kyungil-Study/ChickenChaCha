@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Firebase.Extensions;
 using Fusion;
 using Fusion.Sockets;
 using Unity.VisualScripting;
@@ -14,9 +15,12 @@ using UnityEngine.Serialization;
 public enum GameSessionState
 {
     Ready,
+    Login,
     Lobby,
-    Match,
-    InGame
+    MatchMaking,
+    Room,
+    InGame,
+    Result
 }
 
 public class GameClient
@@ -50,18 +54,32 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     private NetworkRunner mNetworkRunner;
     private NetworkSceneManagerDefault mNetworkSceneManager;
     
-    private GameSessionState mGameState = GameSessionState.Ready;
-    public GameSessionState GameState
-    {
-        get { return mGameState; }
-        set { mGameState = value; }
-    }
+    private GameSessionState mSessionState = GameSessionState.Ready;
 
+    public class Callbacks
+    {
+        public Action OnEnteredLobby;
+        public Action OnLeftLobby;
+        
+        public Action OnEnteredMatchMaking;
+        public Action OnLeftMatchMaking;
+        
+        public Action OnEnteredRoom;
+        public Action OnLeftRoom;
+        
+        public Action OnEnteredInGame;
+        public Action OnLeftInGame;
+        
+        public Action OnEnteredResult;
+        public Action OnLeftResult;
+    }
+    
+    public Callbacks callbacks = new Callbacks();
+    
     private void Awake()
     {
         AccountManagement.Instance.OnLogInEvent += OnLogIn;
     }
-    
     
     private async Task InitRunnerAsync()
     {
@@ -85,32 +103,67 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
 
     public async void EnterLobbyAsync()
     {
-        if (mNetworkRunner != null)
-        {
-            Destroy(mNetworkRunner);
-        }
-        if(mNetworkSceneManager != null)
-        {
-            Destroy(mNetworkSceneManager);
-        }
-        
-        await Task.Delay(1000);
-        
         if (mNetworkRunner == null)
         {
             await InitRunnerAsync();
         }
         
+        mSessionState = GameSessionState.Lobby;
+        callbacks.OnEnteredLobby?.Invoke();
+    }
+
+    public async void EnterMatchMakingAsync()
+    {
+        if (mSessionState == GameSessionState.MatchMaking)
+        {
+            return;
+        }
+        
+        if (mNetworkRunner == null)
+        {
+            Debug.LogAssertion($"<color=red>[SessionManager] StartMatchMakingAsync ::: NetworkRunner가 초기화되지 않았습니다.</color>");
+            return;
+        }
+        
+        mSessionState = GameSessionState.MatchMaking;
+        
         Debug.Log($"[SessionManager] StartMatchMaking ::: 세션 리스트 요청 중...");
         StartGameResult result = await mNetworkRunner.JoinSessionLobby(sessionLobby: SessionLobby.Shared);
-        Debug.Log($"[SessionManager] JoinSessionLobby Result = {result.ToString()}");
+        if (result.Ok)
+        {
+            Debug.LogError($"[SessionManager] StartMatchMakingAsync ::: 세션 리스트 요청 실패, result = {result}");
+            return;
+        }
+        Debug.Log("[SessionManager] JoinSessionLobby Success");
 
-        mGameState = GameSessionState.Lobby;
+        mSessionState = GameSessionState.Room;
+        callbacks.OnEnteredRoom?.Invoke();
+    }
+
+    public async void LeaveMatchMakingAsync()
+    {
+        if (mNetworkRunner == null)
+        {
+            Debug.LogAssertion($"<color=red>[SessionManager] LeaveMatchMakingAsync ::: NetworkRunner가 초기화되지 않았습니다.</color>");
+            return;
+        }
+        mSessionState = GameSessionState.Lobby;
+        await mNetworkRunner.Shutdown();
+
+        callbacks.OnLeftRoom?.Invoke();
     }
 
     private void OnLogIn(OnLogInEventArgs eventArgs)
     {
+        // 중복요청 제외
+        if (mSessionState == GameSessionState.Login)
+        {
+            return;
+        }
+
         Debug.Log($"[SessionManager] OnSignIn ::: 유저 이름 = {eventArgs.UserID}");
+            
+        mSessionState = GameSessionState.Login;
         EnterLobbyAsync();
     }
     
