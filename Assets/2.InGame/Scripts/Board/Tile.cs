@@ -23,7 +23,7 @@ public struct TileInfo : INetworkStruct
 
 public abstract class Tile : NetworkBehaviour
 {
-    [SerializeField] private new Renderer mRenderer;
+    [SerializeField] private Renderer mRenderer;
     [Networked] public TileInfo Info { get; set; }
 
     public override void Spawned()
