@@ -22,31 +22,19 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
 
     private IEnumerator LinkSteppingTiles()
     {
-        bool isAllReady = false;
-        while (isAllReady == false)
+        while (steppingTiles.Any(tile => tile == null))
         {
             yield return null;
-            foreach (var tile in steppingTiles)
-            {
-                if (tile == null)
-                {
-                    break;
-                }
-
-                isAllReady = true;
-            }
         }
+
         Debug.Log("All stepping tiles are ready. Linking...");
 
         int len = steppingTiles.Length;
-        Debug.Log("Stepping tiles length: " + len);
         for (int i = 0; i < len; i++)
         {
-            Debug.Log("Linking stepping tile " + i);
             int next = i == len - 1 ? 0 : i + 1;
             int prev = i == 0 ? len - 1 : i - 1;
 
-            Debug.Log($"Next: {next} {steppingTiles[next] == null}");
             SteppingTile tile = steppingTiles[i];
             tile.Next = steppingTiles[next];
             tile.Prev = steppingTiles[prev];
@@ -61,22 +49,30 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
         {
             players = FindObjectsByType<NetworkPlayer>(FindObjectsSortMode.InstanceID);
         }
-        SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
-        SpawnSelectingTiles(4, 3, transform.position, new Vector3(-3, 2.5f, -3), new Vector3(3, 2.5f, 3));
+
+        StartCoroutine(InitBoardCoroutine(players));
+    }
+
+    private IEnumerator InitBoardCoroutine(NetworkPlayer[] players)
+    {
+        yield return StartCoroutine(SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6)));
+        yield return StartCoroutine(SpawnSelectingTiles(4, 3, transform.position, new Vector3(-3, 2.5f, -3),
+            new Vector3(3, 2.5f, 3)));
         InitPlayerPieces(players);
     }
 
     private void SpawnTile(GameObject prefab, Vector3 position, TileInfo info)
     {
-        var netObj = Runner.Spawn(prefab, position, onBeforeSpawned: (runner, o) =>
+        var netObj = Runner.Spawn(prefab, position + Vector3.up * 2f, onBeforeSpawned: (runner, o) =>
         {
             Tile tile = o.GetComponent<Tile>();
             tile.Info = info;
         });
     }
 
-    private void SpawnSteppingTiles(Vector3 zeroPosition)
+    private IEnumerator SpawnSteppingTiles(Vector3 zeroPosition)
     {
+        var wait = new WaitForSeconds(0.05f);
         int index = 0;
 
         int[] firstBag = RandomUtil.GetShuffled(imageKeys);
@@ -85,12 +81,12 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
 
         Vector3 position = zeroPosition;
 
-        SpawnLine(Vector3.forward);
-        SpawnLine(Vector3.right);
-        SpawnLine(Vector3.back);
-        SpawnLine(Vector3.left);
+        yield return StartCoroutine(SpawnLine(Vector3.forward));
+        yield return StartCoroutine(SpawnLine(Vector3.right));
+        yield return StartCoroutine(SpawnLine(Vector3.back));
+        yield return StartCoroutine(SpawnLine(Vector3.left));
 
-        void SpawnLine(Vector3 direction)
+        IEnumerator SpawnLine(Vector3 direction)
         {
             for (int i = 0; i < 6; i++)
             {
@@ -98,6 +94,7 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
 
                 TileInfo info = new TileInfo(ETileType.Stepping, index, imageKey);
                 SpawnTile(steppingTilePrefab, position, info);
+                yield return wait;
 
                 position += direction * 2;
                 index++;
@@ -105,8 +102,9 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
         }
     }
 
-    private void SpawnSelectingTiles(int columnCount, int rowCount, Vector3 offset, Vector3 start, Vector3 end)
+    private IEnumerator SpawnSelectingTiles(int columnCount, int rowCount, Vector3 offset, Vector3 start, Vector3 end)
     {
+        var wait = new WaitForSeconds(0.05f);
         Vector3 diff = end - start;
         Vector3 garo = Vector3.right * diff.x / (columnCount - 1);
         Vector3 sero = Vector3.forward * diff.z / (rowCount - 1);
@@ -122,6 +120,7 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
 
                 TileInfo info = new TileInfo(ETileType.Selecting, index, imageKey);
                 SpawnTile(selectingTilePrefab, offset + start + garo * x + sero * z, info);
+                yield return wait;
             }
         }
     }
