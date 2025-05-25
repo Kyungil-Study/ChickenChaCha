@@ -113,7 +113,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.00030517578, y: -0.67297363}
+  m_AnchoredPosition: {x: -0.00024414062, y: -0.67297363}
   m_SizeDelta: {x: 528.19507, y: 60.2442}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &2213879718643791394
@@ -500,7 +500,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mPlayerUI: {fileID: 5529438729744871132}
   mScoreBoardUI: {fileID: 3155783408701852173}
-  mTurnUI: {fileID: 0}
+  mTurnUI: {fileID: 5640752917473430172}
 --- !u!114 &5529438729744871132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -513,7 +513,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb2a29b30fb437345bed4681eac05237, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mPlayerNameText: {fileID: 0}
+  mPlayerNameText: {fileID: 5962771225483824144}
 --- !u!114 &3155783408701852173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -527,10 +527,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mPlayerScores:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 4868192930333482757}
+  - {fileID: 8834704661223301589}
+  - {fileID: 8851834060689641476}
+  - {fileID: 9028720400123399787}
 --- !u!114 &5640752917473430172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -543,7 +543,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3931e620b751354b94d9ba76692e74c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mPlayerNameText: {fileID: 0}
+  mPlayerNameText: {fileID: 7287857017699389188}
 --- !u!1 &4139956127624631994
 GameObject:
   m_ObjectHideFlags: 0

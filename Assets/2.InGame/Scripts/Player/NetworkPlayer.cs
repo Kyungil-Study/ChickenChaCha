@@ -5,6 +5,7 @@ using Fusion;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
+using TMPro;
 
 // 플레이어 데이터, 애니메이션 등 처리하기
 
@@ -70,6 +71,7 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     public InputHandler inputHandler;
     public IPlayerState currentState;
 
+
     [Networked] private int CurrentSteppingTileIndex { get; set; }
     public SteppingTile CurrentSteppingTile
     {
@@ -118,7 +120,10 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
         SetState(new WaitingState()); // 초기 상태는 대기로
 
         StartCoroutine(RegisterPlayer());
-    }
+        UIAdapter.Instance.SetLocalPlayerName($"{Ref.PlayerId}");
+    } 
+    
+
     private IEnumerator RegisterPlayer()
     {
         yield return new WaitForSeconds(0.1f);
@@ -159,7 +164,7 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     public void MoveTo(SteppingTile targetTile)
     {
         transform.position = targetTile.transform.position;
-        GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile);
+        GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile, Runner.LocalPlayer);
         CurrentSteppingTile = targetTile;
     }
 
@@ -177,6 +182,4 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     {
         networkTransform.Teleport(position);
     }
-    
-    
 }

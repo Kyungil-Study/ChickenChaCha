@@ -37,6 +37,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
         BoardManager.Instance.InitBoard(players);
         players[0].RPC_ReceiveMovePermission(true);
         ActivePlayer = players[0];
+        turnPlayer = ActivePlayer;
         mTailPlayers = new List<NetworkPlayer>();
     }
 
@@ -55,18 +56,38 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
             // 다음 턴으로 넘기기
             Debug.Log($"index : {ActivePlayer.PlayerIndex} / count : {playerCount}");
             ActivePlayer.RPC_ReceiveMovePermission(false);
+            
             ActivePlayer = players[(ActivePlayer.PlayerIndex + 1) % playerCount];
+            turnPlayer = ActivePlayer;
             ActivePlayer.RPC_ReceiveMovePermission(true);
         }
     }
+
+    [Networked, OnChangedRender(nameof(OnChangedTurn))]
+    public NetworkPlayer turnPlayer { get; set; } // 현재 턴 인덱스, OnChangedRender로 변경 감지
+    public void OnChangedTurn()
+    {
+        UIAdapter.Instance.SetTurnPlayerName($"{turnPlayer.Ref.PlayerId}");
+    }
     
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_MoveTo(SteppingTile targetTile, SteppingTile currentSteppingTile)
+    public void RPC_ChangeActivePlayer(PlayerRef player)
+    {
+        // 현재 턴 변경
+        UIAdapter.Instance.SetTurnPlayerName($"{player.PlayerId}");
+    }
+    
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_MoveTo(SteppingTile targetTile, SteppingTile currentSteppingTile, PlayerRef changeplayer)
     {
         // 현재 타일, 다음 타일, 플레이어
-        targetTile.StandingPlayer = Runner.LocalPlayer;
+        Debug.Log(targetTile.Info.index);
+        Debug.Log(targetTile.StandingPlayer);
+        targetTile.StandingPlayer = changeplayer;
+        Debug.Log(targetTile.StandingPlayer);
+        Debug.Log(currentSteppingTile.StandingPlayer);
         currentSteppingTile.StandingPlayer = PlayerRef.None;
-
+        Debug.Log(currentSteppingTile.StandingPlayer);
     }
     
     public void PlayerJoined(PlayerRef player)
