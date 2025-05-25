@@ -67,10 +67,11 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     
     [Networked, OnChangedRender(nameof(OnChangedTailCount))] 
     public int tailCount{ get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
+    public PlayerScoreUI scoreUI;
+    public string Name => $"Player {Ref.PlayerId.ToString()}";
     
     public InputHandler inputHandler;
     public IPlayerState currentState;
-
 
     [Networked] private int CurrentSteppingTileIndex { get; set; }
     public SteppingTile CurrentSteppingTile
@@ -95,6 +96,7 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
         {
             Debug.Log("Continue playing...");
         }
+        scoreUI.UpdateScore(tailCount);
 
 }
 
@@ -121,6 +123,7 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
 
         StartCoroutine(RegisterPlayer());
         UIAdapter.Instance.SetLocalPlayerName($"{Ref.PlayerId}");
+        UIAdapter.Instance.RegisterPlayer(this);
     } 
     
 

@@ -25,6 +25,13 @@ public class ScoreBoardUI : MonoBehaviour
         //UpdatePlayerScores(playerInfos);
     }
 
+    public void BindPlayer(NetworkPlayer player)
+    {
+        int index = player.PlayerIndex;
+        player.scoreUI = mPlayerScores[index];
+        player.scoreUI.UpdateUI(player.Name, player.tailCount);
+    }
+
     public void UpdatePlayerScores(List<PlayerRef> playerRefs)
     {
         var gameManager = GameManager.Instance;
