@@ -36,13 +36,17 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
                 isAllReady = true;
             }
         }
+        Debug.Log("All stepping tiles are ready. Linking...");
 
         int len = steppingTiles.Length;
+        Debug.Log("Stepping tiles length: " + len);
         for (int i = 0; i < len; i++)
         {
+            Debug.Log("Linking stepping tile " + i);
             int next = i == len - 1 ? 0 : i + 1;
             int prev = i == 0 ? len - 1 : i - 1;
 
+            Debug.Log($"Next: {next} {steppingTiles[next] == null}");
             SteppingTile tile = steppingTiles[i];
             tile.Next = steppingTiles[next];
             tile.Prev = steppingTiles[prev];
@@ -57,10 +61,18 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
         {
             players = FindObjectsByType<NetworkPlayer>(FindObjectsSortMode.InstanceID);
         }
-
         SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
         SpawnSelectingTiles(4, 3, transform.position, new Vector3(-3, 2.5f, -3), new Vector3(3, 2.5f, 3));
         InitPlayerPieces(players);
+    }
+
+    private void SpawnTile(GameObject prefab, Vector3 position, TileInfo info)
+    {
+        var netObj = Runner.Spawn(prefab, position, onBeforeSpawned: (runner, o) =>
+        {
+            Tile tile = o.GetComponent<Tile>();
+            tile.Info = info;
+        });
     }
 
     private void SpawnSteppingTiles(Vector3 zeroPosition)
@@ -71,29 +83,25 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
         int[] secondBag = RandomUtil.GetShuffled(imageKeys);
         var rndKey = firstBag.Concat(secondBag).ToArray();
 
-        Vector3 firstEnd = SpawnLine(zeroPosition, Vector3.forward);
-        Vector3 secondEnd = SpawnLine(firstEnd, Vector3.right);
-        Vector3 thirdEnd = SpawnLine(secondEnd, Vector3.back);
-        SpawnLine(thirdEnd, Vector3.left);
+        Vector3 position = zeroPosition;
 
-        Vector3 SpawnLine(Vector3 initPosition, Vector3 direction)
+        SpawnLine(Vector3.forward);
+        SpawnLine(Vector3.right);
+        SpawnLine(Vector3.back);
+        SpawnLine(Vector3.left);
+
+        void SpawnLine(Vector3 direction)
         {
             for (int i = 0; i < 6; i++)
             {
                 int imageKey = rndKey[index];
 
                 TileInfo info = new TileInfo(ETileType.Stepping, index, imageKey);
-                var netObj = Runner.Spawn(steppingTilePrefab, initPosition, onBeforeSpawned: (runner, o) =>
-                {
-                    Tile tile = o.GetComponent<Tile>();
-                    tile.Info = info;
-                });
+                SpawnTile(steppingTilePrefab, position, info);
 
-                initPosition += direction * 2;
+                position += direction * 2;
                 index++;
             }
-
-            return initPosition;
         }
     }
 
@@ -113,12 +121,7 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
                 int imageKey = rndKey[index];
 
                 TileInfo info = new TileInfo(ETileType.Selecting, index, imageKey);
-                var netObj = Runner.Spawn(selectingTilePrefab, offset + start + garo * x + sero * z,
-                    onBeforeSpawned: (runner, obj) =>
-                    {
-                        Tile tile = obj.GetComponent<Tile>();
-                        tile.Info = info;
-                    });
+                SpawnTile(selectingTilePrefab, offset + start + garo * x + sero * z, info);
             }
         }
     }
