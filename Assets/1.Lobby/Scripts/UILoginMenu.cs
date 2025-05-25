@@ -9,19 +9,26 @@ using UnityEngine.UI;
 
 public class UILoginMenu : MonoBehaviour
 {
-    [FormerlySerializedAs("inputLoginEmail")] [SerializeField] private TMP_InputField mInputLoginEmail; // TMP_InputField로 변경
-    [FormerlySerializedAs("inputLoginPassword")] [SerializeField] private TMP_InputField mInputLoginPassword; // TMP_InputField로 변경
-    [FormerlySerializedAs("inputSignUpEmail")] [SerializeField] private TMP_InputField mInputSignUpEmail; // TMP_InputField로 변경
-    [FormerlySerializedAs("inputSignUpPassword")] [SerializeField] private TMP_InputField mInputSignUpPassword; // TMP_InputField로 변경
-    [FormerlySerializedAs("inputSignUpNickname")] [SerializeField] private TMP_InputField mInputSignUpNickname; // TMP_InputField로 변경
+    [Header("UI Login")]
+    [SerializeField] private TMP_InputField mInputLoginEmail; // TMP_InputField로 변경
+    [SerializeField] private TMP_InputField mInputLoginPassword; // TMP_InputField로 변경
     
-    [FormerlySerializedAs("buttonStart")] [SerializeField] private Button mButtonLogin;
-    [FormerlySerializedAs("buttonSignUp")] [SerializeField] private Button mButtonSignUp;
+    [Space(10)]
+    [Header("UI Sign Up")]
+    [SerializeField] private TMP_InputField mInputSignUpEmail; // TMP_InputField로 변경
+    [SerializeField] private TMP_InputField mInputSignUpPassword; // TMP_InputField로 변경
+    [SerializeField] private TMP_InputField mInputSignUpNickname; // TMP_InputField로 변경
+    
+    [Space(10)]
+    [Header("UI Buttons Refs")]
+    [SerializeField] private Button mButtonLogin;
+    [SerializeField] private Button mButtonSignUp;
     
     //[FormerlySerializedAs("loginButton")] [SerializeField] private LoginButton mLoginButton;
-    [FormerlySerializedAs("NotificationText")] [SerializeField] private TMP_Text mNotificationText;
+    [SerializeField] private TMP_Text mNotificationText;
     
-    
+    [Space(10)]
+    [Header("UI Buttons Events")]
     public UnityEvent<OnSignInEventArgs> OnLoginButtonClickedEvent;
     public UnityEvent<OnSignUpEventArgs> OnSignUpButtonClickedEvent;
     

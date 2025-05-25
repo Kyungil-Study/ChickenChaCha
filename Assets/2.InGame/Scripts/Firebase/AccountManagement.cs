@@ -160,8 +160,6 @@ public class AccountManagement : MonoBehaviour
                     mStatusMessage = "회원가입 성공";
 
                     SaveUserToFirestore(newUser.UserId, email, HashPassword(password), nickname, email);
-                    
-                    OnLogIn(newUser);
                 }
                 else
                 {

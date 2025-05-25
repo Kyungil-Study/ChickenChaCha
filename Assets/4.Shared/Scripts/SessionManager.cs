@@ -122,6 +122,16 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             Debug.Log($"Session Name = {session.Name}, Player Count = {session.PlayerCount}, Max Player Count = {session.MaxPlayers}");
         }
     }
+    
+    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+    {
+        Debug.Log($"Player Joined: {player.PlayerId}");
+    }
+
+    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+    {
+        
+    }
 
     #region NetworkRunnerCallbacks
 
@@ -135,15 +145,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         
     }
 
-    public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-    {
-        
-    }
-
-    public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-    {
-        
-    }
+   
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
