@@ -159,7 +159,7 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     public void MoveTo(SteppingTile targetTile)
     {
         transform.position = targetTile.transform.position;
-        GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile);
+        GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile, Runner.LocalPlayer);
         CurrentSteppingTile = targetTile;
     }
 
