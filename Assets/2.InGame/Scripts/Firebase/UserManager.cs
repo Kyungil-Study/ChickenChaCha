@@ -417,6 +417,8 @@ public class UserManager : MonoBehaviour
 
             var myRef = db.Collection("users").Document(myUid).Collection("friends").Document(requesterUid);
             var requestRef = db.Collection("users").Document(myUid).Collection("requests").Document(requesterUid);
+            var reMyRef = db.Collection("users").Document(requesterUid).Collection("friends").Document(myUid);
+            var reRequestRef = db.Collection("users").Document(requesterUid).Collection("requests").Document(myUid);
 
             var data = new Dictionary<string, object>
             {
@@ -426,6 +428,8 @@ public class UserManager : MonoBehaviour
 
             await myRef.SetAsync(data);
             await requestRef.DeleteAsync();
+            await reMyRef.SetAsync(data);
+            await reRequestRef.DeleteAsync();
 
             Debug.Log("친구 요청 수락 완료");
         }
