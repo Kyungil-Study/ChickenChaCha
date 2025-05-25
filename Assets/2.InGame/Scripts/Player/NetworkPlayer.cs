@@ -1,11 +1,6 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using Fusion;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Serialization;
-using TMPro;
 
 // 플레이어 데이터, 애니메이션 등 처리하기
 
@@ -13,7 +8,7 @@ public interface IPlayerState
 {
     void EnterState(NetworkPlayer player);
     void ExitState(NetworkPlayer player);
-    void Update(NetworkPlayer player);  // 상태별 로직 처리
+    void Update(NetworkPlayer player); // 상태별 로직 처리
 }
 
 public class ActiveState : IPlayerState
@@ -39,7 +34,7 @@ public class WaitingState : IPlayerState
 {
     public void EnterState(NetworkPlayer player)
     {
-        Debug.Log("[상태] : Waiting 진입");
+        Debug.Log($"[{player.PlayerIndex}] : Active 진입");
         if (player.inputHandler != null)
         {
             player.inputHandler.bCanInput = false;
@@ -57,38 +52,39 @@ public class WaitingState : IPlayerState
     }
 }
 
-public class NetworkPlayer : NetworkBehaviour//, IToPlayer
+public class NetworkPlayer : NetworkBehaviour //, IToPlayer
 {
-    [Networked] public PlayerRef Ref { get; set; }
-    [Networked] public int PlayerIndex { get; set; }
+    //public GameObject tailModel; // 꽁지 모델 관리 오브젝트
     public NetworkTransform networkTransform;
-    //public int tailCount;
-    public GameObject tailModel;// 꽁지 모델 관리 오브젝트
-    
-    [Networked, OnChangedRender(nameof(OnChangedTailCount))] 
-    public int tailCount{ get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
     public PlayerScoreUI scoreUI;
-    public string Name => $"Player {Ref.PlayerId.ToString()}";
-    
     public InputHandler inputHandler;
     public IPlayerState currentState;
+    [Networked] public PlayerRef Ref { get; set; }
+    [Networked] public int PlayerIndex { get; set; }
+
+    [Networked]
+    [OnChangedRender(nameof(OnChangedTailCount))]
+    public int TailCount { get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
+
+    public string Name => $"Player {Ref.PlayerId.ToString()}";
 
     [Networked] private int CurrentSteppingTileIndex { get; set; }
+
     public SteppingTile CurrentSteppingTile
     {
         get => BoardManager.Instance.steppingTiles[CurrentSteppingTileIndex];
         set => RPC_SetTileIndex(value.Info.index);
     }
-    
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     private void RPC_SetTileIndex(int index)
     {
         CurrentSteppingTileIndex = index;
     }
 
-    void OnChangedTailCount()
+    private void OnChangedTailCount()
     {
-        if (GameManager.Instance.CheckTail(tailCount))
+        if (GameManager.Instance.CheckTail(TailCount))
         {
             Debug.Log("Winning!");
         }
@@ -96,19 +92,8 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
         {
             Debug.Log("Continue playing...");
         }
-        scoreUI.UpdateScore(tailCount);
 
-}
-
-    private void Update()
-    {
-        if (HasStateAuthority && Input.GetKeyDown(KeyCode.A))
-        {
-            Debug.Log(GameManager.Instance);
-            GameManager.Instance.players[PlayerIndex] = this;
-            GameManager.Instance.playerCount++;
-            Debug.Log(GameManager.Instance.playerCount);
-        }
+        scoreUI.UpdateScore(TailCount);
     }
 
     public override void Spawned()
@@ -116,7 +101,7 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
         base.Spawned();
         inputHandler = GetComponent<InputHandler>();
         networkTransform = GetComponent<NetworkTransform>();
-        
+
         // 타일 선택 동작 위임 : 이벤트
         inputHandler.OnTileSelected = HandleTileSelected;
         SetState(new WaitingState()); // 초기 상태는 대기로
@@ -124,18 +109,18 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
         StartCoroutine(RegisterPlayer());
         UIAdapter.Instance.SetLocalPlayerName($"{Ref.PlayerId}");
         UIAdapter.Instance.RegisterPlayer(this);
-    } 
-    
+    }
+
 
     private IEnumerator RegisterPlayer()
     {
         yield return new WaitForSeconds(0.1f);
-        Debug.Log($"playerIndex: {PlayerIndex}, playerRef: {Ref}");
         GameManager.Instance.players[PlayerIndex] = this;
         GameManager.Instance.playerCount++;
-        Debug.Log($"playerCount : {GameManager.Instance.playerCount}");
+        Debug.Log($"RegisterPlayer() // playerIndex: {PlayerIndex}, playerRef: {Ref}");
+        Debug.Log($"RegisterPlayer() // playerCount : {GameManager.Instance.playerCount}");
     }
-    
+
     // 상태 확장을 고려해서 플레이어 상태 변경
     public void SetState(IPlayerState newState)
     {
@@ -155,15 +140,14 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
         if (currentState is ActiveState)
         {
             var currentTile = GameManager.Instance.GetMatchTile(CurrentSteppingTile);
-            bool isSuccess = GameManager.Instance.OpenTile(currentTile, tile);
+            var isSuccess = GameManager.Instance.OpenTile(currentTile, tile);
             if (isSuccess)
             {
                 MoveTo(currentTile);
             }
         }
     }
-    
-    // 외부 매니저 클래스에서 상태 변경 가능하도록하는 메서드
+
     public void MoveTo(SteppingTile targetTile)
     {
         transform.position = targetTile.transform.position;
@@ -175,9 +159,13 @@ public class NetworkPlayer : NetworkBehaviour//, IToPlayer
     public void RPC_ReceiveMovePermission(bool allowed)
     {
         if (allowed)
+        {
             SetState(new ActiveState());
+        }
         else
+        {
             SetState(new WaitingState());
+        }
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]

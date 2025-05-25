@@ -1,10 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 
 public enum ETileType
 {
@@ -28,9 +23,9 @@ public struct TileInfo : INetworkStruct
 
 public abstract class Tile : NetworkBehaviour
 {
-    [FormerlySerializedAs("renderer")] [SerializeField] private new Renderer mRenderer;
+    [SerializeField] private new Renderer mRenderer;
     [Networked] public TileInfo Info { get; set; }
-    
+
     public override void Spawned()
     {
         SetImage(Info.imageKey);
