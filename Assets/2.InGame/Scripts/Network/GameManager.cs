@@ -63,10 +63,6 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_MoveTo(SteppingTile targetTile, SteppingTile currentSteppingTile, PlayerRef changeplayer)
     {
-        if (changeplayer != Runner.LocalPlayer)
-        {
-            return;
-        }
         // 현재 타일, 다음 타일, 플레이어
         Debug.Log(targetTile.Info.index);
         Debug.Log(targetTile.StandingPlayer);
