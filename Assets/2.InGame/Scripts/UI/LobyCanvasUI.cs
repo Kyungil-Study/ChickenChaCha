@@ -10,12 +10,8 @@ public class LobyCanvasUI : MonoBehaviour
 {
     [Header("Buttons")]
     [SerializeField] private Button createButton;
-    [Header("SubPanels")]
-    [SerializeField] private GameObject createPanel;
     [Header("WaitImages")]
     [SerializeField] private GameObject[] waitImage;
-    [Header("NotifyText")]
-    [SerializeField] private TextMeshProUGUI notifyText;
     [Header("PartyMember")]
     [SerializeField] private TextMeshProUGUI[] partyMemberText;
     
@@ -35,24 +31,19 @@ public class LobyCanvasUI : MonoBehaviour
     private void Update()
     {
         SessionManager.GameRoomInfo roomInfo = SessionManager.Instance.RoomInfo;
-        notifyText.text = $"알림 메시지 ... ({roomInfo.userCount},{SessionManager.MAX_PLAYER_COUNT})";
     }
 
     private void OnInviteClicked()
     {
-        //
-        createPanel.SetActive(true);
         OnMatchClicked?.Invoke();
     }
 
     private void OnSearchClicked()
     {
-        createPanel.SetActive(false);
     }
 
     public void ExitSubPanel()
     {
-        createPanel.SetActive(false);
         OnLeaveClicked?.Invoke();
     }
 

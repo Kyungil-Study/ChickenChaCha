@@ -771,8 +771,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mRoomNameForTesting: 00
   mRoomMapPlayerCount: 1
-  fusionBootstrapDebugGUIChaCha: {fileID: 8617112816031464163}
-  networkRunner: {fileID: 0}
 --- !u!4 &1617176915641697326
 Transform:
   m_ObjectHideFlags: 0
@@ -877,8 +875,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1617176915641697326}
   - component: {fileID: 1202258736510613186}
-  - component: {fileID: 8617112816031464162}
-  - component: {fileID: 8617112816031464163}
+  - component: {fileID: 8617112816031464161}
   m_Layer: 0
   m_Name: SessionManager
   m_TagString: Untagged
@@ -886,7 +883,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &8617112816031464162
+--- !u!114 &8617112816031464161
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -895,33 +892,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8617112816031464160}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4df840a200c0394fa009ccce0515255, type: 3}
+  m_Script: {fileID: 11500000, guid: c65de4c3bcdd45d47b721983b990d21f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RunnerPrefab: {fileID: 0}
-  StartMode: 0
-  AutoStartAs: 2
-  AutoHideGUI: 1
-  AutoClients: 1
-  ClientStartDelay: 0.1
-  ServerPort: 0
-  DefaultRoomName: 
-  InitialScenePath: 
-  _currentStage: 0
-  AutoConnectVirtualInstances: 1
-  VirtualInstanceConnectDelay: 1
---- !u!114 &8617112816031464163
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8617112816031464160}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 367609ef23e47dd49af90a65944c912f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 3663557632832281380, guid: 0cabec4324e4872469817ba81f35a024,
+    type: 3}
+  gameManagerPrefab:
+    RawGuidValue: 2ffe015b4a1769b4793631efbdd3d525
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -4,18 +4,11 @@ using Fusion;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft , ISceneLoadDone , ISpawned
+public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
 {
 
     public GameObject playerPrefab;
     public NetworkPrefabRef gameManagerPrefab;
-    
-    public void Spawned()
-    {
-        Debug.Log("scene load done");
-        GameManagerSpawn();
-        PlayerSpawn(Runner.LocalPlayer);
-    }
     
     private void GameManagerSpawn()
     {
@@ -59,6 +52,9 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft , I
 
     public void PlayerJoined(PlayerRef player)
     {
+        Debug.Log("scene load done");
+        GameManagerSpawn();
+        PlayerSpawn(Runner.LocalPlayer);
     }
 
 

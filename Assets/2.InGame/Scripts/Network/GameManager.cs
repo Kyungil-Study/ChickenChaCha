@@ -29,7 +29,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
         return players;
     }
 
-    private void GameStart()
+    public void GameStart()
     {
         Debug.Log("게임 시작");
         BoardManager.Instance.InitBoard(players);
