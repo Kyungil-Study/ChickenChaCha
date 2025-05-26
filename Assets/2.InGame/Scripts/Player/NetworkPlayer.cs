@@ -143,7 +143,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
         tailModels[0].SetActive(true);
         IEnumerator RegisterPlayer()
         {
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.5f);
             GameManager.Instance.players[Index] = this;
             GameManager.Instance.playerCount++;
         }

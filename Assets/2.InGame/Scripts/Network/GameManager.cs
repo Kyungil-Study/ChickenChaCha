@@ -3,7 +3,7 @@ using System.Linq;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
+public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPlayerLeft
 {
     public NetworkPlayer[] players = new NetworkPlayer[4];
     public int playerCount; // 현재 플레이어 수
@@ -52,17 +52,21 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
             // 액티브 플레이어에게 오답 처리
             // 다음 턴으로 넘기기
             Debug.Log($"index : {ActivePlayer.Index} / False");
-            ActivePlayer.RPC_ReceiveMovePermission(false);
-
-            ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
-            Debug.Log($"ActivePlayer : {ActivePlayer.bHasLeft} /");
-            while (ActivePlayer.bHasLeft)
-            {
-                ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
-            }
-            Debug.Log($"index : {ActivePlayer.Index} / True");
-            ActivePlayer.RPC_ReceiveMovePermission(true);
+            MoveTurn();
         }
+    }
+
+    public void MoveTurn()
+    {
+        ActivePlayer.RPC_ReceiveMovePermission(false);
+
+        ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
+        while (ActivePlayer.bHasLeft)
+        {
+            ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
+        }
+        
+        ActivePlayer.RPC_ReceiveMovePermission(true);
     }
 
     public void OnChangedTurn()
@@ -94,7 +98,23 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
     [Rpc(RpcSources.All, RpcTargets.All)]
     private void RPC_PlayerJoined(PlayerRef player)
     {
+        
     }
+    
+    public void PlayerLeft(PlayerRef player)
+    {
+        if (Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>() == ActivePlayer)
+        {
+            RPC_ActivePlayerLeft();
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_ActivePlayerLeft()
+    {
+        MoveTurn();
+    }
+    
 
     #endregion
 
@@ -167,4 +187,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
     }
 
     #endregion
+
+
+
 }
