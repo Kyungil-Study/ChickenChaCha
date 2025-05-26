@@ -27,7 +27,7 @@ public class InputHandler : NetworkBehaviour
     {
         if (bCanInput == false) return;   // 내 턴일때만 입력 가능하게 예외처리
         
-        if (Input.GetKey(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             bClicked = true;
         }
@@ -35,6 +35,19 @@ public class InputHandler : NetworkBehaviour
         if (Input.GetKey(KeyCode.Alpha1))   // 단축키로 선택한 타일 확인하기
         {
             Debug.Log(selectedTile);
+        }
+        
+        if (HasStateAuthority && Input.GetKeyDown(KeyCode.E))
+        {
+            Debug.Log("E");
+            NetworkObject netObj = GetComponent<NetworkObject>();
+            NetworkId id = netObj.Id;
+            
+            
+            GameManager.Instance.AddDictionary<PlayerInfo> (
+                id, new PlayerInfo(Runner.LocalPlayer, false, 1, id)
+            );
+            Debug.Log("Added to dictionary: " + id);
         }
     }
     public override void FixedUpdateNetwork()
