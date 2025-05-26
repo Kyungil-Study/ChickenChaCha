@@ -43,8 +43,19 @@ public class UserManager : MonoBehaviour
         {
             if (task.Result == DependencyStatus.Available)
             {
-                mAuth = FirebaseAuth.DefaultInstance;
-                mDB = FirebaseFirestore.DefaultInstance;
+                AppOptions options = new AppOptions()
+                {
+                    ApiKey = FirebaseApp.DefaultInstance.Options.ApiKey,
+                    AppId = FirebaseApp.DefaultInstance.Options.AppId,
+                    DatabaseUrl = FirebaseApp.DefaultInstance.Options.DatabaseUrl,
+                    MessageSenderId = FirebaseApp.DefaultInstance.Options.MessageSenderId,
+                    ProjectId = FirebaseApp.DefaultInstance.Options.ProjectId,
+                    StorageBucket = FirebaseApp.DefaultInstance.Options.StorageBucket
+                };
+                var app = FirebaseApp.Create(options, Guid.NewGuid().ToString());
+                
+                mAuth = FirebaseAuth.GetAuth(app);
+                mDB = FirebaseFirestore.GetInstance(app);
 
                 mButtonSignUp.onClick.AddListener(OnSignUpClicked);
                 mButtonLogin.onClick.AddListener(OnLoginClicked);
