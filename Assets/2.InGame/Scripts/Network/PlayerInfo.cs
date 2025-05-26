@@ -1,20 +1,7 @@
 using Fusion;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public struct PlayerInfo : INetworkStruct
+public class PlayerInfo
 {
-    public PlayerRef player;
-    public bool isActive;
-    public int score;
-    public SteppingTile steppingTile;
-    
-    public PlayerInfo(PlayerRef player, bool isActive, int score)
-    {
-        this.player = player;
-        this.isActive = isActive;
-        this.score = score;
-        this.steppingTile = null;
-    }
     
 }
