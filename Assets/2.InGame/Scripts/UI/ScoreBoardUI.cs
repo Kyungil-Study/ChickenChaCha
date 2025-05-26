@@ -27,7 +27,7 @@ public class ScoreBoardUI : MonoBehaviour
 
     public void BindPlayer(NetworkPlayer player)
     {
-        int index = player.PlayerIndex;
+        int index = player.Index;
         player.scoreUI = mPlayerScores[index];
         player.scoreUI.UpdateUI(player.Name, player.TailCount);
     }

@@ -51,10 +51,16 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
             Debug.Log("오답입니다.");
             // 액티브 플레이어에게 오답 처리
             // 다음 턴으로 넘기기
-            Debug.Log($"index : {ActivePlayer.PlayerIndex} / count : {playerCount}");
+            Debug.Log($"index : {ActivePlayer.Index} / False");
             ActivePlayer.RPC_ReceiveMovePermission(false);
 
-            ActivePlayer = players[(ActivePlayer.PlayerIndex + 1) % playerCount];
+            ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
+            Debug.Log($"ActivePlayer : {ActivePlayer.bHasLeft} /");
+            while (ActivePlayer.bHasLeft)
+            {
+                ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
+            }
+            Debug.Log($"index : {ActivePlayer.Index} / True");
             ActivePlayer.RPC_ReceiveMovePermission(true);
         }
     }
@@ -72,16 +78,11 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_MoveTo(SteppingTile targetTile, SteppingTile currentSteppingTile, PlayerRef changeplayer)
+    public void RPC_MoveTo(SteppingTile targetTile, SteppingTile currentSteppingTile, PlayerRef changePlayer)
     {
         // 현재 타일, 다음 타일, 플레이어
-        Debug.Log(targetTile.Info.index);
-        Debug.Log(targetTile.StandingPlayer);
-        targetTile.StandingPlayer = changeplayer;
-        Debug.Log(targetTile.StandingPlayer);
-        Debug.Log(currentSteppingTile.StandingPlayer);
+        targetTile.StandingPlayer = changePlayer;
         currentSteppingTile.StandingPlayer = PlayerRef.None;
-        Debug.Log(currentSteppingTile.StandingPlayer);
     }
 
     public void PlayerJoined(PlayerRef player)

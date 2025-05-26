@@ -16,7 +16,7 @@ public class ActiveState : IPlayerState
 {
     public void EnterState(NetworkPlayer player)
     {
-        Debug.Log($"[{player.PlayerIndex}] : Active 진입");
+        Debug.Log($"[{player.Index}] : Active 진입");
         player.inputHandler.bCanInput = true;
     }
 
@@ -35,7 +35,7 @@ public class WaitingState : IPlayerState
 {
     public void EnterState(NetworkPlayer player)
     {
-        Debug.Log($"[{player.PlayerIndex}] : Active 진입");
+        Debug.Log($"[{player.Index}] : Waiting 진입");
         if (player.inputHandler != null)
         {
             player.inputHandler.bCanInput = false;
@@ -53,16 +53,17 @@ public class WaitingState : IPlayerState
     }
 }
 
-public class NetworkPlayer : NetworkBehaviour //, IToPlayer
+public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 {
     public NetworkTransform networkTransform;
     public PlayerScoreUI scoreUI;
     public InputHandler inputHandler;
     public GameObject[] tailModels;
     public IPlayerState currentState;
+    public bool bHasLeft = false;
     
     [Networked] public PlayerRef Ref { get; set; }
-    [Networked] public int PlayerIndex { get; set; }
+    [Networked] public int Index { get; set; }
 
     [Networked]
     [OnChangedRender(nameof(OnChangedTailCount))]
@@ -140,6 +141,12 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
 
         UIAdapter.Instance.RegisterPlayer(this);
         tailModels[0].SetActive(true);
+        IEnumerator RegisterPlayer()
+        {
+            yield return new WaitForSeconds(0.1f);
+            GameManager.Instance.players[Index] = this;
+            GameManager.Instance.playerCount++;
+        }
     }
 
     // 상태 확장을 고려해서 플레이어 상태 변경
@@ -148,15 +155,6 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         currentState?.ExitState(this);
         currentState = newState;
         currentState.EnterState(this);
-    }
-
-    private IEnumerator RegisterPlayer()
-    {
-        yield return new WaitForSeconds(0.1f);
-        GameManager.Instance.players[PlayerIndex] = this;
-        GameManager.Instance.playerCount++;
-        Debug.Log($"RegisterPlayer() // playerIndex: {PlayerIndex}, playerRef: {Ref}");
-        Debug.Log($"RegisterPlayer() // playerCount : {GameManager.Instance.playerCount}");
     }
 
     public override void FixedUpdateNetwork()
@@ -239,5 +237,10 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
     public void RPC_TeleportTo(Vector3 position)
     {
         networkTransform.Teleport(position);
+    }
+
+    public void PlayerLeft(PlayerRef player)
+    {
+        Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>().bHasLeft = true;
     }
 }
