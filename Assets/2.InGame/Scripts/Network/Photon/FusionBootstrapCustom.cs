@@ -83,7 +83,7 @@ namespace Fusion {
     public GameMode AutoStartAs = GameMode.Shared;
 
     /// <summary>
-    /// <see cref="FusionBootstrapDebugGUICustom"/> will not render GUI elements while <see cref="CurrentStage"/> == <see cref="Stage.AllConnected"/>.
+    /// <see cref="FusionBootstrapDebugGUIChaCha"/> will not render GUI elements while <see cref="CurrentStage"/> == <see cref="Stage.AllConnected"/>.
     /// </summary>
     [InlineHelp]
     [DrawIf(nameof(StartMode), (long)StartModes.UserInterface, Hide = true)]
@@ -184,8 +184,8 @@ namespace Fusion {
 
 #if UNITY_EDITOR
     protected virtual void Reset() {
-      if (TryGetComponent<FusionBootstrapDebugGUICustom>(out var ndsg) == false) {
-        ndsg = gameObject.AddComponent<FusionBootstrapDebugGUICustom>();
+      if (TryGetComponent<FusionBootstrapDebugGUIChaCha>(out var ndsg) == false) {
+        ndsg = gameObject.AddComponent<FusionBootstrapDebugGUIChaCha>();
       }
     }
 
@@ -271,8 +271,8 @@ namespace Fusion {
     }
 
     protected void ShowUserInterface() {
-      if (TryGetComponent<FusionBootstrapDebugGUICustom>(out var gui) == false) {
-        gui = gameObject.AddComponent<FusionBootstrapDebugGUICustom>();
+      if (TryGetComponent<FusionBootstrapDebugGUIChaCha>(out var gui) == false) {
+        gui = gameObject.AddComponent<FusionBootstrapDebugGUIChaCha>();
       }
       gui.enabled = true;
     }

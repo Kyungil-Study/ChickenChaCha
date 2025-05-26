@@ -98,6 +98,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         callbacks.OnLoginSuccess += LoadLobbyScene;
     }
     
+    
     private void LoadLobbyScene()
     {
         SceneManager.LoadScene(LOBBY_SCENE_INDEX, LoadSceneMode.Single);
@@ -281,10 +282,21 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
        
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            StartInGame();
+        }
+    }
+
+    public FusionBootstrapDebugGUIChaCha fusionBootstrapDebugGUIChaCha;
+    public NetworkRunner networkRunner;
     private void StartInGame()
     {
+        fusionBootstrapDebugGUIChaCha.StartGame(mRoomNameForTesting);
         Debug.Log($"[SessionManager] StartInGame : Master에서 호출됨");
-        mNetworkRunner.LoadScene(SceneRef.FromIndex(IN_GAME_SCENE_INDEX));
+        networkRunner.LoadScene(SceneRef.FromIndex(IN_GAME_SCENE_INDEX));
     }
     
     public void OnSceneLoadDone(NetworkRunner runner)
