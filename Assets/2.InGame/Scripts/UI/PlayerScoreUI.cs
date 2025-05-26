@@ -11,7 +11,17 @@ public class PlayerScoreUI : MonoBehaviour
     
     public void UpdateUI(string playerName, int playerScore)
     {
-        mPlayerNameText.text = playerName;
-        mPlayerScoreText.text = playerScore.ToString();
+        UpdateName(playerName);
+        UpdateScore(playerScore);
+    }
+
+    public void UpdateName(string newName)
+    {
+        mPlayerNameText.text = newName;
+    }
+    
+    public void UpdateScore(int newScore)
+    {
+        mPlayerScoreText.text = newScore.ToString();
     }
 }

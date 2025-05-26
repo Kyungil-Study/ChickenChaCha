@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 
-public class RuleManager : DontDestroyOnNetwork<RuleManager>, IToRule
+public class RuleManager : NetworkBehaviour, IToRule
 {
     // 1. 플레이어 앞질렀는지 판별 함수 => 앞질렀는지 여부를 액티브 플레이어에게 전달해줘야됨
     // ps. 앞지른 플레이어가 꽁지를 가지고 있는지도 확인해야 함 => 앞지른 플레이어의 꽁지 정보 받아오기
     public int PassPlayer(SteppingTile tile) // 플레이어를 앞질렀는지 확인하고 앞질렀으면 가져가게 될 꽁지 개수 리턴;
     {
         int tail = 0;
-        while (tile.Next.StandingPlayer != null) // 다음 발판의 사람이 있는지 여부
+        while (tile.Next.StandingPlayer != PlayerRef.None) // 다음 발판의 사람이 있는지 여부
         {
             tail += tile.StandingPlayer.PlayerId /*임시로 지정, 나중에 꼬리 개수를 확인하는 변수로 변환 예정*/;
             //tile.StandingPlayer.PlayerId = 0; // **꽁지 개수 0으로 변경하는 코드 작성 필요**

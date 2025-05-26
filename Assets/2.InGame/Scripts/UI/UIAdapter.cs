@@ -37,8 +37,8 @@ public class UIAdapter : MonoBehaviour, IToUI
         mTurnUI.SetTurnPlayerName(playerName);
     }
 
-    /*public void UpdatePlayerScore(List<UIPlayerScoreData> playerScores)
+    public void RegisterPlayer(NetworkPlayer player)
     {
-        mScoreBoardUI.UpdatePlayerScores(playerScores);
-    }*/
+        mScoreBoardUI.BindPlayer(player);
+    }
 }
