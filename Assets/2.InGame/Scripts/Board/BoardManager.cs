@@ -1,76 +1,76 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using Fusion;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 
-public class BoardManager : DontDestroyOnNetwork<BoardManager>
+public class BoardManager : NetworkBehaviour
 {
+    public static BoardManager Instance;
     public GameObject steppingTilePrefab;
     public GameObject selectingTilePrefab;
     public Texture2D[] tileTextures;
-
     public SteppingTile[] steppingTiles = new SteppingTile[24];
     public SelectingTile[] selectingTiles = new SelectingTile[12];
+    public GameObject playerPrefab;
 
     private readonly int[] imageKeys = new int[12] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
-    public override void Spawned()
+    private void Awake()
     {
-        base.Spawned();
-        StartCoroutine(LinkSteppingTiles());
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Runner.Despawn(Object);
+        }
     }
 
-    private IEnumerator LinkSteppingTiles()
+    private void Update()
     {
-        bool isAllReady = false;
-        while (isAllReady == false)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            yield return null;
-            foreach (var tile in steppingTiles)
+            SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
+            SpawnSelectingTiles(4,3,transform.position, new Vector3(-3, 2.5f, -3),new Vector3(3, 2.5f, 3));
+        }
+    }
+
+    public void InitTiles()
+    {
+        int[] rndKey = RandomUtil.GetShuffled(imageKeys);
+        int keyLength = imageKeys.Length;
+
+        // steppingTiles
+        for (int i = 0; i < steppingTiles.Length; i++)
+        {
+            if (i == keyLength)
             {
-                if (tile == null)
-                {
-                    break;
-                }
-
-                isAllReady = true;
+                rndKey = RandomUtil.GetShuffled(imageKeys);
             }
+
+            int imgKey = rndKey[i % keyLength];
+            steppingTiles[i].SetImage(imgKey, tileTextures[imgKey]);
+            steppingTiles[i].Next = steppingTiles[i == steppingTiles.Length - 1 ? 0 : i + 1];
+            steppingTiles[i].Prev = steppingTiles[i == 0 ? steppingTiles.Length - 1 : i - 1];
         }
 
-        int len = steppingTiles.Length;
-        for (int i = 0; i < len; i++)
+        // selectingTiles
+        rndKey = RandomUtil.GetShuffled(imageKeys);
+        for (int i = 0; i < selectingTiles.Length; i++)
         {
-            int next = i == len - 1 ? 0 : i + 1;
-            int prev = i == 0 ? len - 1 : i - 1;
-
-            SteppingTile tile = steppingTiles[i];
-            tile.Next = steppingTiles[next];
-            tile.Prev = steppingTiles[prev];
+            int imgKey = rndKey[i % keyLength];
+            selectingTiles[i].SetImage(imgKey, tileTextures[imgKey]);
         }
-
-        Debug.Log("Linked all stepping tiles.");
     }
 
-    public void InitBoard(NetworkPlayer[] players)
-    {
-        if (players.Length == 0)
-        {
-            players = FindObjectsByType<NetworkPlayer>(FindObjectsSortMode.InstanceID);
-        }
-
-        SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
-        SpawnSelectingTiles(4, 3, transform.position, new Vector3(-3, 2.5f, -3), new Vector3(3, 2.5f, 3));
-        InitPlayerPieces(players);
-    }
-
-    private void SpawnSteppingTiles(Vector3 zeroPosition)
+    public void SpawnSteppingTiles(Vector3 zeroPosition)
     {
         int index = 0;
-
-        int[] firstBag = RandomUtil.GetShuffled(imageKeys);
-        int[] secondBag = RandomUtil.GetShuffled(imageKeys);
-        var rndKey = firstBag.Concat(secondBag).ToArray();
-
         Vector3 firstEnd = SpawnLine(zeroPosition, Vector3.forward);
         Vector3 secondEnd = SpawnLine(firstEnd, Vector3.right);
         Vector3 thirdEnd = SpawnLine(secondEnd, Vector3.back);
@@ -80,68 +80,52 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
         {
             for (int i = 0; i < 6; i++)
             {
-                int imageKey = rndKey[index];
-
-                TileInfo info = new TileInfo(ETileType.Stepping, index, imageKey);
-                var netObj = Runner.Spawn(steppingTilePrefab, initPosition, onBeforeSpawned: (runner, o) =>
-                {
-                    Tile tile = o.GetComponent<Tile>();
-                    tile.Info = info;
-                });
-
+                var tile = Runner.Spawn(steppingTilePrefab, initPosition);
+                steppingTiles[index++] = tile.GetComponent<SteppingTile>();
+                
                 initPosition += direction * 2;
-                index++;
             }
 
             return initPosition;
         }
     }
 
-    private void SpawnSelectingTiles(int columnCount, int rowCount, Vector3 offset, Vector3 start, Vector3 end)
+    public void SpawnSelectingTiles(int columnCount, int rowCount, Vector3 offset,Vector3 start, Vector3 end)
     {
         Vector3 diff = end - start;
         Vector3 garo = Vector3.right * diff.x / (columnCount - 1);
         Vector3 sero = Vector3.forward * diff.z / (rowCount - 1);
-
-        int[] rndKey = RandomUtil.GetShuffled(imageKeys);
-
         for (int x = 0; x < columnCount; x++)
         {
             for (int z = 0; z < rowCount; z++)
             {
-                int index = z + x * rowCount;
-                int imageKey = rndKey[index];
-
-                TileInfo info = new TileInfo(ETileType.Selecting, index, imageKey);
-                var netObj = Runner.Spawn(selectingTilePrefab, offset + start + garo * x + sero * z,
-                    onBeforeSpawned: (runner, obj) =>
-                    {
-                        Tile tile = obj.GetComponent<Tile>();
-                        tile.Info = info;
-                    });
+                var tile = Runner.Spawn(selectingTilePrefab, offset + start + garo * x + sero * z);
+                selectingTiles[z + x * rowCount] = tile.GetComponent<SelectingTile>();
             }
         }
     }
 
-    private void InitPlayerPieces(NetworkPlayer[] players)
+    public void InitPlayerPieces()
     {
-        int playerCount = GameManager.Instance.playerCount;
+        
+        PlayerRef[] players = Runner.ActivePlayers.ToArray();
+        int playerCount = players.Length;
+
         int div = steppingTiles.Length / playerCount;
+
         for (int i = 0; i < playerCount; i++)
         {
             SteppingTile tile = steppingTiles[i * div];
-            NetworkPlayer player = players[i];
+            PlayerRef player = players[i];
 
-            if (player == null)
-            {
-                break;
-            }
-
-            player.RPC_TeleportTo(tile.transform.position);
-
-            player.CurrentSteppingTile = tile;
-            tile.StandingPlayer = player.Ref;
+            SpawnPlayer(player, tile.transform.position);
+            tile.StandingPlayer = player;
         }
+    }
+
+    private void SpawnPlayer(PlayerRef player, Vector3 position)
+    {
+        Runner.Spawn(playerPrefab, position, Quaternion.identity, player);
     }
 
     public void SubscribeAllSelectingTiles(Action<Tile> callback)

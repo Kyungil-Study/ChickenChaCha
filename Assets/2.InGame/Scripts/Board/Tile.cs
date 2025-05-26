@@ -1,44 +1,24 @@
+using System.Collections;
+using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
-
-public enum ETileType
-{
-    Stepping,
-    Selecting
-}
-
-public struct TileInfo : INetworkStruct
-{
-    public ETileType type;
-    public int index;
-    public int imageKey;
-
-    public TileInfo(ETileType type, int index, int imageKey)
-    {
-        this.type = type;
-        this.index = index;
-        this.imageKey = imageKey;
-    }
-}
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public abstract class Tile : NetworkBehaviour
 {
-    [SerializeField] private Renderer mRenderer;
-    [Networked] public TileInfo Info { get; set; }
+    [Networked]
+    public int imageKey { get; set; }
+    [SerializeField] private Renderer renderer;
 
-    public override void Spawned()
+    public void SetImage(int key, Texture2D img)
     {
-        SetImage(Info.imageKey);
-    }
-
-    public void SetImage(int key)
-    {
-        mRenderer.material.mainTexture = BoardManager.Instance.tileTextures[key];
-        Info = new TileInfo(Info.type, Info.index, key);
+        renderer.material.mainTexture = img;
+        imageKey = key;
     }
 
     public bool IsSamePicture(Tile tile)
     {
-        return Info.imageKey == tile.Info.imageKey;
+        return imageKey == tile.imageKey;
     }
 }

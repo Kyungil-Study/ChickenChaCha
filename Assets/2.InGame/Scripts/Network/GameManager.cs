@@ -1,169 +1,116 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
+public class GameManager : DontDestroyOnNetwork<GameManager>, IToNetwork, IPlayerJoined
 {
-    public NetworkPlayer[] players = new NetworkPlayer[4];
-    public int playerCount; // 현재 플레이어 수
+    
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<Tile, SteppingTile> mSteppingTileInfo => default;
 
-    public List<NetworkPlayer> mTailPlayers; // 여기 있는 애들한테 꼬리 뺐으면 됌.
-
-    [Networked]
-    [OnChangedRender(nameof(OnChangedTurn))]
-    private NetworkPlayer ActivePlayer { get; set; } // 현재 턴 인덱스, OnChangedRender로 변경 감지
-
-    #region GameManager
-
-    private void Update()
+    public void AddTile(Tile t, SteppingTile tile)
     {
-        if (Runner.IsSharedModeMasterClient && Input.GetKeyDown(KeyCode.Space))
-        {
-            GameStart();
-        }
+        mSteppingTileInfo.Add(t, tile);
+    }
+    
+    
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<Tile, SelectingTile> mSelectingTileInfo => default;
+    
+    
+    public void SendSelectedTile(PlayerRef player, SelectingTile tile)
+    {
+        bool result = RuleManager.Instance.OpenTile(new SteppingTile(), tile);
+        //SetPlayerState(player, result);
+    }
+    
+    public void SendSelectedTile(SelectingTile tile)
+    {
+        throw new NotImplementedException();
     }
 
-    public NetworkPlayer[] GetPlayersArray()
+    public SelectingTile GetSelectedTile()
     {
+        throw new NotImplementedException();
+    }
+    
+    
+    // 에러 코드 주석 처리
+    // 에러코드 수정후
+    // 아래 파일 호출부도 복원해주세요.
+    // ScoreBoaurUI
+    // PlayerController 
+    /*
+    [Networked] 
+    [UnitySerializeField]
+    private NetworkDictionary<PlayerRef, PlayerInfo> mPlayerInfo => default;
+    
+    
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_AddPlayer(PlayerRef player)
+    {
+        if (mPlayerInfo.Count >= 4)
+        {
+            Debug.Log("더 이상 추가 할 수 없습니다.");
+            
+            return;
+        }
+
+        PlayerInfo playerInfo = new PlayerInfo(player, false, 1);
+        Debug.Log($"{playerInfo.player} , {playerInfo.isActive}, {playerInfo.score}");
+        mPlayerInfo.Add(player, playerInfo);
+    }
+
+    public PlayerInfo? GetPlayerInfoOrNull(PlayerRef player)
+    {
+        if(mPlayerInfo.TryGet(player, out var value))
+        {
+            return value;
+        }
+        return null;
+    }
+
+    public PlayerInfo? GetLocalPlayerOrNull()
+    {
+        if(mPlayerInfo.TryGet(Runner.LocalPlayer, out var value))
+        {
+            return value;
+        }
+        return null;
+    }
+
+    public List<PlayerRef> GetPlayersInfo()
+    {
+        List<PlayerRef> players = new List<PlayerRef>();
+        foreach (var playerInfo in mPlayerInfo)
+        {
+            players.Add(playerInfo.Key);
+        }
         return players;
     }
-
-    private void GameStart()
+    
+    public void SetPlayerState(PlayerRef Player, bool isActive)
     {
-        Debug.Log("게임 시작");
-        BoardManager.Instance.InitBoard(players);
-        players[0].RPC_ReceiveMovePermission(true);
-        ActivePlayer = players[0];
-        mTailPlayers = new List<NetworkPlayer>();
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_OpenTileResult(bool result)
-    {
-        if (result)
+        if(Runner.TryGetPlayerObject(Player, out NetworkObject netObj))
         {
-            Debug.Log("정답입니다.");
-            // 액티브 플레이어에게 정답 처리
+            netObj.GetComponent<NetworkPlayer>().ReceiveMovePermission(isActive);
         }
-        else
-        {
-            Debug.Log("오답입니다.");
-            // 액티브 플레이어에게 오답 처리
-            // 다음 턴으로 넘기기
-            Debug.Log($"index : {ActivePlayer.PlayerIndex} / count : {playerCount}");
-            ActivePlayer.RPC_ReceiveMovePermission(false);
-
-            ActivePlayer = players[(ActivePlayer.PlayerIndex + 1) % playerCount];
-            ActivePlayer.RPC_ReceiveMovePermission(true);
-        }
+        // mPlayerInfo.Set(nextPlayer,
+        //     new PlayerInfo(mPlayerInfo[nextPlayer].player, isActive, mPlayerInfo[nextPlayer].score));
     }
-
-    public void OnChangedTurn()
-    {
-        UIAdapter.Instance.SetTurnPlayerName($"{ActivePlayer.Ref.PlayerId}");
-    }
+    
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_ChangeActivePlayer(PlayerRef player)
+    public void RPC_DebugList()
     {
-        // 현재 턴 변경
-        UIAdapter.Instance.SetTurnPlayerName($"{player.PlayerId}");
+        
     }
-
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_MoveTo(SteppingTile targetTile, SteppingTile currentSteppingTile, PlayerRef changeplayer)
-    {
-        // 현재 타일, 다음 타일, 플레이어
-        Debug.Log(targetTile.Info.index);
-        Debug.Log(targetTile.StandingPlayer);
-        targetTile.StandingPlayer = changeplayer;
-        Debug.Log(targetTile.StandingPlayer);
-        Debug.Log(currentSteppingTile.StandingPlayer);
-        currentSteppingTile.StandingPlayer = PlayerRef.None;
-        Debug.Log(currentSteppingTile.StandingPlayer);
-    }
-
+    */
     public void PlayerJoined(PlayerRef player)
     {
-        // UI에게 새로 접속한 플레이어 정보 전달
-        RPC_PlayerJoined(player);
+        //RPC_AddPlayer(player);
     }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    private void RPC_PlayerJoined(PlayerRef player)
-    {
-    }
-
-    #endregion
-
-    #region RuleManager
-
-    // 1. 획득한 꽁지로 승리 판별 => 액티브 플레이어에게 1번의 정보를 리턴 후 꽁지 정보를 받아와 4개일 시 승리 판정 아닐시 게임 진행
-    // ps. 승리 판정이 나면 다른 플레이어들은 패배 판정
-    public bool CheckTail(int tailCount) //이 함수가 true면 승리, false면 진행 혹은 패배
-    {
-        // 사전 작업: PassPlayer로 꽁지 개수 플레이어에게 전달해주기
-        if (tailCount >= players.Count(player => player != null)) // 플레이어 꽁지 개수 확인, 후에 == 4로 변경 예정
-        {
-            return true; // 꽁지가 4개면 true 리턴
-        }
-
-        return false; //꽁지가 4개 미만이면 false 리턴
-    }
-
-    // 2. 액티브 플레이어에게 선택 타일을 전달 받고 뒤집어 보여주며 성공 / 실패 판별 => 액티브 플레이어에게 전달해줘야 됨
-    // ps. 이를 토대로 이동 여부도 판정
-    public bool OpenTile(SteppingTile tile, SelectingTile selectTileInfo)
-    {
-        if (tile.IsSamePicture(selectTileInfo))
-        {
-            RPC_OpenTileResult(true);
-            var takeCount = 0;
-            foreach (var netplayers in mTailPlayers)
-            {
-                takeCount += netplayers.TailCount; // 꼬리 개수 합산
-                RPC_ResetTails(netplayers.Ref);
-            }
-
-            TakeTails(Runner.LocalPlayer, takeCount);
-            return true;
-        }
-
-        RPC_OpenTileResult(false);
-        return false;
-    }
-
-
-    // 3. 뭘 맞춰야 하는지 확인 하는 코드
-    public SteppingTile GetMatchTile(SteppingTile tile)
-    {
-        while (tile.Next.StandingPlayer != PlayerRef.None) // "나 자신"은 예외 처리 해야 함
-        {
-            var netObj = Runner.GetPlayerObject(tile.Next.StandingPlayer);
-            Debug.Log(tile.StandingPlayer);
-            Debug.Log(netObj);
-            var netPlayer = netObj.GetComponent<NetworkPlayer>();
-            mTailPlayers.Add(netPlayer);
-            tile = tile.Next; // 있으면 그 다음 발판 확인
-        }
-
-        return tile.Next;
-    }
-
-    // 4.  뺏은 꼬리 개수만큼 액티브 플레이어에게 추가
-    public void TakeTails(PlayerRef player, int takeCount)
-    {
-        var netPlayer = Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>();
-        netPlayer.TailCount += takeCount; // 액티브 플레이어에게 꼬리 개수 추가
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_ResetTails(PlayerRef resetPlayer)
-    {
-        var resetNetPlayer = Runner.GetPlayerObject(resetPlayer).GetComponent<NetworkPlayer>();
-        resetNetPlayer.TailCount = 0;
-    }
-
-    #endregion
 }
