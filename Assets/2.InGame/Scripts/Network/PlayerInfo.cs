@@ -1,4 +1,5 @@
 using Fusion;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public struct PlayerInfo : INetworkStruct
@@ -6,13 +7,14 @@ public struct PlayerInfo : INetworkStruct
     public PlayerRef player;
     public bool isActive;
     public int score;
-    public NetworkId steppingTile;
+    public SteppingTile steppingTile;
     
-    public PlayerInfo(PlayerRef player, bool isActive, int score, NetworkId steppingTile)
+    public PlayerInfo(PlayerRef player, bool isActive, int score)
     {
         this.player = player;
         this.isActive = isActive;
-        this.score = score; 
-        this.steppingTile = steppingTile;
+        this.score = score;
+        this.steppingTile = null;
     }
+    
 }

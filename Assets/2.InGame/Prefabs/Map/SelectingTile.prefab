@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8558480579880274572}
   - component: {fileID: 6087160234949481288}
   - component: {fileID: 3102450276202968193}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: SelectingTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -70,6 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a917b1652c003b74ea4b6803b344b9c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _imageKey: 0
   renderer: {fileID: 7611230501986006823}
   anim: {fileID: 0}
 --- !u!65 &8558480579880274572
