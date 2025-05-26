@@ -23,4 +23,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/3.Develop/UI/Scenes/UIDevelopScene.unity
     guid: 5356a229255a3b34faea3ad77aa2749c
+  - enabled: 1
+    path: Assets/3.Develop/Result.unity
+    guid: 34ff366e271d88a4dafe650ce7b5a6a9
   m_configObjects: {}

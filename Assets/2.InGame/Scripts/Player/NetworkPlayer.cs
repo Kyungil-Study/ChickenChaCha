@@ -1,6 +1,7 @@
 using System.Collections;
 using Fusion;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // 플레이어 데이터, 애니메이션 등 처리하기
 
@@ -59,6 +60,7 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
     public PlayerScoreUI scoreUI;
     public InputHandler inputHandler;
     public IPlayerState currentState;
+    public GameObject[] tailModels;
     [Networked] public PlayerRef Ref { get; set; }
     [Networked] public int PlayerIndex { get; set; }
 
@@ -84,9 +86,19 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
 
     private void OnChangedTailCount()
     {
+        for (int i = 0; i < TailCount; i++)
+        {
+            tailModels[i].SetActive(true);
+        }
+        
+        for (int i = TailCount; i < tailModels.Length; i++)
+        {
+            tailModels[i].SetActive(false);
+        }
         if (GameManager.Instance.CheckTail(TailCount))
         {
             Debug.Log("Winning!");
+            RPC_Result(Ref);
         }
         else
         {
@@ -94,6 +106,19 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         }
 
         scoreUI.UpdateScore(TailCount);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_Result(PlayerRef player)
+    {
+        if (Runner.LocalPlayer == player)
+        {
+            SceneManager.LoadScene("Result");
+        }
+        else
+        {
+            SceneManager.LoadScene("Result");
+        }
     }
 
     public override void Spawned()
@@ -112,6 +137,7 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
             UIAdapter.Instance.SetLocalPlayerName($"{Ref.PlayerId}");
             UIAdapter.Instance.RegisterPlayer(this);
         }
+        tailModels[0].SetActive(true);
     }
 
 
