@@ -6,108 +6,184 @@ using Firebase.Auth;
 using Firebase.Extensions;
 using Firebase.Firestore;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class UserManager : MonoBehaviour
 {
+    private static UserManager mInstance;
+    public static UserManager Instance
+    {
+        get
+        {
+            if (mInstance == null)
+            {
+                mInstance = FindObjectOfType<UserManager>();
+            }
+            return mInstance;
+        }
+        
+    }
+    
+    private FirebaseApp mApp;
     private FirebaseAuth mAuth;
     private FirebaseFirestore mDB;
-
-    [FormerlySerializedAs("inputSignUpEmail")]
-    [Header("회원가입 UI")]
-    [SerializeField] private TMP_InputField mInputSignUpEmail;
-    [FormerlySerializedAs("inputSignUpPassword")] [SerializeField] private TMP_InputField mInputSignUpPassword;
-    [FormerlySerializedAs("inputSignUpNickname")] [SerializeField] private TMP_InputField mInputSignUpNickname;
-    [FormerlySerializedAs("buttonSignUp")] [SerializeField] private Button mButtonSignUp;
-
-    [FormerlySerializedAs("inputLoginEmail")]
-    [Header("로그인 UI")]
-    [SerializeField] private TMP_InputField mInputLoginEmail;
-    [FormerlySerializedAs("inputLoginPassword")] [SerializeField] private TMP_InputField mInputLoginPassword;
-    [FormerlySerializedAs("buttonLogin")] [SerializeField] private Button mButtonLogin;
-
-    [FormerlySerializedAs("inputFriendEmail")]
+    private FirebaseUser mUser;
+    
+    private bool mIsInitialized = false;
+    
+    public event Action<OnLogInEventArgs> OnLogInEvent;
+    
     [Header("친구 기능 UI")]
     [SerializeField] private TMP_InputField mInputFriendEmail;
-    [FormerlySerializedAs("buttonSendRequest")] [SerializeField] private Button mButtonSendRequest;
-    [FormerlySerializedAs("buttonAcceptRequest")] [SerializeField] private Button mButtonAcceptRequest;
-    [FormerlySerializedAs("buttonRemoveFriend")] [SerializeField] private Button mButtonRemoveFriend;
-    [FormerlySerializedAs("buttonShowFriends")] [SerializeField] private Button mButtonShowFriends;
-    [FormerlySerializedAs("buttonShowRequests")] [SerializeField] private Button mButtonShowRequests;
+    [SerializeField] private Button mButtonSendRequest;
+    [SerializeField] private Button mButtonAcceptRequest;
+    [SerializeField] private Button mButtonRemoveFriend;
+    [SerializeField] private Button mButtonShowFriends;
+    [SerializeField] private Button mButtonShowRequests;
 
-    private void Start()
+    private async void Start()
     {
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+        Debug.Log("UserManager Start");
+
+        DependencyStatus dependencyStatus = await FirebaseApp.CheckAndFixDependenciesAsync();
+        if (dependencyStatus == DependencyStatus.Available)
         {
-            if (task.Result == DependencyStatus.Available)
+            AppOptions options = new AppOptions()
             {
-                AppOptions options = new AppOptions()
-                {
-                    ApiKey = FirebaseApp.DefaultInstance.Options.ApiKey,
-                    AppId = FirebaseApp.DefaultInstance.Options.AppId,
-                    DatabaseUrl = FirebaseApp.DefaultInstance.Options.DatabaseUrl,
-                    MessageSenderId = FirebaseApp.DefaultInstance.Options.MessageSenderId,
-                    ProjectId = FirebaseApp.DefaultInstance.Options.ProjectId,
-                    StorageBucket = FirebaseApp.DefaultInstance.Options.StorageBucket
-                };
-                var app = FirebaseApp.Create(options, Guid.NewGuid().ToString());
+                ApiKey = FirebaseApp.DefaultInstance.Options.ApiKey,
+                AppId = FirebaseApp.DefaultInstance.Options.AppId,
+                DatabaseUrl = FirebaseApp.DefaultInstance.Options.DatabaseUrl,
+                MessageSenderId = FirebaseApp.DefaultInstance.Options.MessageSenderId,
+                ProjectId = FirebaseApp.DefaultInstance.Options.ProjectId,
+                StorageBucket = FirebaseApp.DefaultInstance.Options.StorageBucket
+            };
+            var app = FirebaseApp.Create(options, Guid.NewGuid().ToString());
                 
-                mAuth = FirebaseAuth.GetAuth(app);
-                mDB = FirebaseFirestore.GetInstance(app);
+            mAuth = FirebaseAuth.GetAuth(app);
+            mDB = FirebaseFirestore.GetInstance(app);
+                
+            /*mButtonSendRequest.onClick.AddListener(OnSendFriendRequest);
+            mButtonAcceptRequest.onClick.AddListener(OnAcceptFriendRequest);
+            mButtonRemoveFriend.onClick.AddListener(OnRemoveFriend);
+            mButtonShowFriends.onClick.AddListener(OnShowFriends);
+            mButtonShowRequests.onClick.AddListener(OnShowRequests);*/
 
-                mButtonSignUp.onClick.AddListener(OnSignUpClicked);
-                mButtonLogin.onClick.AddListener(OnLoginClicked);
-                mButtonSendRequest.onClick.AddListener(OnSendFriendRequest);
-                mButtonAcceptRequest.onClick.AddListener(OnAcceptFriendRequest);
-                mButtonRemoveFriend.onClick.AddListener(OnRemoveFriend);
-                mButtonShowFriends.onClick.AddListener(OnShowFriends);
-                mButtonShowRequests.onClick.AddListener(OnShowRequests);
-            }
-            else
-            {
-                Debug.LogError("Firebase 초기화 실패");
-            }
-        });
-    }
-
-    private void OnSignUpClicked()
-    {
-        string email = mInputSignUpEmail.text;
-        string password = mInputSignUpPassword.text;
-        string nickname = mInputSignUpNickname.text;
-
-        mAuth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
+            mIsInitialized = true;
+            Debug.Log("Firebase 초기화 성공");
+        }
+        else
         {
-            if (task.IsCompletedSuccessfully)
-            {
-                FirebaseUser user = task.Result.User;
-                SaveUserToFirestore(user.UserId, email, nickname, password);
-            }
-            else
-            {
-                Debug.LogError("회원가입 실패: " + task.Exception?.Message);
-            }
-        });
+            Debug.LogError("Firebase 초기화 실패");
+        }
     }
-
-    private void OnLoginClicked()
+    
+    public void OnLoginButtonClicked(OnSignInEventArgs args)
     {
-        string email = mInputLoginEmail.text;
-        string password = mInputLoginPassword.text;
-
-        mAuth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
+        SignIn(args.Email, args.Password);
+    }
+    public void OnSignUpButtonClicked(OnSignUpEventArgs args)
+    {
+        CreateAccount(args.Email, args.Password, args.Nickname);
+    }
+    private void OnLogIn(FirebaseUser newUser)
+    {
+        mUser = newUser;
+        OnLogInEventArgs args = new OnLogInEventArgs()
         {
-            if (task.IsCompletedSuccessfully)
+            UserID = newUser.UserId
+        };
+        OnLogInEvent?.Invoke(args);
+    }
+    
+    private void SignIn(string email, string password)
+    {
+        try
+        {
+            if (mIsInitialized == false) 
             {
-                Debug.Log("로그인 성공: " + task.Result.User.Email);
+                Debug.LogError("Firebase가 초기화되지 않았습니다.");
+                return;
             }
-            else
+
+            mAuth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
             {
-                Debug.LogError("로그인 실패: " + task.Exception?.Message);
+                if (task.IsFaulted)
+                {
+                    if (task.Exception != null && task.Exception.InnerException is FirebaseException firebaseEx)
+                    {
+                        var errorCode = ((FirebaseException)firebaseEx).ErrorCode;
+
+                        if (errorCode == (int)AuthError.UserNotFound)
+                        {
+                            Debug.LogError("Email not found");
+                        }
+                        else if (errorCode == (int)AuthError.WrongPassword)
+                        {
+                            Debug.LogError("Password is incorrect");
+                        }
+                        else
+                        {
+                            Debug.LogError("로그인 중 예외 발생: " + firebaseEx.Message);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("로그인 중 알 수 없는 예외 발생: " + task.Exception?.Message);
+                    }
+
+                    return;
+                }
+
+                if (task.IsCompleted)
+                {
+                    FirebaseUser newUser = task.Result.User;
+                    Debug.Log("로그인 성공: " + newUser.Email);
+                    FriendManager.MyUid = newUser?.UserId;
+                    Debug.Log("CurrentUser: " + newUser?.Email);
+
+                    OnLogIn(newUser);
+                }
+
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("SignIn에서 예외 발생: " + ex.Message);
+        }
+    }
+    
+    private void CreateAccount(string email, string password, string nickname)
+    {
+        try
+        {
+            if (mIsInitialized == false)
+            {
+                Debug.LogError("Firebase가 초기화되지 않았습니다.");
+                return;
             }
-        });
+
+            mAuth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
+            {
+                if (task.IsCompleted && !task.IsFaulted)
+                {
+                    FirebaseUser newUser = task.Result.User;
+                    Debug.Log("회원가입 성공");
+
+                    SaveUserToFirestore(newUser.UserId, email, nickname, password);
+                }
+                else
+                {
+                    Debug.Log("회원가입 실패: " + task.Exception?.Message);
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("CreateAccount에서 예외 발생: " + ex.Message);
+        }
     }
 
     private void SaveUserToFirestore(string uid, string email, string nickname, string password)
@@ -130,11 +206,11 @@ public class UserManager : MonoBehaviour
         return BitConverter.ToString(hash).Replace("-", "").ToLower();
     }
 
-    private async void OnSendFriendRequest()
+    public async void OnSendFriendRequest(string email)
     {
         try
         {
-            string friendEmail = mInputFriendEmail.text;
+            string friendEmail = email;
             string myUid = mAuth.CurrentUser?.UserId;
             string friendUid = await FindUidByEmail(friendEmail);
 
@@ -157,7 +233,7 @@ public class UserManager : MonoBehaviour
         }
     }
 
-    private async void OnAcceptFriendRequest()
+    public async void OnAcceptFriendRequest()
     {
         try
         {
@@ -191,7 +267,7 @@ public class UserManager : MonoBehaviour
         }
     }
 
-    private async void OnRemoveFriend()
+    public async void OnRemoveFriend()
     {
         try
         {
@@ -211,7 +287,7 @@ public class UserManager : MonoBehaviour
         }
     }
 
-    private async void OnShowFriends()
+    public async void OnShowFriends()
     {
         try
         {
@@ -237,7 +313,7 @@ public class UserManager : MonoBehaviour
         }
     }
 
-    private async void OnShowRequests()
+    public async void OnShowRequests()
     {
         try
         {
