@@ -1,58 +1,57 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class Friend : MonoBehaviour
+namespace _2.InGame.Scripts.Firebase.Friend
 {
-    public FriendManager mFriendManager;
-    [SerializeField] private TMP_InputField mInputFriendID;
+    public class Friend : MonoBehaviour
+    {
+        public FriendManager mFriendManager;
+        [SerializeField] private TMP_InputField mInputFriendID;
     
-    // Start is called before the first frame update
-    void Start()
-    {
+        // Start is called before the first frame update
+        void Start()
+        {
         
-    }
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
+        // Update is called once per frame
+        void Update()
+        {
         
-    }
+        }
 
-    public void SendFriendRequest()
-    {
-        mFriendManager.SendFriendRequest(mInputFriendID.text, success =>
+        public void OnSendFriendRequest()
         {
-            if (success) Debug.Log("요청 성공!");
-            else Debug.Log("요청 실패!");
-        });
-    }
-    
-    public void AcceptFriendRequest()
-    {
-        mFriendManager.AcceptFriendRequest("상대 UID", success =>
-        {
-            if (success) Debug.Log("수락 완료!");
-        });
-    }
-
-    public void RemoveFriend()
-    {
-        mFriendManager.RemoveFriend(mInputFriendID.text, success =>
-        {
-            if (success) Debug.Log("삭제 완료!");
-        });
-    }
-
-    public void GetFriendList()
-    {
-        mFriendManager.GetFriendList(friendList =>
-        {
-            foreach (var uid in friendList)
+            string emailToAdd = mInputFriendID.text;
+            mFriendManager.AddFriendByEmail(emailToAdd, success =>
             {
-                Debug.Log("친구 UID: " + uid);
-            }
-        });
+                Debug.Log(success ? "친구 추가 성공" : "친구 추가 실패");
+            });
+        }
+    
+        public void OnAcceptFriendRequest()
+        {
+            
+        }
+
+        public void OnRemoveFriend()
+        {
+            string emailToRemove = mInputFriendID.text;
+            mFriendManager.RemoveFriendByEmail(emailToRemove, success =>
+            {
+                Debug.Log(success ? "친구 삭제 성공" : "친구 삭제 실패");
+            });
+        }
+
+        public void OnGetFriendList()
+        {
+            mFriendManager.GetFriendList(friendEmails =>
+            {
+                foreach (var email in friendEmails)
+                {
+                    Debug.Log("친구 이메일: " + email);
+                }
+            });
+        }
     }
 }
