@@ -95,7 +95,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     
     private void LoadLobbyScene()
     {
-        SceneManager.LoadScene(1, LoadSceneMode.Single);
+        SceneManager.LoadScene(LOBBY_SCENE_INDEX, LoadSceneMode.Single);
     }
 
     private async Task InitRunnerAsync()
@@ -152,9 +152,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             return;
         }
         Debug.Log("[SessionManager] JoinSessionLobby Success");
-
-        mSessionState = GameSessionState.Room;
-        callbacks.OnEnteredRoom?.Invoke();
+        
     }
 
     public async void LeaveMatchMakingAsync()
@@ -220,6 +218,8 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         mRoomInfo.roomName = roomName;
         
         mSessionState = GameSessionState.Room;
+        
+        callbacks.OnEnteredRoom?.Invoke();
     }
 
     private async void JoinRoom(string roomName)
@@ -238,6 +238,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         mRoomInfo.roomName = roomName;
         mSessionState = GameSessionState.Room;
 
+        callbacks.OnEnteredRoom?.Invoke();
     }
     
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
@@ -247,6 +248,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         canStart &= runner.ActivePlayers.Count() == MAX_PLAYER_COUNT;
         if (canStart)
         {
+            Debug.Log($"[SessionManager] OnPlayerJoined : {player.PlayerId} ::: 플레이어 수가 {MAX_PLAYER_COUNT}명에 도달했습니다. 게임 시작을 요청합니다.");
             StartInGame();
         }
     }
