@@ -108,8 +108,11 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         SetState(new WaitingState()); // 초기 상태는 대기로
 
         StartCoroutine(RegisterPlayer());
-        UIAdapter.Instance.SetLocalPlayerName($"{Ref.PlayerId}");
-        UIAdapter.Instance.RegisterPlayer(this);
+        if (HasStateAuthority)
+        {
+            UIAdapter.Instance.SetLocalPlayerName($"{Ref.PlayerId}");
+            UIAdapter.Instance.RegisterPlayer(this);
+        }
     }
 
 
