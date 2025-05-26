@@ -765,6 +765,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: MainSystem
       objectReference: {fileID: 0}
+    - target: {fileID: 1202258734675804187, guid: b4778c39c8237924eb7258502791b186,
+        type: 3}
+      propertyPath: mRoomMapPlayerCount
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1668434357587498442, guid: b4778c39c8237924eb7258502791b186,
         type: 3}
       propertyPath: m_LocalPosition.x

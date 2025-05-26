@@ -32,12 +32,14 @@ public class GameClient
 
 public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
 {
-    public const int MAX_PLAYER_COUNT = 4;
+    //public const int MAX_PLAYER_COUNT = 4;
+    public const int MAX_PLAYER_COUNT = 1;
     public const int LOBBY_SCENE_INDEX = 1;
     public const int IN_GAME_SCENE_INDEX = 2;
     
     public class GameRoomInfo
     {
+        PlayerRef localPlayer;
         public string roomName;
         public List<GameClient> players = new List<GameClient>();
         public int userCount => players.Count; // 마스터 클라이언트 포함
@@ -61,9 +63,12 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     
     private NetworkRunner mNetworkRunner;
     private NetworkSceneManagerDefault mNetworkSceneManager;
+    private NetworkObjectProviderDefault mNetworkObjectProvider;
     
     private GameSessionState mSessionState = GameSessionState.Ready;
-
+    
+    [SerializeField] private string mRoomNameForTesting = "00"; // 테스트용 방 이름
+    [SerializeField] private int mRoomMapPlayerCount = 1; // 테스트용 방 플레이어 수
     public class Callbacks
     {
         public Action OnLoginSuccess;
@@ -110,20 +115,24 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             Destroy(mNetworkSceneManager);
         }
         
+        if(mNetworkObjectProvider != null)
+        {
+            Destroy(mNetworkObjectProvider);
+        }
+        
+        
         await Task.Delay(1000);
         
         mNetworkRunner = gameObject.AddComponent<NetworkRunner>();
         mNetworkSceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
+        mNetworkObjectProvider = gameObject.AddComponent<NetworkObjectProviderDefault>();
         mNetworkRunner.ProvideInput = true;
         
     }
 
-    public async void EnterLobbyAsync()
+    public async Task EnterLobbyAsync()
     {
-        if (mNetworkRunner == null)
-        {
-            await InitRunnerAsync();
-        }
+        await InitRunnerAsync();
         
         mSessionState = GameSessionState.Lobby;
         callbacks.OnEnteredLobby?.Invoke();
@@ -163,8 +172,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             return;
         }
         mSessionState = GameSessionState.Lobby;
-        await mNetworkRunner.Shutdown();
-
+        await EnterLobbyAsync();
         callbacks.OnLeftRoom?.Invoke();
     }
 
@@ -185,15 +193,29 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
         Debug.Log($"[SessionManager] OnSessionListUpdated, sessionList.Count = {sessionList.Count}");
+        /*
         SessionInfo joinAble = sessionList.FirstOrDefault(sessionInfo =>
         {
             return sessionInfo.PlayerCount < sessionInfo.MaxPlayers &&
                    sessionInfo.IsOpen && sessionInfo.IsVisible;
         });
+        */
+
+        SessionInfo joinAble = null;
+
+        foreach (SessionInfo sessionInfo in sessionList)
+        {
+            if (sessionInfo.Name == mRoomNameForTesting)
+            {
+                joinAble = sessionInfo;
+                break;
+            }
+        }
+        
 
         if (joinAble == null)
         {
-            CreateRoom("room_" + Guid.NewGuid());
+            CreateRoom(mRoomNameForTesting);
         }
         else
         {
@@ -209,8 +231,9 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         {
             GameMode = GameMode.Shared,
             SessionName = roomName, // room_{guid} 가 roomName
-            PlayerCount = MAX_PLAYER_COUNT,
+            PlayerCount = mRoomMapPlayerCount,
             SceneManager = mNetworkSceneManager,
+            ObjectProvider = mNetworkObjectProvider
         };
         
         await mNetworkRunner.StartGame(args);
@@ -245,10 +268,10 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     {
         Debug.Log($"Player Joined: {player.PlayerId}");
         bool canStart = mNetworkRunner.IsSharedModeMasterClient;
-        canStart &= runner.ActivePlayers.Count() == MAX_PLAYER_COUNT;
+        canStart &= runner.ActivePlayers.Count() == mRoomMapPlayerCount;
         if (canStart)
         {
-            Debug.Log($"[SessionManager] OnPlayerJoined : {player.PlayerId} ::: 플레이어 수가 {MAX_PLAYER_COUNT}명에 도달했습니다. 게임 시작을 요청합니다.");
+            Debug.Log($"[SessionManager] OnPlayerJoined : {player.PlayerId} ::: 플레이어 수가 {mRoomMapPlayerCount}명에 도달했습니다. 게임 시작을 요청합니다.");
             StartInGame();
         }
     }
