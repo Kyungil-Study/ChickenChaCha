@@ -59,6 +59,7 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
     public PlayerScoreUI scoreUI;
     public InputHandler inputHandler;
     public IPlayerState currentState;
+
     [Networked] public PlayerRef Ref { get; set; }
     [Networked] public int PlayerIndex { get; set; }
 
@@ -134,17 +135,35 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         currentState?.Update(this);
     }
 
+    private bool mbCanInput = true;
     // 타일 선택 처리 (상태가 Active일 때만 처리)
     private void HandleTileSelected(SelectingTile tile)
     {
-        if (currentState is ActiveState)
+        if (currentState is ActiveState && mbCanInput)
         {
+            StartCoroutine(WaitTileAnimationCoroutine());
             var currentTile = GameManager.Instance.GetMatchTile(CurrentSteppingTile);
             var isSuccess = GameManager.Instance.OpenTile(currentTile, tile);
             if (isSuccess)
             {
                 MoveTo(currentTile);
             }
+        }
+
+        IEnumerator WaitTileAnimationCoroutine()
+        {
+            mbCanInput = false;
+            tile.ShowFace();
+            AnimatorStateInfo state = tile.anim.GetCurrentAnimatorStateInfo(0);
+            while ((state.shortNameHash == SelectingTile.HIDE_FACE && state.normalizedTime > 0.8f) == false)
+            {
+                state = tile.anim.GetCurrentAnimatorStateInfo(0);
+                yield return null;
+            }
+
+            mbCanInput = true;
+            Debug.Log("대기 코루틴 종류ㅕㅛ");
+            yield break;
         }
     }
 
