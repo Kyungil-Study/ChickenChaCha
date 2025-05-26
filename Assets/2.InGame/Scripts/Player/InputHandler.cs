@@ -13,12 +13,12 @@ public class InputHandler : NetworkBehaviour
     // 타일 선택 콜백 처리 -> NetworkPlayer에게 보내기
     public Action<SelectingTile> OnTileSelected;
     
-    private Camera camera;
+    private Camera mCamera;
     private bool bClicked;
     
     public override void Spawned()
     {
-        camera = Camera.main;
+        mCamera = Camera.main;
         bClicked = false;
     }
     
@@ -42,7 +42,7 @@ public class InputHandler : NetworkBehaviour
         {
             bClicked = false; // 플래그 초기화
 
-            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = mCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out var hit, Mathf.Infinity, clickLayer))
             {
                 var tile = hit.collider.gameObject.GetComponent<SelectingTile>();
