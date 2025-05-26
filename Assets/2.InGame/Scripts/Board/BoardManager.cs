@@ -22,20 +22,12 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
 
     private IEnumerator LinkSteppingTiles()
     {
-        bool isAllReady = false;
-        while (isAllReady == false)
+        while (steppingTiles.Any(tile => tile == null))
         {
             yield return null;
-            foreach (var tile in steppingTiles)
-            {
-                if (tile == null)
-                {
-                    break;
-                }
-
-                isAllReady = true;
-            }
         }
+
+        Debug.Log("All stepping tiles are ready. Linking...");
 
         int len = steppingTiles.Length;
         for (int i = 0; i < len; i++)
@@ -58,47 +50,61 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
             players = FindObjectsByType<NetworkPlayer>(FindObjectsSortMode.InstanceID);
         }
 
-        SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6));
-        SpawnSelectingTiles(4, 3, transform.position, new Vector3(-3, 2.5f, -3), new Vector3(3, 2.5f, 3));
+        StartCoroutine(InitBoardCoroutine(players));
+    }
+
+    private IEnumerator InitBoardCoroutine(NetworkPlayer[] players)
+    {
+        yield return StartCoroutine(SpawnSteppingTiles(transform.position + new Vector3(-6, 2.5f, -6)));
+        yield return StartCoroutine(SpawnSelectingTiles(4, 3, transform.position, new Vector3(-3, 2.5f, -3),
+            new Vector3(3, 2.5f, 3)));
         InitPlayerPieces(players);
     }
 
-    private void SpawnSteppingTiles(Vector3 zeroPosition)
+    private void SpawnTile(GameObject prefab, Vector3 position, TileInfo info)
     {
+        var netObj = Runner.Spawn(prefab, position + Vector3.up * 2f, onBeforeSpawned: (runner, o) =>
+        {
+            Tile tile = o.GetComponent<Tile>();
+            tile.Info = info;
+        });
+    }
+
+    private IEnumerator SpawnSteppingTiles(Vector3 zeroPosition)
+    {
+        var wait = new WaitForSeconds(0.05f);
         int index = 0;
 
         int[] firstBag = RandomUtil.GetShuffled(imageKeys);
         int[] secondBag = RandomUtil.GetShuffled(imageKeys);
         var rndKey = firstBag.Concat(secondBag).ToArray();
 
-        Vector3 firstEnd = SpawnLine(zeroPosition, Vector3.forward);
-        Vector3 secondEnd = SpawnLine(firstEnd, Vector3.right);
-        Vector3 thirdEnd = SpawnLine(secondEnd, Vector3.back);
-        SpawnLine(thirdEnd, Vector3.left);
+        Vector3 position = zeroPosition;
 
-        Vector3 SpawnLine(Vector3 initPosition, Vector3 direction)
+        yield return StartCoroutine(SpawnLine(Vector3.forward));
+        yield return StartCoroutine(SpawnLine(Vector3.right));
+        yield return StartCoroutine(SpawnLine(Vector3.back));
+        yield return StartCoroutine(SpawnLine(Vector3.left));
+
+        IEnumerator SpawnLine(Vector3 direction)
         {
             for (int i = 0; i < 6; i++)
             {
                 int imageKey = rndKey[index];
 
                 TileInfo info = new TileInfo(ETileType.Stepping, index, imageKey);
-                var netObj = Runner.Spawn(steppingTilePrefab, initPosition, onBeforeSpawned: (runner, o) =>
-                {
-                    Tile tile = o.GetComponent<Tile>();
-                    tile.Info = info;
-                });
+                SpawnTile(steppingTilePrefab, position, info);
+                yield return wait;
 
-                initPosition += direction * 2;
+                position += direction * 2;
                 index++;
             }
-
-            return initPosition;
         }
     }
 
-    private void SpawnSelectingTiles(int columnCount, int rowCount, Vector3 offset, Vector3 start, Vector3 end)
+    private IEnumerator SpawnSelectingTiles(int columnCount, int rowCount, Vector3 offset, Vector3 start, Vector3 end)
     {
+        var wait = new WaitForSeconds(0.05f);
         Vector3 diff = end - start;
         Vector3 garo = Vector3.right * diff.x / (columnCount - 1);
         Vector3 sero = Vector3.forward * diff.z / (rowCount - 1);
@@ -113,12 +119,8 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
                 int imageKey = rndKey[index];
 
                 TileInfo info = new TileInfo(ETileType.Selecting, index, imageKey);
-                var netObj = Runner.Spawn(selectingTilePrefab, offset + start + garo * x + sero * z,
-                    onBeforeSpawned: (runner, obj) =>
-                    {
-                        Tile tile = obj.GetComponent<Tile>();
-                        tile.Info = info;
-                    });
+                SpawnTile(selectingTilePrefab, offset + start + garo * x + sero * z, info);
+                yield return wait;
             }
         }
     }
@@ -141,6 +143,7 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
 
             player.CurrentSteppingTile = tile;
             tile.StandingPlayer = player.Ref;
+            player.RPC_LookAtNextTile();
         }
     }
 
