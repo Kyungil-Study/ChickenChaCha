@@ -143,6 +143,7 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
 
             player.CurrentSteppingTile = tile;
             tile.StandingPlayer = player.Ref;
+            player.RPC_LookAtNextTile();
         }
     }
 

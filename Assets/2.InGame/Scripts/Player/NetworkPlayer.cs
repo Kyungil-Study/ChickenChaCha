@@ -135,13 +135,14 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         currentState?.Update(this);
     }
 
-    private bool mbCanInput = true;
+
+    private bool mbIsWaitingTile = false;
     // 타일 선택 처리 (상태가 Active일 때만 처리)
     private void HandleTileSelected(SelectingTile tile)
     {
-        if (currentState is ActiveState && mbCanInput)
+        if (currentState is ActiveState && mbIsWaitingTile == false)
         {
-            StartCoroutine(WaitTileAnimationCoroutine());
+            RPC_StartWait(tile);
             var currentTile = GameManager.Instance.GetMatchTile(CurrentSteppingTile);
             var isSuccess = GameManager.Instance.OpenTile(currentTile, tile);
             if (isSuccess)
@@ -149,22 +150,29 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
                 MoveTo(currentTile);
             }
         }
+    }
 
-        IEnumerator WaitTileAnimationCoroutine()
+    [Rpc(RpcSources.All,RpcTargets.All)]
+    private void RPC_StartWait(SelectingTile tile)
+    {
+        StartCoroutine(WaitTileAnimationCoroutine(tile));
+    }
+    
+    private IEnumerator WaitTileAnimationCoroutine(SelectingTile tile)
+    {
+        NetworkPlayer local = Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<NetworkPlayer>();
+        local.mbIsWaitingTile = true;
+            
+        tile.ShowFace();
+        AnimatorStateInfo state = tile.anim.GetCurrentAnimatorStateInfo(0);
+        while ((state.shortNameHash == SelectingTile.HIDE_FACE && state.normalizedTime > 0.95f) == false)
         {
-            mbCanInput = false;
-            tile.ShowFace();
-            AnimatorStateInfo state = tile.anim.GetCurrentAnimatorStateInfo(0);
-            while ((state.shortNameHash == SelectingTile.HIDE_FACE && state.normalizedTime > 0.8f) == false)
-            {
-                state = tile.anim.GetCurrentAnimatorStateInfo(0);
-                yield return null;
-            }
-
-            mbCanInput = true;
-            Debug.Log("대기 코루틴 종류ㅕㅛ");
-            yield break;
+            state = tile.anim.GetCurrentAnimatorStateInfo(0);
+            yield return null;
         }
+
+        local.mbIsWaitingTile = false;
+        yield break;
     }
 
     public void MoveTo(SteppingTile targetTile)
@@ -172,7 +180,13 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         transform.position = targetTile.transform.position;
         GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile, Runner.LocalPlayer);
         CurrentSteppingTile = targetTile;
-        transform.forward = targetTile.Next.transform.position - targetTile.transform.position;
+        transform.forward = CurrentSteppingTile.Next.transform.position - CurrentSteppingTile.transform.position;
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_LookAtNextTile()
+    {
+        transform.forward = CurrentSteppingTile.Next.transform.position - CurrentSteppingTile.transform.position;
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
