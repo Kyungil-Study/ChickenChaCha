@@ -139,6 +139,7 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         }
 
         UIAdapter.Instance.RegisterPlayer(this);
+        tailModels[0].SetActive(true);
     }
 
     // 상태 확장을 고려해서 플레이어 상태 변경
