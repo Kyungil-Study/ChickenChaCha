@@ -1,6 +1,7 @@
 using System.Collections;
 using Fusion;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // 플레이어 데이터, 애니메이션 등 처리하기
 
@@ -54,12 +55,12 @@ public class WaitingState : IPlayerState
 
 public class NetworkPlayer : NetworkBehaviour //, IToPlayer
 {
-    //public GameObject tailModel; // 꽁지 모델 관리 오브젝트
     public NetworkTransform networkTransform;
     public PlayerScoreUI scoreUI;
     public InputHandler inputHandler;
+    public GameObject[] tailModels;
     public IPlayerState currentState;
-
+    
     [Networked] public PlayerRef Ref { get; set; }
     [Networked] public int PlayerIndex { get; set; }
 
@@ -85,9 +86,20 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
 
     private void OnChangedTailCount()
     {
+        for (int i = 0; i < TailCount; i++)
+        {
+            tailModels[i].SetActive(true);
+        }
+
+        for (int i = TailCount; i < tailModels.Length; i++)
+        {
+            tailModels[i].SetActive(false);
+        }
+
         if (GameManager.Instance.CheckTail(TailCount))
         {
             Debug.Log("Winning!");
+            RPC_Result(Ref);
         }
         else
         {
@@ -95,6 +107,19 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         }
 
         scoreUI.UpdateScore(TailCount);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_Result(PlayerRef player)
+    {
+        if (Runner.LocalPlayer == player)
+        {
+            SceneManager.LoadScene("Result");
+        }
+        else
+        {
+            SceneManager.LoadScene("Result");
+        }
     }
 
     public override void Spawned()
@@ -112,9 +137,10 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         {
             UIAdapter.Instance.SetLocalPlayerName($"{Ref.PlayerId}");
         }
+
         UIAdapter.Instance.RegisterPlayer(this);
     }
-    
+
     // 상태 확장을 고려해서 플레이어 상태 변경
     public void SetState(IPlayerState newState)
     {
@@ -122,7 +148,7 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         currentState = newState;
         currentState.EnterState(this);
     }
-    
+
     private IEnumerator RegisterPlayer()
     {
         yield return new WaitForSeconds(0.1f);
@@ -136,7 +162,7 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
     {
         currentState?.Update(this);
     }
-    
+
     private bool mbIsWaitingTile = false;
     // 타일 선택 처리 (상태가 Active일 때만 처리)
     private void HandleTileSelected(SelectingTile tile)
