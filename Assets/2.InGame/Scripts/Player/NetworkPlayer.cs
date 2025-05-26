@@ -114,8 +114,15 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
             UIAdapter.Instance.RegisterPlayer(this);
         }
     }
-
-
+    
+    // 상태 확장을 고려해서 플레이어 상태 변경
+    public void SetState(IPlayerState newState)
+    {
+        currentState?.ExitState(this);
+        currentState = newState;
+        currentState.EnterState(this);
+    }
+    
     private IEnumerator RegisterPlayer()
     {
         yield return new WaitForSeconds(0.1f);
@@ -125,20 +132,11 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         Debug.Log($"RegisterPlayer() // playerCount : {GameManager.Instance.playerCount}");
     }
 
-    // 상태 확장을 고려해서 플레이어 상태 변경
-    public void SetState(IPlayerState newState)
-    {
-        currentState?.ExitState(this);
-        currentState = newState;
-        currentState.EnterState(this);
-    }
-
     public override void FixedUpdateNetwork()
     {
         currentState?.Update(this);
     }
-
-
+    
     private bool mbIsWaitingTile = false;
     // 타일 선택 처리 (상태가 Active일 때만 처리)
     private void HandleTileSelected(SelectingTile tile)
@@ -155,17 +153,17 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         }
     }
 
-    [Rpc(RpcSources.All,RpcTargets.All)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     private void RPC_StartWait(SelectingTile tile)
     {
         StartCoroutine(WaitTileAnimationCoroutine(tile));
     }
-    
+
     private IEnumerator WaitTileAnimationCoroutine(SelectingTile tile)
     {
         NetworkPlayer local = Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<NetworkPlayer>();
         local.mbIsWaitingTile = true;
-            
+
         tile.ShowFace();
         AnimatorStateInfo state = tile.anim.GetCurrentAnimatorStateInfo(0);
         while ((state.shortNameHash == SelectingTile.HIDE_FACE && state.normalizedTime > 0.95f) == false)
@@ -183,13 +181,18 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         transform.position = targetTile.transform.position;
         GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile, Runner.LocalPlayer);
         CurrentSteppingTile = targetTile;
+        LookAtNextTile();
+    }
+
+    private void LookAtNextTile()
+    {
         transform.forward = CurrentSteppingTile.Next.transform.position - CurrentSteppingTile.transform.position;
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_LookAtNextTile()
     {
-        transform.forward = CurrentSteppingTile.Next.transform.position - CurrentSteppingTile.transform.position;
+        LookAtNextTile();
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
