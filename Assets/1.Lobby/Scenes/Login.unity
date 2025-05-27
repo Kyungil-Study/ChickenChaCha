@@ -703,7 +703,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mRoomNameForTesting: 00
-  mRoomMapPlayerCount: 2
+  mRoomMapPlayerCount: 4
 --- !u!4 &1617176915641697326
 Transform:
   m_ObjectHideFlags: 0
