@@ -11,13 +11,9 @@ public class UIFriendRequestMenu : UISingleton<UIFriendRequestMenu>
     [Header("Search")]
     [SerializeField] private TMP_InputField mSearchInputField;
     
-    [SerializeField] private Button mSearchButton;
-    [SerializeField] private TMP_Text mSearchLogText;
-    
     [SerializeField] private Button mRequestButton;
     [SerializeField] private TMP_Text mRequestLogText;
 
-    public event Action<string> OnSearchButtonClicked;
     public event Action<string> OnRequestClicked;
 
     private void Awake()
@@ -27,13 +23,11 @@ public class UIFriendRequestMenu : UISingleton<UIFriendRequestMenu>
 
     private void OnEnable()
     {
-        UpdateSearchLog("");
         UpdateRequestLog("");
     }
     
     void Start()
     {
-        mSearchButton.onClick.AddListener(OnClickedSearchButton);
         mRequestButton.onClick.AddListener(OnClickedRequestButton);
     }
 
@@ -42,17 +36,7 @@ public class UIFriendRequestMenu : UISingleton<UIFriendRequestMenu>
         OnRequestClicked?.Invoke(mSearchInputField.text);
     }
 
-    void OnClickedSearchButton()
-    {
-        string searchText = mSearchInputField.text;
-        OnSearchButtonClicked?.Invoke(searchText);
-    }
     
-    public void UpdateSearchLog(string log)
-    {
-        mSearchLogText.text = log;
-    }
-
     public void UpdateRequestLog(string log)
     {
         mRequestLogText.text = log;

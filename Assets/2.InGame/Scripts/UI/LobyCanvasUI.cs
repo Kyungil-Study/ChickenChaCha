@@ -30,7 +30,6 @@ public class LobyCanvasUI : MonoBehaviour
 
     private void Update()
     {
-        SessionManager.GameRoomInfo roomInfo = SessionManager.Instance.RoomInfo;
     }
 
     private void OnInviteClicked()

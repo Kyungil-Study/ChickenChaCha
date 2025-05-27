@@ -606,11 +606,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4683370459893265439, guid: a7d216ce111b926479322df6f02dd383,
         type: 3}
-      propertyPath: m_Navigation.m_Mode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4683370459893265439, guid: a7d216ce111b926479322df6f02dd383,
-        type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 89396232}
@@ -619,59 +614,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SignupUI
       objectReference: {fileID: 0}
-    - target: {fileID: 5699430772229023120, guid: a7d216ce111b926479322df6f02dd383,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8898412540960430330, guid: a7d216ce111b926479322df6f02dd383,
-        type: 3}
-      propertyPath: m_Navigation.m_Mode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8898412540960430330, guid: a7d216ce111b926479322df6f02dd383,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8898412540960430330, guid: a7d216ce111b926479322df6f02dd383,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8898412540960430330, guid: a7d216ce111b926479322df6f02dd383,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 8898412540960430330, guid: a7d216ce111b926479322df6f02dd383,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8898412540960430330, guid: a7d216ce111b926479322df6f02dd383,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnSignUpButtonClicked
-      objectReference: {fileID: 0}
-    - target: {fileID: 8898412540960430330, guid: a7d216ce111b926479322df6f02dd383,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: UILoginMenu, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 8898412540960430330, guid: a7d216ce111b926479322df6f02dd383,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5699430772229023120, guid: a7d216ce111b926479322df6f02dd383,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2030642740}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a7d216ce111b926479322df6f02dd383, type: 3}
 --- !u!1 &2030642731 stripped
 GameObject:
@@ -727,19 +673,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2030642740
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2030642731}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 072dbd51c2444e24e81eff37ab686e8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  firstInput: {fileID: 2030642735}
 --- !u!1 &501940888547594562
 GameObject:
   m_ObjectHideFlags: 0
@@ -770,7 +703,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mRoomNameForTesting: 00
-  mRoomMapPlayerCount: 1
+  mRoomMapPlayerCount: 2
 --- !u!4 &1617176915641697326
 Transform:
   m_ObjectHideFlags: 0
@@ -846,6 +779,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3610947978722557826}
   - component: {fileID: 3883139293561369047}
+  - component: {fileID: 5044901201014538128}
   m_Layer: 0
   m_Name: UserManager
   m_TagString: Untagged
@@ -853,6 +787,18 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &5044901201014538128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5044901201014538127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d944d3adb5cc7bc40a76dbc5e6986404, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6446602818579115843
 MonoBehaviour:
   m_ObjectHideFlags: 0

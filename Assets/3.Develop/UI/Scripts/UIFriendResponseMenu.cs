@@ -25,15 +25,38 @@ public class UIFriendResponseMenu : UISingleton<UIFriendResponseMenu>
     List<UIFriendRequestItem> mRequestItemList = new List<UIFriendRequestItem>();
     HashSet<string> mAcceptedItemList = new HashSet<string>();
     
-    public event Action<List<string>> OnAcceptButtonClicked;
+    public event Action<OnAcceptFriendEventArgs , Action> OnAcceptButtonClicked;
     public event Action OnExitButtonClicked;
+    
 
-    private void Awake()
+    private void Start()
     {
         mAcceptButton.onClick.AddListener(OnClickedAcceptButton);
         mRejectButton.onClick.AddListener(OnClickedExitButton);
+        OnAcceptButtonClicked += UserManager.Instance.OnAcceptFriendRequest;
     }
 
+    private void OnEnable()
+    {
+        UserManager.Instance.OnShowRequests(() =>
+        {
+            UpdateView();
+        });
+    }
+
+    public void UpdateView()
+    {
+        Debug.Log($"Response Menu UpdateView called. Request count: {UserManager.Instance.RequestFriendList.Count}");
+        List<ViewItemData> viewItemList = new List<ViewItemData>();
+        foreach (var request in UserManager.Instance.RequestFriendList)
+        {
+            ViewItemData itemData = new ViewItemData();
+            itemData.userEmail = request;
+            viewItemList.Add(itemData);
+        }
+        UpdateListView(viewItemList);
+    }
+    
     public void UpdateListView(List<ViewItemData> requestItemList)
     {
         // destroy all items
@@ -72,7 +95,16 @@ public class UIFriendResponseMenu : UISingleton<UIFriendResponseMenu>
 
     void OnClickedAcceptButton()
     {
-        OnAcceptButtonClicked?.Invoke(mAcceptedItemList.ToList());
+        OnAcceptFriendEventArgs args = new OnAcceptFriendEventArgs();
+        args.AcceptedEmails = mAcceptedItemList.ToList();
+        OnAcceptButtonClicked?.Invoke(args,
+            () =>
+            {
+                UserManager.Instance.OnShowRequests(() =>
+                {
+                    UpdateView();
+                });
+            });
     }
 
     void OnClickedExitButton()
