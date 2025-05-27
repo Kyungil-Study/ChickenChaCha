@@ -348,8 +348,6 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         
     }
 
-   
-
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         
