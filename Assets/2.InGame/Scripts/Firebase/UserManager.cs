@@ -238,7 +238,7 @@ public class UserManager : MonoBehaviour
         }
     }
 
-    public async void OnAcceptFriendRequest(OnAcceptFriendEventArgs args)
+    public async void OnAcceptFriendRequest(OnAcceptFriendEventArgs args, Action OnComplete)
     {
         try
         {
@@ -277,6 +277,8 @@ public class UserManager : MonoBehaviour
         {
             Debug.LogError("친구 수락 중 오류: " + e.Message);
         }
+        
+        OnComplete.Invoke();
     }
 
     public async void OnRemoveFriend()
@@ -330,6 +332,7 @@ public class UserManager : MonoBehaviour
     public List<string> RequestFriendList => mRequestFriendList;
     public async void OnShowRequests(Action OnCompleteTask)
     {
+        Debug.Log($"OnShowRequests 호출됨");
         mRequestFriendList.Clear();
         try
         {

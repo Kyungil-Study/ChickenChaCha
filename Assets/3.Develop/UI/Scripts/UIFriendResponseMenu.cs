@@ -25,7 +25,7 @@ public class UIFriendResponseMenu : UISingleton<UIFriendResponseMenu>
     List<UIFriendRequestItem> mRequestItemList = new List<UIFriendRequestItem>();
     HashSet<string> mAcceptedItemList = new HashSet<string>();
     
-    public event Action<OnAcceptFriendEventArgs> OnAcceptButtonClicked;
+    public event Action<OnAcceptFriendEventArgs , Action> OnAcceptButtonClicked;
     public event Action OnExitButtonClicked;
     
 
@@ -46,6 +46,7 @@ public class UIFriendResponseMenu : UISingleton<UIFriendResponseMenu>
 
     public void UpdateView()
     {
+        Debug.Log($"Response Menu UpdateView called. Request count: {UserManager.Instance.RequestFriendList.Count}");
         List<ViewItemData> viewItemList = new List<ViewItemData>();
         foreach (var request in UserManager.Instance.RequestFriendList)
         {
@@ -96,7 +97,14 @@ public class UIFriendResponseMenu : UISingleton<UIFriendResponseMenu>
     {
         OnAcceptFriendEventArgs args = new OnAcceptFriendEventArgs();
         args.AcceptedEmails = mAcceptedItemList.ToList();
-        OnAcceptButtonClicked?.Invoke(args);
+        OnAcceptButtonClicked?.Invoke(args,
+            () =>
+            {
+                UserManager.Instance.OnShowRequests(() =>
+                {
+                    UpdateView();
+                });
+            });
     }
 
     void OnClickedExitButton()
