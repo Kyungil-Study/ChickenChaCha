@@ -31,6 +31,11 @@ public class UserManager : MonoBehaviour
     private FirebaseAuth mAuth;
     private FirebaseFirestore mDB;
     private FirebaseUser mUser;
+
+    public FirebaseApp App => mApp;
+    public FirebaseAuth Auth => mAuth;
+    public FirebaseFirestore DB => mDB;
+    public FirebaseUser User => mUser;
     
     private bool mIsInitialized = false;
     
