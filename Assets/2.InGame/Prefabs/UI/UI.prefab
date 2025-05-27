@@ -1555,6 +1555,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomUI
       objectReference: {fileID: 0}
+    - target: {fileID: 7637845000973354301, guid: 1039e72fafc74d643907e565780b53b7,
+        type: 3}
+      propertyPath: m_fontStyle
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7657812337181176140, guid: 1039e72fafc74d643907e565780b53b7,
         type: 3}
       propertyPath: m_Pivot.x

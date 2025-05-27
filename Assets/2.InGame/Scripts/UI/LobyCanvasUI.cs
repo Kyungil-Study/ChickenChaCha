@@ -15,10 +15,15 @@ public class LobyCanvasUI : MonoBehaviour
     [Header("PartyMember")]
     [SerializeField] private TextMeshProUGUI[] partyMemberText;
     
+    
     [Header("게임 찾기")]
     public UnityEvent OnMatchClicked;
     [Header("게임 떠가니")]
     public UnityEvent OnLeaveClicked;
+    
+    [Header("Testing")]
+    [SerializeField] private TMP_InputField roomNameText;
+    [SerializeField] private TMP_InputField playerCountText;
     
     [SerializeField] GameObject mGotoFriendPanel;
     
@@ -27,7 +32,7 @@ public class LobyCanvasUI : MonoBehaviour
         // 버튼 클릭 시 각 패널을 토글하는 리스너 등록
         createButton.onClick.AddListener(OnInviteClicked);
         
-        OnMatchClicked.AddListener(SessionManager.Instance.EnterMatchMakingAsync);
+        OnMatchClicked.AddListener(EnterMatchMaking);
         OnLeaveClicked.AddListener(SessionManager.Instance.LeaveMatchMakingAsync);
 
         if (UserManager.Instance.User.IsAnonymous)
@@ -38,6 +43,14 @@ public class LobyCanvasUI : MonoBehaviour
 
     private void Update()
     {
+    }
+
+    private void EnterMatchMaking()
+    {
+        SessionManager.Instance.RoomNameForTesting = roomNameText.text;
+        SessionManager.Instance.RoomMapPlayerCount = int.Parse(playerCountText.text);
+        
+        SessionManager.Instance.EnterMatchMakingAsync();
     }
 
     private void OnInviteClicked()
