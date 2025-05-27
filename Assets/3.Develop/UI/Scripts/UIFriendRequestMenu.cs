@@ -18,7 +18,12 @@ public class UIFriendRequestMenu : UISingleton<UIFriendRequestMenu>
     [SerializeField] private TMP_Text mRequestLogText;
 
     public event Action<string> OnSearchButtonClicked;
-    public event Action OnRequestClicked;
+    public event Action<string> OnRequestClicked;
+
+    private void Awake()
+    {
+        OnRequestClicked += UserManager.Instance.OnSendFriendRequest;
+    }
 
     private void OnEnable()
     {
@@ -29,11 +34,12 @@ public class UIFriendRequestMenu : UISingleton<UIFriendRequestMenu>
     void Start()
     {
         mSearchButton.onClick.AddListener(OnClickedSearchButton);
+        mRequestButton.onClick.AddListener(OnClickedRequestButton);
     }
 
-    void OnClickedRequestButton()
+    public void OnClickedRequestButton()
     {
-        OnRequestClicked?.Invoke();
+        OnRequestClicked?.Invoke(mSearchInputField.text);
     }
 
     void OnClickedSearchButton()

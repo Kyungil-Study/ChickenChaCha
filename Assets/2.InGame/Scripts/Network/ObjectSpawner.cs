@@ -10,12 +10,6 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
     public GameObject playerPrefab;
     public NetworkPrefabRef gameManagerPrefab;
     
-    public void PlayerJoined(PlayerRef player)
-    {
-        GameManagerSpawn();
-        PlayerSpawn(player);
-    }
-
     private void GameManagerSpawn()
     {
         if (GameManager.Instance != null)
@@ -53,5 +47,19 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
         // {
         //     GameManagerChange();
         // }
+    }
+
+
+    public void PlayerJoined(PlayerRef player)
+    {
+        Debug.Log("scene load done");
+        GameManagerSpawn();
+        PlayerSpawn(Runner.LocalPlayer);
+    }
+
+
+    public void SceneLoadDone(in SceneLoadDoneArgs sceneInfo)
+    {
+        
     }
 }

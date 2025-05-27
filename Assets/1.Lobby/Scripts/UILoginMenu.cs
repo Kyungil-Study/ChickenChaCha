@@ -7,7 +7,7 @@ using UnityEngine.Events;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class UILoginMenu : MonoBehaviour
+public class UILoginMenu : UISingleton<UILoginMenu>
 {
     [Header("UI Login")]
     [SerializeField] private TMP_InputField mInputLoginEmail; // TMP_InputField로 변경
@@ -24,9 +24,6 @@ public class UILoginMenu : MonoBehaviour
     [SerializeField] private Button mButtonLogin;
     [SerializeField] private Button mButtonSignUp;
     
-    //[FormerlySerializedAs("loginButton")] [SerializeField] private LoginButton mLoginButton;
-    [SerializeField] private TMP_Text mNotificationText;
-    
     [Space(10)]
     [Header("UI Buttons Events")]
     public UnityEvent<OnSignInEventArgs> OnLoginButtonClickedEvent;
@@ -38,7 +35,7 @@ public class UILoginMenu : MonoBehaviour
         mButtonSignUp.onClick.AddListener(OnSignUpButtonClicked);
     }
 
-    private void OnLoginButtonClicked()
+    public void OnLoginButtonClicked()
     {
         OnSignInEventArgs args = new OnSignInEventArgs()
         {
@@ -47,7 +44,7 @@ public class UILoginMenu : MonoBehaviour
         };
         OnLoginButtonClickedEvent?.Invoke(args);
     }
-    private void OnSignUpButtonClicked()
+    public void OnSignUpButtonClicked()
     {
         OnSignUpEventArgs args = new OnSignUpEventArgs()
         {

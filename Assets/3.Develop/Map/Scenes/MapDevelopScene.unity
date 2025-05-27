@@ -1928,8 +1928,40 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5578463833808454712, guid: 0406ba93321fde14f8ebcb30b75e2904,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 553436151}
   m_SourcePrefab: {fileID: 100100000, guid: 0406ba93321fde14f8ebcb30b75e2904, type: 3}
+--- !u!1 &553436149 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5578463833808454712, guid: 0406ba93321fde14f8ebcb30b75e2904,
+    type: 3}
+  m_PrefabInstance: {fileID: 553436148}
+  m_PrefabAsset: {fileID: 0}
+--- !u!81 &553436150 stripped
+AudioListener:
+  m_CorrespondingSourceObject: {fileID: 70608055352799607, guid: 0406ba93321fde14f8ebcb30b75e2904,
+    type: 3}
+  m_PrefabInstance: {fileID: 553436148}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &553436151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 553436149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d73b0a95be81246699cf0d9ecdc01863, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PreferredRunner: 0
+  Components:
+  - {fileID: 553436150}
+  _guid: 42927e4a-b129-4272-
 --- !u!43 &570374067
 Mesh:
   m_ObjectHideFlags: 0
@@ -2106,6 +2138,7 @@ GameObject:
   - component: {fileID: 591844754}
   - component: {fileID: 591844753}
   - component: {fileID: 591844755}
+  - component: {fileID: 591844756}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -2213,6 +2246,22 @@ MonoBehaviour:
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
   m_SoftShadowQuality: 0
+--- !u!114 &591844756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591844752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d73b0a95be81246699cf0d9ecdc01863, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PreferredRunner: 0
+  Components:
+  - {fileID: 591844753}
+  _guid: bb02b7bf-3df3-49ad-
 --- !u!43 &618048905
 Mesh:
   m_ObjectHideFlags: 0
