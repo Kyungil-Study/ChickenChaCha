@@ -54,7 +54,7 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
     {
         Debug.Log("scene load done");
         GameManagerSpawn();
-        PlayerSpawn(Runner.LocalPlayer);
+        PlayerSpawn(player);
     }
 
 
