@@ -57,7 +57,7 @@ MonoBehaviour:
       m_FlipV: 0
       m_SwapUV: 0
       m_Fill: 1
-      m_Scale: {x: 0.65, y: 0.65}
+      m_Scale: {x: 1.2, y: 1.2}
       m_Offset: {x: -0.5, y: -0.5}
       m_Rotation: 135
       m_Anchor: 9
@@ -78,17 +78,17 @@ MonoBehaviour:
   - {x: 0.5, y: 0, z: -0.5}
   - {x: 0.5, y: 0, z: 0.5}
   m_Textures0:
-  - {x: 0.5, y: 0.9596194}
-  - {x: 0.9596194, y: 0.5}
-  - {x: 0.040380627, y: 0.5}
-  - {x: 0.5, y: 0.040380627}
+  - {x: 0.5, y: 1.3485281}
+  - {x: 1.3485281, y: 0.5}
+  - {x: -0.34852815, y: 0.5}
+  - {x: 0.5, y: -0.34852815}
   m_Textures2: []
   m_Textures3: []
   m_Tangents:
-  - {x: -1, y: 0, z: 0, w: 1}
-  - {x: -1, y: 0, z: 0, w: 1}
-  - {x: -1, y: 0, z: 0, w: 1}
-  - {x: -1, y: 0, z: 0, w: 1}
+  - {x: -0.6401844, y: 0, z: 0.76822126, w: -1}
+  - {x: -0.6401844, y: 0, z: 0.76822126, w: -1}
+  - {x: -0.6401844, y: 0, z: 0.76822126, w: -1}
+  - {x: -0.6401844, y: 0, z: 0.76822126, w: -1}
   m_Colors: []
   m_UnwrapParameters:
     m_HardAngle: 88
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 105
+  m_VersionIndex: 161
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -123,7 +123,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d0d2ace3157233843b8ac6cab98622f8, type: 2}
+  - {fileID: 2100000, guid: 66d262912e97c154394cb7a52864295b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -136,7 +136,7 @@ MeshRenderer:
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
   m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 2
+  m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -624,10 +624,10 @@ MonoBehaviour:
   m_Textures2: []
   m_Textures3: []
   m_Tangents:
-  - {x: -1, y: 0, z: 0, w: 1}
-  - {x: -1, y: 0, z: 0, w: 1}
-  - {x: -1, y: 0, z: 0, w: 1}
-  - {x: -1, y: 0, z: 0, w: 1}
+  - {x: -0.7071068, y: 0, z: 0.7071068, w: -1}
+  - {x: -0.7071068, y: 0, z: 0.7071068, w: -1}
+  - {x: -0.7071068, y: 0, z: 0.7071068, w: -1}
+  - {x: -0.7071068, y: 0, z: 0.7071068, w: -1}
   m_Colors: []
   m_UnwrapParameters:
     m_HardAngle: 88
