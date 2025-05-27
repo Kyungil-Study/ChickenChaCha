@@ -18,19 +18,43 @@ public class UIFriendListMenu : MonoBehaviour
     
     [Space(10)]
     [Header("Request Menu UI Action Refs")]
-    [SerializeField] private Button mInviteButton;
+    [SerializeField] private Button mRemoveButton;
     [SerializeField] private Button mExitButton;
     
     List<UIFriendRequestItem> mRequestItemList = new List<UIFriendRequestItem>();
     HashSet<string> mCheckedItemList = new HashSet<string>();
     
-    public event Action<List<string>> OnInviteButtonClicked;
+    public event Action<List<string>,Action> OnRemoveButtonClicked;
     public event Action OnExitButtonClicked;
     
     private void Awake()
     {
-        mInviteButton.onClick.AddListener(OnClickedInviteButton);
-        mExitButton.onClick.AddListener(OnClickedExitButton);
+        OnRemoveButtonClicked += UserManager.Instance.OnRemoveFriend;
+        mRemoveButton.onClick.AddListener(() =>
+        {
+            OnRemoveButtonClicked?.Invoke(mCheckedItemList.ToList(), () =>
+            {
+                UserManager.Instance.OnShowFriends(() =>
+                {
+                    List<ViewItemData> viewItemList = new List<ViewItemData>();
+                    foreach (var friend in UserManager.Instance.FriendList)
+                    {
+                        var itemData = new ViewItemData
+                        {
+                            userEmail = friend
+                        };
+                        viewItemList.Add(itemData);
+                    }
+                    UpdateListView(viewItemList);
+                });
+            });
+        });
+        
+        mExitButton.onClick.AddListener(() =>
+        {
+            OnExitButtonClicked?.Invoke();
+        });
+        
     }
 
     private void OnEnable()
@@ -87,13 +111,4 @@ public class UIFriendListMenu : MonoBehaviour
         }
     }
 
-    void OnClickedInviteButton()
-    {
-        OnInviteButtonClicked?.Invoke(mCheckedItemList.ToList());
-    }
-
-    void OnClickedExitButton()
-    {
-        OnExitButtonClicked?.Invoke();
-    }
 }
