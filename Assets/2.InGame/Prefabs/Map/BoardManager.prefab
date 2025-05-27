@@ -4442,6 +4442,11 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 9f0e3d271507d8c4f82c74cce08b279c, type: 3}
   - {fileID: 2800000, guid: 8973e03c3c04afa4c9e6a7abdf0781a2, type: 3}
   - {fileID: 2800000, guid: 618bbaa6e1e5c814d8a3e1beb95ccde3, type: 3}
+  chickMats:
+  - {fileID: 2100000, guid: f792488e4707cae4a82239a2aa7808a5, type: 2}
+  - {fileID: 2100000, guid: dc9720a642fb0b146a28a044fbb0ba3b, type: 2}
+  - {fileID: 2100000, guid: 5be8811f5fbd35546b47d4d6e0bdc7e6, type: 2}
+  - {fileID: 2100000, guid: 50c2670459bbe10478250a79e3348fdf, type: 2}
   steppingTiles:
   - {fileID: 0}
   - {fileID: 0}
