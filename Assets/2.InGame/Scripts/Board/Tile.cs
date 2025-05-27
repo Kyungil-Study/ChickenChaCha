@@ -41,4 +41,17 @@ public abstract class Tile : NetworkBehaviour
     {
         return Info.imageKey == tile.Info.imageKey;
     }
+    
+    [Networked] private bool MbInitialized { get; set; } = false;
+    public override void FixedUpdateNetwork()
+    {
+        if (MbInitialized == false)
+        {
+            transform.position +=  (2 * Vector3.down) * Runner.DeltaTime * 4;
+            if (transform.position.y <= 2.5f)
+            {
+                MbInitialized = true;
+            }
+        }
+    }
 }
