@@ -113,14 +113,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_Result(PlayerRef player)
     {
-        if (Runner.LocalPlayer == player)
-        {
-            SceneManager.LoadScene("Result");
-        }
-        else
-        {
-            SceneManager.LoadScene("Result");
-        }
+        GameResultController.Instance.OnEndedGame(player);
     }
 
     public override void Spawned()
