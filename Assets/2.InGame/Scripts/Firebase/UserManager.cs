@@ -352,8 +352,9 @@ public class UserManager : MonoBehaviour
             Debug.LogError("친구 삭제 중 오류: " + e.Message);
         }
     }
-
-    public async void OnShowFriends()
+    
+    public List<string> FriendList { get; private set; } = new List<string>();
+    public async void OnShowFriends(Action OnCompleteTask)
     {
         try
         {
@@ -363,6 +364,7 @@ public class UserManager : MonoBehaviour
             var snapshot = await mDB.Collection("users").Document(myUid).Collection("friends")
                 .WhereEqualTo("status", "accepted").GetSnapshotAsync();
 
+            FriendList.Clear();
             foreach (var doc in snapshot.Documents)
             {
                 string friendUid = doc.Id;
@@ -370,13 +372,18 @@ public class UserManager : MonoBehaviour
                 if (userSnap.Exists && userSnap.TryGetValue("email", out string email))
                 {
                     Debug.Log("친구: " + email);
+                    
+                    FriendList.Add(email);
                 }
             }
+            
         }
         catch (Exception e)
         {
             Debug.LogError("친구 목록 로딩 실패: " + e.Message);
         }
+        
+        OnCompleteTask?.Invoke();
     }
 
     
