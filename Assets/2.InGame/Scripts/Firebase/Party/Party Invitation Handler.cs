@@ -1,5 +1,6 @@
 // PartyInvitationHandler.cs
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Firebase.Firestore;
@@ -12,6 +13,24 @@ public class PartyInvitationHandler : MonoBehaviour
     private FirebaseFirestore mDB;
     //private NetworkRunner mRunner;
     private string mRoomName;
+    
+    private static PartyInvitationHandler mInstance;
+    
+    public static PartyInvitationHandler Instance
+    {
+        get
+        {
+            if (mInstance == null)
+            {
+                mInstance = FindObjectOfType<PartyInvitationHandler>();
+            }
+            return mInstance;
+        }
+        
+    }
+    
+    private List<string> mRequestFriendList = new List<string>();
+    public List<string> RequestFriendList => mRequestFriendList;
 
     private void Awake()
     {
@@ -20,7 +39,7 @@ public class PartyInvitationHandler : MonoBehaviour
         //mRunner = SessionManager.Instance.NetworkRunner;
     }
 
-    public async void ShowInvitations()
+    public async void ShowInvitations(Action OnCompleteTask)
     {
         try
         {
@@ -43,9 +62,11 @@ public class PartyInvitationHandler : MonoBehaviour
         {
             Debug.LogError("초대 목록 불러오기 실패: " + e.Message);
         }
+        
+        OnCompleteTask?.Invoke();
     }
 
-    public async void AcceptInvite()
+    public async void AcceptInvite(OnInviteEventArgs args, Action OnComplete)
     {
         try
         {
@@ -77,9 +98,11 @@ public class PartyInvitationHandler : MonoBehaviour
         {
             Debug.LogError("초대 수락 중 오류: " + e.Message);
         }
+        
+        OnComplete?.Invoke();
     }
 
-    public async void RejectInvite()
+    public async void RejectInvite(OnInviteEventArgs args, Action OnComplete)
     {
         try
         {
@@ -97,5 +120,7 @@ public class PartyInvitationHandler : MonoBehaviour
         {
             Debug.LogError("초대 거절 중 오류: " + e.Message);
         }
+        
+        OnComplete?.Invoke();
     }
 }
