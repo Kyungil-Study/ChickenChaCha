@@ -9,6 +9,12 @@ using UnityEngine;
 
 public class PartyInvitationHandler : MonoBehaviour
 {
+    public class InvitationData
+    {
+        public string RoomName;
+        public string From;
+    }
+    
     private FirebaseAuth mAuth;
     private FirebaseFirestore mDB;
     //private NetworkRunner mRunner;
@@ -29,8 +35,8 @@ public class PartyInvitationHandler : MonoBehaviour
         
     }
     
-    private List<string> mRequestFriendList = new List<string>();
-    public List<string> RequestFriendList => mRequestFriendList;
+    private List<InvitationData> mRequestInvitationList = new List<InvitationData>();
+    public List<InvitationData> RequestInvitationList => mRequestInvitationList;
 
     private void Awake()
     {
@@ -38,6 +44,7 @@ public class PartyInvitationHandler : MonoBehaviour
         mDB = UserManager.Instance.DB;
         //mRunner = SessionManager.Instance.NetworkRunner;
     }
+    
 
     public async void ShowInvitations(Action OnCompleteTask)
     {
@@ -50,12 +57,17 @@ public class PartyInvitationHandler : MonoBehaviour
                 .Collection("invitations")
                 .GetSnapshotAsync();
 
+            mRequestInvitationList.Clear();
             foreach (var doc in snapshot.Documents)
             {
                 string roomName = doc.GetValue<string>("roomName");
-                mRoomName = roomName;
                 string from = doc.GetValue<string>("from");
                 Debug.Log($"🎉 {from} 님이 '{roomName}' 파티에 초대했습니다.");
+
+                var invitationData = new InvitationData();
+                invitationData.From = from;
+                invitationData.RoomName = doc.GetValue<string>("roomName");
+                mRequestInvitationList.Add(invitationData);
             }
         }
         catch (Exception e)
@@ -70,9 +82,16 @@ public class PartyInvitationHandler : MonoBehaviour
     {
         try
         {
+            Debug.Log($"Accept Invitation {args.InviteRoomName}");
+            
             string myUid = mAuth.CurrentUser?.UserId;
-            string roomName = mRoomName;
+            string roomName = args.InviteRoomName;
             if (string.IsNullOrEmpty(roomName) || myUid == null) return;
+            
+            // 내가 참가할 방을 선택했어
+            
+            // 방이 어딘지를 조회해야돼
+
             
             var invitationRef = mDB.Collection("users").Document(myUid)
                 .Collection("invitations").Document(roomName);
@@ -107,7 +126,7 @@ public class PartyInvitationHandler : MonoBehaviour
         try
         {
             string myUid = mAuth.CurrentUser?.UserId;
-            string roomName = mRoomName;
+            string roomName = args.InviteRoomName;
             if (string.IsNullOrEmpty(roomName) || myUid == null) return;
 
             var invitationRef = mDB.Collection("users").Document(myUid)

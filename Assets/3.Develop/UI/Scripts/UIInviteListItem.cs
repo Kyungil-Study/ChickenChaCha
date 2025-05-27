@@ -9,9 +9,13 @@ using UnityEngine.UI;
 public class UIInviteListItem : MonoBehaviour
 {
     [SerializeField] private Toggle mAcceptToggle;
+    public Toggle AcceptToggle => mAcceptToggle;
     [SerializeField] private Text mEmailText;
+    public string Email => mEmailText.text;
+    [SerializeField] private Text mRoomNameText;
+    public string RoomName => mRoomNameText.text;
 
-    public UnityEvent<bool, string> OnAcceptToggleChanged = new UnityEvent<bool, string>();
+    public UnityEvent<UIInviteListItem> OnAcceptToggleChanged = new UnityEvent<UIInviteListItem>();
 
     public void Reset()
     {
@@ -24,7 +28,12 @@ public class UIInviteListItem : MonoBehaviour
         mEmailText.text = email;
     }
     
-    public void BindListner(UnityAction<bool,string> callback)
+    public void SetRoomNameText(string roomName)
+    {
+        mRoomNameText.text = roomName;
+    }
+    
+    public void BindListner(UnityAction<UIInviteListItem> callback)
     {
         OnAcceptToggleChanged.RemoveAllListeners();
         mAcceptToggle.isOn = false;
@@ -38,7 +47,7 @@ public class UIInviteListItem : MonoBehaviour
 
     private void OnAcceptToggleValueChanged(bool value)
     {
-        OnAcceptToggleChanged?.Invoke(value, mEmailText.text);
+        OnAcceptToggleChanged?.Invoke(this);
     }
 
     

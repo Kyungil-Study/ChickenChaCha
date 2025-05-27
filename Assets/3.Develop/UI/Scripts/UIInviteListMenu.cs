@@ -11,6 +11,7 @@ public class UIInviteListMenu : UISingleton<UIFriendResponseMenu>
     public class ViewItemData
     {
         public string userEmail;
+        public string roomName;
     }
     
     [SerializeField] private GameObject mListView;
@@ -24,7 +25,7 @@ public class UIInviteListMenu : UISingleton<UIFriendResponseMenu>
     [SerializeField] private Button mExittButton;
     
     List<UIInviteListItem> mRequestItemList = new List<UIInviteListItem>();
-    HashSet<string> mAcceptedItemList = new HashSet<string>();
+    string mAcceptedInviationRoomName = "";
     
     public event Action<OnInviteEventArgs, Action> OnAcceptButtonClicked;
     public event Action<OnInviteEventArgs, Action> OnRejectButtonClicked;
@@ -50,12 +51,13 @@ public class UIInviteListMenu : UISingleton<UIFriendResponseMenu>
 
     public void UpdateView()
     {
-        Debug.Log($"Response Menu UpdateView called. Request count: {PartyInvitationHandler.Instance.RequestFriendList.Count}");
+        Debug.Log($"Response Menu UpdateView called. Request count: {PartyInvitationHandler.Instance.RequestInvitationList.Count}");
         List<ViewItemData> viewItemList = new List<ViewItemData>();
-        foreach (var request in PartyInvitationHandler.Instance.RequestFriendList)
+        foreach (var request in PartyInvitationHandler.Instance.RequestInvitationList)
         {
             ViewItemData itemData = new ViewItemData();
-            itemData.userEmail = request;
+            itemData.userEmail = request.From;
+            itemData.roomName = request.RoomName;
             viewItemList.Add(itemData);
         }
         UpdateListView(viewItemList);
@@ -70,7 +72,7 @@ public class UIInviteListMenu : UISingleton<UIFriendResponseMenu>
         }
         // clear cached items
         mRequestItemList.Clear();
-        mAcceptedItemList.Clear();
+        
         
         // create new items
         foreach (var item in requestItemList)
@@ -78,6 +80,7 @@ public class UIInviteListMenu : UISingleton<UIFriendResponseMenu>
             UIInviteListItem newItem = Instantiate(mRequestItemPrefab, mListView.transform);
             newItem.Reset();    
             newItem.SetEmailtext(item.userEmail);
+            newItem.SetRoomNameText(item.roomName);
             newItem.BindListner(OnAcceptToggleChanged);
             
             // add listener to accept button
@@ -85,22 +88,32 @@ public class UIInviteListMenu : UISingleton<UIFriendResponseMenu>
         }
     }
 
-    void OnAcceptToggleChanged(bool isOn, string email)
+    void OnAcceptToggleChanged(UIInviteListItem toggleItem)
     {
-        if (isOn)
+        Debug.Log($"OnAcceptToggleChanged :::: Toggle  Invitation {toggleItem.AcceptToggle.isOn} {toggleItem.RoomName}");
+        foreach (var requestItem in mRequestItemList)
         {
-            mAcceptedItemList.Add(email);
+            if (toggleItem != requestItem)
+            {
+                requestItem.AcceptToggle.isOn = false;
+            }
+        }
+
+        if (toggleItem.AcceptToggle.isOn == true)
+        {
+            mAcceptedInviationRoomName = toggleItem.RoomName;
         }
         else
         {
-            mAcceptedItemList.Remove(email);
+            mAcceptedInviationRoomName = "";
         }
     }
 
     void OnClickedAcceptButton()
     {
+        Debug.Log("Accept button clicked.");
         OnInviteEventArgs args = new OnInviteEventArgs();
-        args.InviteEmails = mAcceptedItemList.ToList();
+        args.InviteRoomName = mAcceptedInviationRoomName;
         OnAcceptButtonClicked?.Invoke(args,
             () =>
             {
@@ -114,7 +127,7 @@ public class UIInviteListMenu : UISingleton<UIFriendResponseMenu>
     void OnClickedRejectButton()
     {
         OnInviteEventArgs args = new OnInviteEventArgs();
-        args.InviteEmails = mAcceptedItemList.ToList();
+        args.InviteRoomName = mAcceptedInviationRoomName;
         OnRejectButtonClicked?.Invoke(args,
             () =>
             {
