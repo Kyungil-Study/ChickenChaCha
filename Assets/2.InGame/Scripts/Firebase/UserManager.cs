@@ -70,7 +70,7 @@ public class UserManager : MonoBehaviour
             mAuth = FirebaseAuth.GetAuth(app);
             mDB = FirebaseFirestore.GetInstance(app);
                 
-            /*mButtonSendRequest.onClick.AddListener(OnSendFriendRequest);
+            /*
             mButtonAcceptRequest.onClick.AddListener(OnAcceptFriendRequest);
             mButtonRemoveFriend.onClick.AddListener(OnRemoveFriend);
             mButtonShowFriends.onClick.AddListener(OnShowFriends);
@@ -238,32 +238,38 @@ public class UserManager : MonoBehaviour
         }
     }
 
-    public async void OnAcceptFriendRequest()
+    public async void OnAcceptFriendRequest(OnAcceptFriendEventArgs args)
     {
         try
         {
-            string requesterEmail = mInputFriendEmail.text;
-            string myUid = mAuth.CurrentUser?.UserId;
-            string requesterUid = await FindUidByEmail(requesterEmail);
-
-            if (myUid == null || requesterUid == null) return;
-
-            var myRef = mDB.Collection("users").Document(myUid).Collection("friends").Document(requesterUid);
-            var requestRef = mDB.Collection("users").Document(myUid).Collection("requests").Document(requesterUid);
-            var reMyRef = mDB.Collection("users").Document(requesterUid).Collection("friends").Document(myUid);
-            var reRequestRef = mDB.Collection("users").Document(requesterUid).Collection("requests").Document(myUid);
-
-            var data = new Dictionary<string, object>
+            var emails = args.AcceptedEmails;
+            for(int i = 0 ; i < emails.Count; i++)
             {
-                { "status", "accepted" },
-                { "timestamp", Timestamp.GetCurrentTimestamp() }
-            };
+                string requesterEmail = mInputFriendEmail.text;
+                string myUid = mAuth.CurrentUser?.UserId;
+                string requesterUid = await FindUidByEmail(requesterEmail);
 
-            await myRef.SetAsync(data);
-            await requestRef.DeleteAsync();
-            await reMyRef.SetAsync(data);
-            await reRequestRef.DeleteAsync();
-
+                if (myUid == null || requesterUid == null)
+                {
+                    continue;
+                }
+                
+                var myRef = mDB.Collection("users").Document(myUid).Collection("friends").Document(requesterUid);
+                var requestRef = mDB.Collection("users").Document(myUid).Collection("requests").Document(requesterUid);
+                var reMyRef = mDB.Collection("users").Document(requesterUid).Collection("friends").Document(myUid);
+                var reRequestRef = mDB.Collection("users").Document(requesterUid).Collection("requests").Document(myUid);
+                
+                var data = new Dictionary<string, object>
+                {
+                    { "status", "accepted" },
+                    { "timestamp", Timestamp.GetCurrentTimestamp() }
+                };
+                
+                await myRef.SetAsync(data);
+                await requestRef.DeleteAsync();
+                await reMyRef.SetAsync(data);
+                await reRequestRef.DeleteAsync();
+            }
             Debug.Log("친구 요청 수락 완료");
         }
         catch (Exception e)
@@ -326,7 +332,6 @@ public class UserManager : MonoBehaviour
             if (myUid == null) return;
 
             var snapshot = await mDB.Collection("users").Document(myUid).Collection("requests").GetSnapshotAsync();
-
             foreach (var doc in snapshot.Documents)
             {
                 string requesterUid = doc.Id;

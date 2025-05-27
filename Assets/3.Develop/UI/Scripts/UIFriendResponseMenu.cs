@@ -25,13 +25,20 @@ public class UIFriendResponseMenu : UISingleton<UIFriendResponseMenu>
     List<UIFriendRequestItem> mRequestItemList = new List<UIFriendRequestItem>();
     HashSet<string> mAcceptedItemList = new HashSet<string>();
     
-    public event Action<List<string>> OnAcceptButtonClicked;
+    public event Action<OnAcceptFriendEventArgs> OnAcceptButtonClicked;
     public event Action OnExitButtonClicked;
+    
 
-    private void Awake()
+    private void Start()
     {
         mAcceptButton.onClick.AddListener(OnClickedAcceptButton);
         mRejectButton.onClick.AddListener(OnClickedExitButton);
+        OnAcceptButtonClicked += UserManager.Instance.OnAcceptFriendRequest;
+    }
+
+    private void OnEnable()
+    {
+        UserManager.Instance.OnShowRequests();
     }
 
     public void UpdateListView(List<ViewItemData> requestItemList)
@@ -72,7 +79,9 @@ public class UIFriendResponseMenu : UISingleton<UIFriendResponseMenu>
 
     void OnClickedAcceptButton()
     {
-        OnAcceptButtonClicked?.Invoke(mAcceptedItemList.ToList());
+        OnAcceptFriendEventArgs args = new OnAcceptFriendEventArgs();
+        args.AcceptedEmails = mAcceptedItemList.ToList();
+        OnAcceptButtonClicked?.Invoke(args);
     }
 
     void OnClickedExitButton()
