@@ -1262,7 +1262,7 @@
         "r": 0.4000000059604645,
         "g": 0.4000000059604645,
         "b": 0.4000000059604645,
-        "a": 1.0
+        "a": 0.7450980544090271
     },
     "isMainColor": false,
     "m_ColorMode": 0
@@ -1333,14 +1333,14 @@
         "m_Id": "a4146027624341269c8f2989a9b1ea8b"
     },
     "m_AllowMaterialOverride": false,
-    "m_SurfaceType": 0,
+    "m_SurfaceType": 1,
     "m_ZTestMode": 4,
-    "m_ZWriteControl": 0,
+    "m_ZWriteControl": 1,
     "m_AlphaMode": 0,
     "m_RenderFace": 2,
     "m_AlphaClip": false,
-    "m_CastShadows": true,
-    "m_ReceiveShadows": true,
+    "m_CastShadows": false,
+    "m_ReceiveShadows": false,
     "m_SupportsLODCrossFade": false,
     "m_CustomEditorGUI": "",
     "m_SupportVFX": false

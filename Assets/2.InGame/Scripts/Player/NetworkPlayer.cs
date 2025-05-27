@@ -247,6 +247,8 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
 
     public void PlayerLeft(PlayerRef player)
     {
-        Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>().bHasLeft = true;
+        var leftPlayer = Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>();
+        leftPlayer.bHasLeft = true;
+        leftPlayer.mRenderer.material.shader = BoardManager.Instance.soulShader;
     }
 }

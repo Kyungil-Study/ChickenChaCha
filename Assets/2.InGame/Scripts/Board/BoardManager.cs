@@ -9,6 +9,7 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
     public GameObject selectingTilePrefab;
     public Texture2D[] tileTextures;
     public Material[] chickMats;
+    public Shader soulShader;
 
     public SteppingTile[] steppingTiles = new SteppingTile[24];
     public SelectingTile[] selectingTiles = new SelectingTile[12];
