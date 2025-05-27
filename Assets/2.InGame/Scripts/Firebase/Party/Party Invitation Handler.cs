@@ -16,7 +16,7 @@ public class PartyInvitationHandler : MonoBehaviour
     {
         mAuth = UserManager.Instance.Auth;
         mDB = UserManager.Instance.DB;
-        mRunner = GetComponent<NetworkRunner>() ?? gameObject.AddComponent<NetworkRunner>();
+        //mRunner = GetComponent<NetworkRunner>() ?? gameObject.AddComponent<NetworkRunner>();
     }
 
     public async void ShowInvitations()

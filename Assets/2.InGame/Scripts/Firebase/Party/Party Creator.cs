@@ -10,8 +10,8 @@ public class PartyCreator : MonoBehaviour
 
     private void Awake()
     {
-        Runner = GameObject.Find("SessionManager").GetComponent<NetworkRunner>();
-        Runner.ProvideInput = true;
+        // Runner = GameObject.Find("SessionManager").GetComponent<NetworkRunner>();
+        // Runner.ProvideInput = true;
     }
 
     public async Task CreateParty(string roomName)
