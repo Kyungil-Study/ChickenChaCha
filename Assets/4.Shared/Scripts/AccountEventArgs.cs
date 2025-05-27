@@ -8,6 +8,12 @@ public class OnLogInEventArgs : EventArgs
     public string UserID;
 }
 
+public class OnAcceptFriendEventArgs : EventArgs
+{
+    public List<string> AcceptedEmails;
+}
+
+
 public class OnSignInEventArgs : EventArgs
 {
     public string Email;

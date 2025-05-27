@@ -74,12 +74,28 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     public GameRoomInfo RoomInfo => mRoomInfo;
     
     private NetworkRunner mNetworkRunner;
+    public NetworkRunner NetworkRunner => mNetworkRunner;
     private NetworkSceneManagerDefault mNetworkSceneManager;
+    public NetworkSceneManagerDefault NetworkSceneManager => mNetworkSceneManager;
     
     private GameSessionState mSessionState = GameSessionState.Ready;
+    public GameSessionState SessionState => mSessionState;
     
     [SerializeField] private string mRoomNameForTesting = "00"; // 테스트용 방 이름
+
+    public string RoomNameForTesting
+    {
+        get => mRoomNameForTesting;
+        set => mRoomNameForTesting = value;
+    }
     [SerializeField] private int mRoomMapPlayerCount = 1; // 테스트용 방 플레이어 수
+    
+    public int RoomMapPlayerCount
+    {
+        get => mRoomMapPlayerCount;
+        set => mRoomMapPlayerCount = value;
+    }
+    
     public class Callbacks
     {
         public Action OnLoginSuccess;
@@ -189,6 +205,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         // 중복요청 제외
         if (mSessionState == GameSessionState.Login)
         {
+            Debug.LogWarning($"[SessionManager] OnSignIn ::: 이미 로그인 중입니다. 유저 이름 = {eventArgs.UserID}");
             return;
         }
 

@@ -27,15 +27,26 @@ public class UserManager : MonoBehaviour
         
     }
     
+    
+    public class GameUser
+    {
+        public FirebaseUser User;
+        public string Name => User.DisplayName ?? "Unknown";
+        
+        public bool IsAnonymous => User.IsAnonymous;
+    }
+    
     private FirebaseApp mApp;
     private FirebaseAuth mAuth;
     private FirebaseFirestore mDB;
-    private FirebaseUser mUser;
+    private GameUser mUser = new GameUser();
 
     public FirebaseApp App => mApp;
     public FirebaseAuth Auth => mAuth;
     public FirebaseFirestore DB => mDB;
-    public FirebaseUser User => mUser;
+
+    
+    public GameUser User => mUser;
     
     private bool mIsInitialized = false;
     
@@ -70,11 +81,11 @@ public class UserManager : MonoBehaviour
             mAuth = FirebaseAuth.GetAuth(app);
             mDB = FirebaseFirestore.GetInstance(app);
                 
-            /*mButtonSendRequest.onClick.AddListener(OnSendFriendRequest);
-            mButtonAcceptRequest.onClick.AddListener(OnAcceptFriendRequest);
+            /*
+            mButtonSendRequest.onClick.AddListener(OnSendFriendRequest);
             mButtonRemoveFriend.onClick.AddListener(OnRemoveFriend);
             mButtonShowFriends.onClick.AddListener(OnShowFriends);
-            mButtonShowRequests.onClick.AddListener(OnShowRequests);*/
+            */
 
             mIsInitialized = true;
             Debug.Log("Firebase 초기화 성공");
@@ -84,7 +95,48 @@ public class UserManager : MonoBehaviour
             Debug.LogError("Firebase 초기화 실패");
         }
     }
-    
+
+    public void OnGhostLoginButtonClicked()
+    {
+        AnoymousLogin();
+    }
+
+    private void AnoymousLogin()
+    {
+        try
+        {
+            if (mIsInitialized == false) 
+            {
+                Debug.LogError("Firebase가 초기화되지 않았습니다.");
+                return;
+            }
+
+            mAuth.SignInAnonymouslyAsync().ContinueWithOnMainThread(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    Debug.LogError("로그인 중 알 수 없는 예외 발생: " + task.Exception?.Message);
+                    return;
+                }
+
+                if (task.IsCompleted)
+                {
+                    FirebaseUser newUser = task.Result.User;
+                    Debug.Log("로그인 성공: " + newUser.Email);
+                    FriendManager.MyUid = newUser?.UserId;
+                    Debug.Log("CurrentUser: " + newUser?.Email);
+
+                    OnLogIn(newUser);
+                }
+
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("SignIn에서 예외 발생: " + ex.Message);
+        }
+    }
+
     public void OnLoginButtonClicked(OnSignInEventArgs args)
     {
         SignIn(args.Email, args.Password);
@@ -95,7 +147,7 @@ public class UserManager : MonoBehaviour
     }
     private void OnLogIn(FirebaseUser newUser)
     {
-        mUser = newUser;
+        mUser.User = newUser;
         OnLogInEventArgs args = new OnLogInEventArgs()
         {
             UserID = newUser.UserId
@@ -238,31 +290,38 @@ public class UserManager : MonoBehaviour
         }
     }
 
-    public async void OnAcceptFriendRequest()
+    public async void OnAcceptFriendRequest(OnAcceptFriendEventArgs args, Action OnComplete)
     {
         try
         {
-            string requesterEmail = mInputFriendEmail.text;
-            string myUid = mAuth.CurrentUser?.UserId;
-            string requesterUid = await FindUidByEmail(requesterEmail);
+            var emails = args.AcceptedEmails;
 
-            if (myUid == null || requesterUid == null) return;
-
-            var myRef = mDB.Collection("users").Document(myUid).Collection("friends").Document(requesterUid);
-            var requestRef = mDB.Collection("users").Document(myUid).Collection("requests").Document(requesterUid);
-            var reMyRef = mDB.Collection("users").Document(requesterUid).Collection("friends").Document(myUid);
-            var reRequestRef = mDB.Collection("users").Document(requesterUid).Collection("requests").Document(myUid);
-
-            var data = new Dictionary<string, object>
+            foreach (var email in emails)
             {
-                { "status", "accepted" },
-                { "timestamp", Timestamp.GetCurrentTimestamp() }
-            };
+                string requesterEmail = email;
+                string myUid = mAuth.CurrentUser?.UserId;
+                string requesterUid = await FindUidByEmail(requesterEmail);
 
-            await myRef.SetAsync(data);
-            await requestRef.DeleteAsync();
-            await reMyRef.SetAsync(data);
-            await reRequestRef.DeleteAsync();
+                if (myUid == null || requesterUid == null) return;
+
+                var myRef = mDB.Collection("users").Document(myUid).Collection("friends").Document(requesterUid);
+                var requestRef = mDB.Collection("users").Document(myUid).Collection("requests").Document(requesterUid);
+                var reMyRef = mDB.Collection("users").Document(requesterUid).Collection("friends").Document(myUid);
+                var reRequestRef = mDB.Collection("users").Document(requesterUid).Collection("requests").Document(myUid);
+
+                var data = new Dictionary<string, object>
+                {
+                    { "status", "accepted" },
+                    { "timestamp", Timestamp.GetCurrentTimestamp() }
+                };
+
+                await myRef.SetAsync(data);
+                await requestRef.DeleteAsync();
+                await reMyRef.SetAsync(data);
+                await reRequestRef.DeleteAsync();
+            }
+            
+            
 
             Debug.Log("친구 요청 수락 완료");
         }
@@ -270,6 +329,8 @@ public class UserManager : MonoBehaviour
         {
             Debug.LogError("친구 수락 중 오류: " + e.Message);
         }
+        
+        OnComplete.Invoke();
     }
 
     public async void OnRemoveFriend()
@@ -318,8 +379,13 @@ public class UserManager : MonoBehaviour
         }
     }
 
-    public async void OnShowRequests()
+    
+    private List<string> mRequestFriendList = new List<string>();
+    public List<string> RequestFriendList => mRequestFriendList;
+    public async void OnShowRequests(Action OnCompleteTask)
     {
+        Debug.Log($"OnShowRequests 호출됨");
+        mRequestFriendList.Clear();
         try
         {
             string myUid = mAuth.CurrentUser?.UserId;
@@ -327,6 +393,7 @@ public class UserManager : MonoBehaviour
 
             var snapshot = await mDB.Collection("users").Document(myUid).Collection("requests").GetSnapshotAsync();
 
+            
             foreach (var doc in snapshot.Documents)
             {
                 string requesterUid = doc.Id;
@@ -334,6 +401,7 @@ public class UserManager : MonoBehaviour
                 if (userSnap.Exists && userSnap.TryGetValue("email", out string email))
                 {
                     Debug.Log("받은 친구 요청: " + email);
+                    mRequestFriendList.Add(email);
                 }
             }
         }
@@ -341,6 +409,7 @@ public class UserManager : MonoBehaviour
         {
             Debug.LogError("요청 목록 로딩 실패: " + e.Message);
         }
+        OnCompleteTask?.Invoke();
     }
 
     private async System.Threading.Tasks.Task<string> FindUidByEmail(string email)

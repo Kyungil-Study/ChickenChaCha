@@ -19,6 +19,9 @@ public class LobyCanvasUI : MonoBehaviour
     public UnityEvent OnMatchClicked;
     [Header("게임 떠가니")]
     public UnityEvent OnLeaveClicked;
+    
+    [SerializeField] GameObject mGotoFriendPanel;
+    
     private void Start()
     {
         // 버튼 클릭 시 각 패널을 토글하는 리스너 등록
@@ -26,11 +29,15 @@ public class LobyCanvasUI : MonoBehaviour
         
         OnMatchClicked.AddListener(SessionManager.Instance.EnterMatchMakingAsync);
         OnLeaveClicked.AddListener(SessionManager.Instance.LeaveMatchMakingAsync);
+
+        if (UserManager.Instance.User.IsAnonymous)
+        {
+            mGotoFriendPanel.SetActive(false);
+        }
     }
 
     private void Update()
     {
-        SessionManager.GameRoomInfo roomInfo = SessionManager.Instance.RoomInfo;
     }
 
     private void OnInviteClicked()

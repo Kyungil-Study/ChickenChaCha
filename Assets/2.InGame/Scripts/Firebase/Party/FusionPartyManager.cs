@@ -37,8 +37,8 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
         mAuth = UserManager.Instance.Auth;
         mDB =  UserManager.Instance.DB;
 
-        mRunner = gameObject.AddComponent<NetworkRunner>();
-        mRunner.ProvideInput = true;
+        // mRunner = gameObject.AddComponent<NetworkRunner>();
+        // mRunner.ProvideInput = true;
 
         mButtonCreateParty.onClick.AddListener(OnCreatePartyClicked);
         mButtonInviteFriend.onClick.AddListener(OnInviteFriendClicked);
