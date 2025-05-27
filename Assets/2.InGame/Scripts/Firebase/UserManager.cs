@@ -32,6 +32,8 @@ public class UserManager : MonoBehaviour
     {
         public FirebaseUser User;
         public string Name => User.DisplayName ?? "Unknown";
+        
+        public bool IsAnonymous => User.IsAnonymous;
     }
     
     private FirebaseApp mApp;
