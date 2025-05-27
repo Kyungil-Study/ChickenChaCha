@@ -335,6 +335,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1484526110011362606, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: m_Text
+      value: 00
+      objectReference: {fileID: 0}
+    - target: {fileID: 1522319086938740373, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: m_Name
+      value: UserCountInput
+      objectReference: {fileID: 0}
+    - target: {fileID: 1707687835701754401, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2170523707612646342, guid: 2b05ecc09e617f64f9358c3da0e94742,
         type: 3}
       propertyPath: m_Pivot.x
@@ -435,16 +450,79 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2398456705691566210, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4136237998976708378, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: m_Name
+      value: UserCount
+      objectReference: {fileID: 0}
+    - target: {fileID: 6339864621921192956, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: roomNameText
+      value: 
+      objectReference: {fileID: 6990752130198797974}
+    - target: {fileID: 6339864621921192956, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: mGotoFriendPanel
+      value: 
+      objectReference: {fileID: 6990752130198797973}
     - target: {fileID: 6752872178657203218, guid: 2b05ecc09e617f64f9358c3da0e94742,
         type: 3}
       propertyPath: m_Name
       value: LobyMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 8970101787116099097, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: m_Text
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8970101787116099097, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: m_InputType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8970101787116099097, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: m_ContentType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8970101787116099097, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: m_KeyboardType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8970101787116099097, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
+      propertyPath: m_CharacterValidation
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2b05ecc09e617f64f9358c3da0e94742, type: 3}
+--- !u!1 &6990752130198797973 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1522319086938740373, guid: 2b05ecc09e617f64f9358c3da0e94742,
+    type: 3}
+  m_PrefabInstance: {fileID: 6990752130198797972}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6990752130198797974 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1484526110011362606, guid: 2b05ecc09e617f64f9358c3da0e94742,
+    type: 3}
+  m_PrefabInstance: {fileID: 6990752130198797972}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
