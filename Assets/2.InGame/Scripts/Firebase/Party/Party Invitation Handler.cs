@@ -11,12 +11,13 @@ public class PartyInvitationHandler : MonoBehaviour
     private FirebaseAuth mAuth;
     private FirebaseFirestore mDB;
     private NetworkRunner mRunner;
+    private string mRoomName;
 
     private void Awake()
     {
         mAuth = UserManager.Instance.Auth;
         mDB = UserManager.Instance.DB;
-        //mRunner = GetComponent<NetworkRunner>() ?? gameObject.AddComponent<NetworkRunner>();
+        mRunner = SessionManager.Instance.NetworkRunner;
     }
 
     public async void ShowInvitations()
@@ -33,6 +34,7 @@ public class PartyInvitationHandler : MonoBehaviour
             foreach (var doc in snapshot.Documents)
             {
                 string roomName = doc.GetValue<string>("roomName");
+                mRoomName = roomName;
                 string from = doc.GetValue<string>("from");
                 Debug.Log($"🎉 {from} 님이 '{roomName}' 파티에 초대했습니다.");
             }
@@ -43,11 +45,12 @@ public class PartyInvitationHandler : MonoBehaviour
         }
     }
 
-    public async void AcceptInvite(string roomName)
+    public async void AcceptInvite()
     {
         try
         {
             string myUid = mAuth.CurrentUser?.UserId;
+            string roomName = mRoomName;
             if (string.IsNullOrEmpty(roomName) || myUid == null) return;
 
             var invitationRef = mDB.Collection("users").Document(myUid)
@@ -70,11 +73,12 @@ public class PartyInvitationHandler : MonoBehaviour
         }
     }
 
-    public async void RejectInvite(string roomName)
+    public async void RejectInvite()
     {
         try
         {
             string myUid = mAuth.CurrentUser?.UserId;
+            string roomName = mRoomName;
             if (string.IsNullOrEmpty(roomName) || myUid == null) return;
 
             var invitationRef = mDB.Collection("users").Document(myUid)

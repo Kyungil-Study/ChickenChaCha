@@ -5,12 +5,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Firebase.Firestore;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PartyInviter : MonoBehaviour
 {
     private FirebaseAuth mAuth;
     private FirebaseFirestore mDB;
+    
+    public TMP_InputField mInputField;
 
     private void Awake()
     {
@@ -18,12 +22,13 @@ public class PartyInviter : MonoBehaviour
         mDB = UserManager.Instance.DB;
     }
 
-    public async void InviteFriend(string friendEmail, string roomName)
+    public async void InviteFriend(string roomName)
     {
         try
         {
             string myUid = mAuth.CurrentUser?.UserId;
             string myEmail = mAuth.CurrentUser?.Email;
+            string friendEmail = mInputField.text;
 
             if (myUid == null || string.IsNullOrEmpty(roomName)) return;
 
