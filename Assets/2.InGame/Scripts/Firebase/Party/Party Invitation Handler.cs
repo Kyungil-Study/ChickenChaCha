@@ -10,14 +10,14 @@ public class PartyInvitationHandler : MonoBehaviour
 {
     private FirebaseAuth mAuth;
     private FirebaseFirestore mDB;
-    private NetworkRunner mRunner;
+    //private NetworkRunner mRunner;
     private string mRoomName;
 
     private void Awake()
     {
         mAuth = UserManager.Instance.Auth;
         mDB = UserManager.Instance.DB;
-        mRunner = SessionManager.Instance.NetworkRunner;
+        //mRunner = SessionManager.Instance.NetworkRunner;
     }
 
     public async void ShowInvitations()
@@ -52,17 +52,23 @@ public class PartyInvitationHandler : MonoBehaviour
             string myUid = mAuth.CurrentUser?.UserId;
             string roomName = mRoomName;
             if (string.IsNullOrEmpty(roomName) || myUid == null) return;
-
+            
             var invitationRef = mDB.Collection("users").Document(myUid)
                 .Collection("invitations").Document(roomName);
 
             await invitationRef.DeleteAsync();
-
-            await mRunner.StartGame(new StartGameArgs
+            
+            SceneRef sceneRef = SceneRef.FromIndex(2);
+            NetworkSceneInfo sceneInfo = new NetworkSceneInfo();
+            sceneInfo.AddSceneRef(sceneRef);
+            
+            await SessionManager.Instance.NetworkRunner.StartGame(new StartGameArgs
             {
                 GameMode = GameMode.Shared,
                 SessionName = roomName,
-                SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+                PlayerCount = 4,
+                SceneManager = SessionManager.Instance.NetworkSceneManager,
+                Scene = sceneInfo
             });
 
             Debug.Log("✅ 초대 수락 후 입장 시도: " + roomName);
