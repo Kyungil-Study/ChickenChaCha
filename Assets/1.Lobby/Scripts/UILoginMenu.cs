@@ -23,6 +23,7 @@ public class UILoginMenu : UISingleton<UILoginMenu>
     [Header("UI Buttons Refs")]
     [SerializeField] private Button mButtonLogin;
     [SerializeField] private Button mButtonSignUp;
+    [SerializeField] private Button mButtonSkip;
     
     [Space(10)]
     [Header("UI Buttons Events")]
@@ -33,6 +34,11 @@ public class UILoginMenu : UISingleton<UILoginMenu>
     {
         mButtonLogin.onClick.AddListener(OnLoginButtonClicked);
         mButtonSignUp.onClick.AddListener(OnSignUpButtonClicked);
+        
+        mButtonSkip.onClick.AddListener(() =>
+        {
+            UserManager.Instance.OnGhostLoginButtonClicked();
+        });
     }
 
     public void OnLoginButtonClicked()

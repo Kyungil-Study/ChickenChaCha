@@ -205,6 +205,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         // 중복요청 제외
         if (mSessionState == GameSessionState.Login)
         {
+            Debug.LogWarning($"[SessionManager] OnSignIn ::: 이미 로그인 중입니다. 유저 이름 = {eventArgs.UserID}");
             return;
         }
 

@@ -27,20 +27,24 @@ public class UserManager : MonoBehaviour
         
     }
     
+    
+    public class GameUser
+    {
+        public FirebaseUser User;
+        public string Name => User.DisplayName ?? "Unknown";
+    }
+    
     private FirebaseApp mApp;
     private FirebaseAuth mAuth;
     private FirebaseFirestore mDB;
-    private FirebaseUser mUser;
+    private GameUser mUser = new GameUser();
 
     public FirebaseApp App => mApp;
     public FirebaseAuth Auth => mAuth;
     public FirebaseFirestore DB => mDB;
 
-    public class GameUser
-    {
-        private FirebaseUser user;
-    }
-    public FirebaseUser User => mUser;
+    
+    public GameUser User => mUser;
     
     private bool mIsInitialized = false;
     
@@ -92,8 +96,45 @@ public class UserManager : MonoBehaviour
 
     public void OnGhostLoginButtonClicked()
     {
+        AnoymousLogin();
     }
-    
+
+    private void AnoymousLogin()
+    {
+        try
+        {
+            if (mIsInitialized == false) 
+            {
+                Debug.LogError("Firebase가 초기화되지 않았습니다.");
+                return;
+            }
+
+            mAuth.SignInAnonymouslyAsync().ContinueWithOnMainThread(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    Debug.LogError("로그인 중 알 수 없는 예외 발생: " + task.Exception?.Message);
+                    return;
+                }
+
+                if (task.IsCompleted)
+                {
+                    FirebaseUser newUser = task.Result.User;
+                    Debug.Log("로그인 성공: " + newUser.Email);
+                    FriendManager.MyUid = newUser?.UserId;
+                    Debug.Log("CurrentUser: " + newUser?.Email);
+
+                    OnLogIn(newUser);
+                }
+
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("SignIn에서 예외 발생: " + ex.Message);
+        }
+    }
+
     public void OnLoginButtonClicked(OnSignInEventArgs args)
     {
         SignIn(args.Email, args.Password);
@@ -104,7 +145,7 @@ public class UserManager : MonoBehaviour
     }
     private void OnLogIn(FirebaseUser newUser)
     {
-        mUser = newUser;
+        mUser.User = newUser;
         OnLogInEventArgs args = new OnLogInEventArgs()
         {
             UserID = newUser.UserId
