@@ -1,6 +1,7 @@
 using System.Collections;
 using Fusion;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // 플레이어 데이터, 애니메이션 등 처리하기
 
@@ -15,7 +16,7 @@ public class ActiveState : IPlayerState
 {
     public void EnterState(NetworkPlayer player)
     {
-        Debug.Log($"[{player.PlayerIndex}] : Active 진입");
+        Debug.Log($"[{player.Index}] : Active 진입");
         player.inputHandler.bCanInput = true;
     }
 
@@ -34,7 +35,7 @@ public class WaitingState : IPlayerState
 {
     public void EnterState(NetworkPlayer player)
     {
-        Debug.Log($"[{player.PlayerIndex}] : Active 진입");
+        Debug.Log($"[{player.Index}] : Waiting 진입");
         if (player.inputHandler != null)
         {
             player.inputHandler.bCanInput = false;
@@ -52,15 +53,17 @@ public class WaitingState : IPlayerState
     }
 }
 
-public class NetworkPlayer : NetworkBehaviour //, IToPlayer
+public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 {
-    //public GameObject tailModel; // 꽁지 모델 관리 오브젝트
     public NetworkTransform networkTransform;
     public PlayerScoreUI scoreUI;
     public InputHandler inputHandler;
+    public GameObject[] tailModels;
     public IPlayerState currentState;
+    public bool bHasLeft = false;
+    
     [Networked] public PlayerRef Ref { get; set; }
-    [Networked] public int PlayerIndex { get; set; }
+    [Networked] public int Index { get; set; }
 
     [Networked]
     [OnChangedRender(nameof(OnChangedTailCount))]
@@ -84,9 +87,20 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
 
     private void OnChangedTailCount()
     {
+        for (int i = 0; i < TailCount; i++)
+        {
+            tailModels[i].SetActive(true);
+        }
+
+        for (int i = TailCount; i < tailModels.Length; i++)
+        {
+            tailModels[i].SetActive(false);
+        }
+
         if (GameManager.Instance.CheckTail(TailCount))
         {
             Debug.Log("Winning!");
+            RPC_Result(Ref);
         }
         else
         {
@@ -94,6 +108,19 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         }
 
         scoreUI.UpdateScore(TailCount);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_Result(PlayerRef player)
+    {
+        if (Runner.LocalPlayer == player)
+        {
+            SceneManager.LoadScene("Result");
+        }
+        else
+        {
+            SceneManager.LoadScene("Result");
+        }
     }
 
     public override void Spawned()
@@ -107,18 +134,19 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         SetState(new WaitingState()); // 초기 상태는 대기로
 
         StartCoroutine(RegisterPlayer());
-        UIAdapter.Instance.SetLocalPlayerName($"{Ref.PlayerId}");
+        if (HasStateAuthority)
+        {
+            UIAdapter.Instance.SetLocalPlayerName($"{Ref.PlayerId}");
+        }
+
         UIAdapter.Instance.RegisterPlayer(this);
-    }
-
-
-    private IEnumerator RegisterPlayer()
-    {
-        yield return new WaitForSeconds(0.1f);
-        GameManager.Instance.players[PlayerIndex] = this;
-        GameManager.Instance.playerCount++;
-        Debug.Log($"RegisterPlayer() // playerIndex: {PlayerIndex}, playerRef: {Ref}");
-        Debug.Log($"RegisterPlayer() // playerCount : {GameManager.Instance.playerCount}");
+        tailModels[0].SetActive(true);
+        IEnumerator RegisterPlayer()
+        {
+            yield return new WaitForSeconds(0.5f);
+            GameManager.Instance.players[Index] = this;
+            GameManager.Instance.playerCount++;
+        }
     }
 
     // 상태 확장을 고려해서 플레이어 상태 변경
@@ -134,11 +162,13 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         currentState?.Update(this);
     }
 
+    private bool mbIsWaitingTile = false;
     // 타일 선택 처리 (상태가 Active일 때만 처리)
     private void HandleTileSelected(SelectingTile tile)
     {
-        if (currentState is ActiveState)
+        if (currentState is ActiveState && mbIsWaitingTile == false)
         {
+            RPC_StartWait(tile);
             var currentTile = GameManager.Instance.GetMatchTile(CurrentSteppingTile);
             var isSuccess = GameManager.Instance.OpenTile(currentTile, tile);
             if (isSuccess)
@@ -148,12 +178,46 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
         }
     }
 
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    private void RPC_StartWait(SelectingTile tile)
+    {
+        StartCoroutine(WaitTileAnimationCoroutine(tile));
+    }
+
+    private IEnumerator WaitTileAnimationCoroutine(SelectingTile tile)
+    {
+        NetworkPlayer local = Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<NetworkPlayer>();
+        local.mbIsWaitingTile = true;
+
+        tile.ShowFace();
+        AnimatorStateInfo state = tile.anim.GetCurrentAnimatorStateInfo(0);
+        while ((state.shortNameHash == SelectingTile.HIDE_FACE && state.normalizedTime > 0.95f) == false)
+        {
+            state = tile.anim.GetCurrentAnimatorStateInfo(0);
+            yield return null;
+        }
+
+        local.mbIsWaitingTile = false;
+        yield break;
+    }
+
     public void MoveTo(SteppingTile targetTile)
     {
         transform.position = targetTile.transform.position;
         GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile, Runner.LocalPlayer);
         CurrentSteppingTile = targetTile;
-        transform.forward = targetTile.Next.transform.position - targetTile.transform.position;
+        LookAtNextTile();
+    }
+
+    private void LookAtNextTile()
+    {
+        transform.forward = CurrentSteppingTile.Next.transform.position - CurrentSteppingTile.transform.position;
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_LookAtNextTile()
+    {
+        LookAtNextTile();
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -173,5 +237,10 @@ public class NetworkPlayer : NetworkBehaviour //, IToPlayer
     public void RPC_TeleportTo(Vector3 position)
     {
         networkTransform.Teleport(position);
+    }
+
+    public void PlayerLeft(PlayerRef player)
+    {
+        Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>().bHasLeft = true;
     }
 }

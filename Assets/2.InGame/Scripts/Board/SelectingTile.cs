@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 public class SelectingTile : Tile, IPointerClickHandler
 {
     private static readonly int SHOW_FACE = Animator.StringToHash("ShowFace");
-    private static readonly int HIDE_FACE = Animator.StringToHash("HideFace");
+    public static readonly int HIDE_FACE = Animator.StringToHash("HideFace");
     public Animator anim;
 
     public Action<Tile> onClick;
@@ -17,6 +17,11 @@ public class SelectingTile : Tile, IPointerClickHandler
 
     public void ShowFace()
     {
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("FaceDown") == false)
+        {
+            return;
+        }
+
         anim.SetTrigger(SHOW_FACE);
     }
 

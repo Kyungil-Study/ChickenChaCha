@@ -3,7 +3,7 @@ using System.Linq;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
+public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPlayerLeft
 {
     public NetworkPlayer[] players = new NetworkPlayer[4];
     public int playerCount; // 현재 플레이어 수
@@ -51,12 +51,22 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
             Debug.Log("오답입니다.");
             // 액티브 플레이어에게 오답 처리
             // 다음 턴으로 넘기기
-            Debug.Log($"index : {ActivePlayer.PlayerIndex} / count : {playerCount}");
-            ActivePlayer.RPC_ReceiveMovePermission(false);
-
-            ActivePlayer = players[(ActivePlayer.PlayerIndex + 1) % playerCount];
-            ActivePlayer.RPC_ReceiveMovePermission(true);
+            Debug.Log($"index : {ActivePlayer.Index} / False");
+            MoveTurn();
         }
+    }
+
+    public void MoveTurn()
+    {
+        ActivePlayer.RPC_ReceiveMovePermission(false);
+
+        ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
+        while (ActivePlayer.bHasLeft)
+        {
+            ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
+        }
+        
+        ActivePlayer.RPC_ReceiveMovePermission(true);
     }
 
     public void OnChangedTurn()
@@ -72,16 +82,11 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
-    public void RPC_MoveTo(SteppingTile targetTile, SteppingTile currentSteppingTile, PlayerRef changeplayer)
+    public void RPC_MoveTo(SteppingTile targetTile, SteppingTile currentSteppingTile, PlayerRef changePlayer)
     {
         // 현재 타일, 다음 타일, 플레이어
-        Debug.Log(targetTile.Info.index);
-        Debug.Log(targetTile.StandingPlayer);
-        targetTile.StandingPlayer = changeplayer;
-        Debug.Log(targetTile.StandingPlayer);
-        Debug.Log(currentSteppingTile.StandingPlayer);
-        currentSteppingTile.StandingPlayer = PlayerRef.None;
-        Debug.Log(currentSteppingTile.StandingPlayer);
+        targetTile.StandingPlayer = Runner.GetPlayerObject(changePlayer).GetComponent<NetworkPlayer>();
+        currentSteppingTile.StandingPlayer = null;
     }
 
     public void PlayerJoined(PlayerRef player)
@@ -93,7 +98,23 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
     [Rpc(RpcSources.All, RpcTargets.All)]
     private void RPC_PlayerJoined(PlayerRef player)
     {
+        
     }
+    
+    public void PlayerLeft(PlayerRef player)
+    {
+        if (ActivePlayer.Ref == player)
+        {
+            RPC_ActivePlayerLeft();
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_ActivePlayerLeft()
+    {
+        MoveTurn();
+    }
+    
 
     #endregion
 
@@ -123,7 +144,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
             foreach (var netplayers in mTailPlayers)
             {
                 takeCount += netplayers.TailCount; // 꼬리 개수 합산
-                RPC_ResetTails(netplayers.Ref);
+                RPC_ResetTails(netplayers);
             }
 
             TakeTails(Runner.LocalPlayer, takeCount);
@@ -138,12 +159,9 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
     // 3. 뭘 맞춰야 하는지 확인 하는 코드
     public SteppingTile GetMatchTile(SteppingTile tile)
     {
-        while (tile.Next.StandingPlayer != PlayerRef.None) // "나 자신"은 예외 처리 해야 함
+        while (tile.Next.StandingPlayer != null) // "나 자신"은 예외 처리 해야 함
         {
-            var netObj = Runner.GetPlayerObject(tile.Next.StandingPlayer);
-            Debug.Log(tile.StandingPlayer);
-            Debug.Log(netObj);
-            var netPlayer = netObj.GetComponent<NetworkPlayer>();
+            NetworkPlayer netPlayer = tile.Next.StandingPlayer;
             mTailPlayers.Add(netPlayer);
             tile = tile.Next; // 있으면 그 다음 발판 확인
         }
@@ -159,11 +177,13 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_ResetTails(PlayerRef resetPlayer)
+    public void RPC_ResetTails(NetworkPlayer resetPlayer)
     {
-        var resetNetPlayer = Runner.GetPlayerObject(resetPlayer).GetComponent<NetworkPlayer>();
-        resetNetPlayer.TailCount = 0;
+        resetPlayer.TailCount = 0;
     }
 
     #endregion
+
+
+
 }
