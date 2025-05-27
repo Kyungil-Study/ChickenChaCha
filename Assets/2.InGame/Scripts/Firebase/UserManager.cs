@@ -35,6 +35,11 @@ public class UserManager : MonoBehaviour
     public FirebaseApp App => mApp;
     public FirebaseAuth Auth => mAuth;
     public FirebaseFirestore DB => mDB;
+
+    public class GameUser
+    {
+        private FirebaseUser user;
+    }
     public FirebaseUser User => mUser;
     
     private bool mIsInitialized = false;
@@ -83,6 +88,10 @@ public class UserManager : MonoBehaviour
         {
             Debug.LogError("Firebase 초기화 실패");
         }
+    }
+
+    public void OnGhostLoginButtonClicked()
+    {
     }
     
     public void OnLoginButtonClicked(OnSignInEventArgs args)
