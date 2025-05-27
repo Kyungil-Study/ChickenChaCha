@@ -29,7 +29,7 @@ public class ScoreBoardUI : MonoBehaviour
     {
         int index = player.Index;
         player.scoreUI = mPlayerScores[index];
-        player.scoreUI.UpdateUI(player.Name, player.TailCount);
+        player.scoreUI.UpdateUI(player.Name, player.ScoreCount);
     }
 
     public void UpdatePlayerScores(List<PlayerRef> playerRefs)

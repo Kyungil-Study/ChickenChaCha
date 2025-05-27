@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -58,17 +59,19 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
     public NetworkTransform networkTransform;
     public PlayerScoreUI scoreUI;
     public InputHandler inputHandler;
-    public GameObject[] tailModels;
     public IPlayerState currentState;
     public bool bHasLeft = false;
     
     [Networked] public PlayerRef Ref { get; set; }
     [Networked] public int Index { get; set; }
-
+    
+    public Transform[] hatTransform; // 모자 위치
+    public GameObject[] hatModels;
+    
     [Networked]
-    [OnChangedRender(nameof(OnChangedTailCount))]
-    public int TailCount { get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
-
+    [OnChangedRender(nameof(OnChangedScoreCount))]
+    public int ScoreCount { get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
+    
     public string Name => $"Player {Ref.PlayerId.ToString()}";
 
     [Networked] private int CurrentSteppingTileIndex { get; set; }
@@ -85,29 +88,21 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
         CurrentSteppingTileIndex = index;
     }
 
-    private void OnChangedTailCount()
+    private void OnChangedScoreCount()
     {
-        for (int i = 0; i < TailCount; i++)
-        {
-            tailModels[i].SetActive(true);
-        }
-
-        for (int i = TailCount; i < tailModels.Length; i++)
-        {
-            tailModels[i].SetActive(false);
-        }
-
-        if (GameManager.Instance.CheckTail(TailCount))
+        if (GameManager.Instance.CheckTail(ScoreCount))
         {
             Debug.Log("Winning!");
-            RPC_Result(Ref);
+            RPC_ReceiveMovePermission(false);
+            // 결과 UI 띄우는 코드 작성하시면 됩니다!!!
+            //RPC_Result(Ref);
         }
         else
         {
             Debug.Log("Continue playing...");
         }
 
-        scoreUI.UpdateScore(TailCount);
+        scoreUI.UpdateScore(ScoreCount);
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -138,9 +133,11 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
         {
             UIAdapter.Instance.SetLocalPlayerName($"{Ref.PlayerId}");
         }
-
+        activeHatNumber = new List<int>();
         UIAdapter.Instance.RegisterPlayer(this);
-        tailModels[0].SetActive(true);
+        hatModels[Index].SetActive(true);
+        activeHatNumber.Add(Index);
+        RPC_ActiveHat();
         IEnumerator RegisterPlayer()
         {
             yield return new WaitForSeconds(0.5f);
@@ -148,6 +145,31 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
             GameManager.Instance.playerCount++;
         }
     }
+    
+    public List<int> activeHatNumber; // 모자 활성화 상태
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_ActiveHat()
+    {
+        for (int i = 0; i < activeHatNumber.Count; i++)
+        {
+            hatModels[activeHatNumber[i]].SetActive(true);
+            hatModels[activeHatNumber[i]].transform.position = hatTransform[i].position;
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_ResetHat()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            hatModels[i].SetActive(false);
+        }
+
+        activeHatNumber = new List<int>();
+    }
+    
+    
 
     // 상태 확장을 고려해서 플레이어 상태 변경
     public void SetState(IPlayerState newState)

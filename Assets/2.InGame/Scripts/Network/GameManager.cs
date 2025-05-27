@@ -9,6 +9,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
     public int playerCount; // 현재 플레이어 수
 
     public List<NetworkPlayer> mTailPlayers; // 여기 있는 애들한테 꼬리 뺐으면 됌.
+    public List<int> mActiveHatNumber = new List<int>();
 
     [Networked]
     [OnChangedRender(nameof(OnChangedTurn))]
@@ -36,6 +37,12 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
         players[0].RPC_ReceiveMovePermission(true);
         ActivePlayer = players[0];
         mTailPlayers = new List<NetworkPlayer>();
+        mActiveHatNumber = new List<int>();
+    }
+
+    public override void Spawned()
+    {
+        base.Spawned();
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -143,10 +150,17 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
             var takeCount = 0;
             foreach (var netplayers in mTailPlayers)
             {
-                takeCount += netplayers.TailCount; // 꼬리 개수 합산
+                takeCount += netplayers.ScoreCount; // 꼬리 개수 합산
+                for (int i = 0; i < netplayers.activeHatNumber.Count; i++)
+                {
+                    mActiveHatNumber.Add(netplayers.activeHatNumber[i]);
+                }
+
+                netplayers.RPC_ResetHat();
                 RPC_ResetTails(netplayers);
             }
-
+            
+            TakeHats(Runner.LocalPlayer, mActiveHatNumber);
             TakeTails(Runner.LocalPlayer, takeCount);
             return true;
         }
@@ -154,6 +168,8 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
         RPC_OpenTileResult(false);
         return false;
     }
+    
+    
 
 
     // 3. 뭘 맞춰야 하는지 확인 하는 코드
@@ -169,17 +185,35 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
         return tile.Next;
     }
 
+    
     // 4.  뺏은 꼬리 개수만큼 액티브 플레이어에게 추가
     public void TakeTails(PlayerRef player, int takeCount)
     {
         var netPlayer = Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>();
-        netPlayer.TailCount += takeCount; // 액티브 플레이어에게 꼬리 개수 추가
+        netPlayer.ScoreCount += takeCount; // 액티브 플레이어에게 꼬리 개수 추가
+    }
+    
+    public void TakeHats(PlayerRef player, List<int> hatsNumber)
+    {
+        var netPlayer = Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>();
+        for(int i = 0; i < hatsNumber.Count; i++)
+        {
+            RPC_AddHat(netPlayer, hatsNumber[i]);  // 액티브 플레이어에게 모자 번호 추가
+        }
+
+        netPlayer.RPC_ActiveHat();
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_AddHat(NetworkPlayer netPlayer, int hatNumber)
+    {
+        netPlayer.activeHatNumber.Add(hatNumber);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_ResetTails(NetworkPlayer resetPlayer)
     {
-        resetPlayer.TailCount = 0;
+        resetPlayer.ScoreCount = 0;
     }
 
     #endregion
