@@ -876,6 +876,7 @@ GameObject:
   - component: {fileID: 1617176915641697326}
   - component: {fileID: 1202258736510613186}
   - component: {fileID: 8617112816031464161}
+  - component: {fileID: 8617112816031464162}
   m_Layer: 0
   m_Name: SessionManager
   m_TagString: Untagged
@@ -899,6 +900,26 @@ MonoBehaviour:
     type: 3}
   gameManagerPrefab:
     RawGuidValue: 2ffe015b4a1769b4793631efbdd3d525
+--- !u!114 &8617112816031464162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8617112816031464160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa69f8b8c2c36eb418bdb4de009ab332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mInputRoomName: {fileID: 0}
+  mInputInviteFriend: {fileID: 0}
+  mInputAcceptRoomName: {fileID: 0}
+  mButtonCreateParty: {fileID: 0}
+  mButtonInviteFriend: {fileID: 0}
+  mButtonShowInvites: {fileID: 0}
+  mButtonAcceptInvite: {fileID: 0}
+  mButtonRejectInvite: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

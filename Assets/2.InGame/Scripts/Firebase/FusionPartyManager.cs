@@ -1,4 +1,4 @@
-// FusionPartyManager.cs - Fusion 기반 파티 초대 시스템 + Firebase 연동
+// FusionPartyManager.cs - Fusion Shared Mode 기반 파티 시스템
 
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,8 @@ using UnityEngine.Serialization;
 
 public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
 {
+    
+    
     [FormerlySerializedAs("inputRoomName")]
     [Header("파티 UI")]
     [SerializeField] private TMP_InputField mInputRoomName;
@@ -32,8 +34,8 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void Start()
     {
-        mAuth = FirebaseAuth.DefaultInstance;
-        mDB = FirebaseFirestore.DefaultInstance;
+        mAuth = UserManager.Instance.Auth;
+        mDB =  UserManager.Instance.DB;
 
         mRunner = gameObject.AddComponent<NetworkRunner>();
         mRunner.ProvideInput = true;
@@ -55,9 +57,8 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
 
         await mRunner.StartGame(new StartGameArgs
         {
-            GameMode = GameMode.Host,
+            GameMode = GameMode.Shared,
             SessionName = roomName,
-            Scene = null,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
     }
@@ -77,7 +78,7 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             string myUid = mAuth.CurrentUser?.UserId;
             string myEmail = mAuth.CurrentUser?.Email;
-            string roomName = mRunner.SessionInfo.Name;
+            string roomName = mRunner.SessionInfo?.Name;
 
             if (myUid == null || string.IsNullOrEmpty(roomName)) return;
 
@@ -143,7 +144,7 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
 
             await mRunner.StartGame(new StartGameArgs
             {
-                GameMode = GameMode.Client,
+                GameMode = GameMode.Shared,
                 SessionName = roomName,
                 SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
             });
@@ -194,42 +195,30 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-    {
-        
-    }
+    public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) {}
 
-    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-    {
-        
-    }
+    public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) {}
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {}
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {}
-    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
-    {
-        
-    }
+    public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) {}
 
     public void OnInput(NetworkRunner runner, NetworkInput input) {}
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) {}
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) {}
-    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
-    {
-        
-    }
+    public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) {}
 
     public void OnConnectedToServer(NetworkRunner runner) {}
     public void OnDisconnectedFromServer(NetworkRunner runner) {}
     public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) {}
     public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) {}
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) {}
-    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data)
+    public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) {}
+
+    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
     {
         
     }
-
-    public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) {}
     public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) {}
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) {}
     public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) {}
