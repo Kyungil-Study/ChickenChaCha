@@ -58,7 +58,7 @@ public class PartyInvitationHandler : MonoBehaviour
 
             await invitationRef.DeleteAsync();
             
-            SceneRef sceneRef = SceneRef.FromIndex(2);
+            SceneRef sceneRef = SceneRef.FromIndex(SessionManager.IN_GAME_SCENE_INDEX);
             NetworkSceneInfo sceneInfo = new NetworkSceneInfo();
             sceneInfo.AddSceneRef(sceneRef);
             
@@ -66,7 +66,7 @@ public class PartyInvitationHandler : MonoBehaviour
             {
                 GameMode = GameMode.Shared,
                 SessionName = roomName,
-                PlayerCount = 4,
+                PlayerCount = 1,
                 SceneManager = SessionManager.Instance.NetworkSceneManager,
                 Scene = sceneInfo
             });
