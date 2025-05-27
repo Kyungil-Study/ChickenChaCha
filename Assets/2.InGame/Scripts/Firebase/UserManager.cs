@@ -333,24 +333,30 @@ public class UserManager : MonoBehaviour
         OnComplete.Invoke();
     }
 
-    public async void OnRemoveFriend()
+    public async void OnRemoveFriend(List<string> removeEmails, Action OnComplete)
     {
         try
         {
-            string friendEmail = mInputFriendEmail.text;
             string myUid = mAuth.CurrentUser?.UserId;
-            string friendUid = await FindUidByEmail(friendEmail);
 
-            if (myUid == null || friendUid == null) return;
+            foreach (var friendEmail in removeEmails)
+            {
+                string friendUid = await FindUidByEmail(friendEmail);
+                if (myUid == null || friendUid == null) return;
+                await mDB.Collection("users").Document(myUid).Collection("friends").Document(friendUid).DeleteAsync();
+                await mDB.Collection("users").Document(friendUid).Collection("friends").Document(myUid).DeleteAsync();
+                
+                Debug.Log($"친구 삭제 {friendEmail}");
 
-            await mDB.Collection("users").Document(myUid).Collection("friends").Document(friendUid).DeleteAsync();
-            await mDB.Collection("users").Document(friendUid).Collection("friends").Document(myUid).DeleteAsync();
+            }
             Debug.Log("친구 삭제 완료");
         }
         catch (Exception e)
         {
             Debug.LogError("친구 삭제 중 오류: " + e.Message);
         }
+        
+        OnComplete?.Invoke();
     }
     
     public List<string> FriendList { get; private set; } = new List<string>();

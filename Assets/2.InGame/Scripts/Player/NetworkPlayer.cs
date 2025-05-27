@@ -53,8 +53,9 @@ public class WaitingState : IPlayerState
     }
 }
 
-public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
+public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
 {
+    [SerializeField] private Renderer mRenderer;
     public NetworkTransform networkTransform;
     public PlayerScoreUI scoreUI;
     public InputHandler inputHandler;
@@ -113,14 +114,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_Result(PlayerRef player)
     {
-        if (Runner.LocalPlayer == player)
-        {
-            SceneManager.LoadScene("Result");
-        }
-        else
-        {
-            SceneManager.LoadScene("Result");
-        }
+        GameResultController.Instance.OnEndedGame(player);
     }
 
     public override void Spawned()
@@ -147,6 +141,11 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
             GameManager.Instance.players[Index] = this;
             GameManager.Instance.playerCount++;
         }
+    }
+
+    public void AfterSpawned()
+    {
+        mRenderer.material = BoardManager.Instance.chickMats[Index];
     }
 
     // 상태 확장을 고려해서 플레이어 상태 변경

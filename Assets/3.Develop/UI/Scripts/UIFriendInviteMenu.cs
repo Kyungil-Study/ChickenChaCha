@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIFriendListMenu : MonoBehaviour
+public class UIFriendInviteMenu : MonoBehaviour
 {
     public class ViewItemData
     {
@@ -18,43 +18,20 @@ public class UIFriendListMenu : MonoBehaviour
     
     [Space(10)]
     [Header("Request Menu UI Action Refs")]
-    [SerializeField] private Button mRemoveButton;
+    [SerializeField] private Button mInviteButton;
     [SerializeField] private Button mExitButton;
     
     List<UIFriendRequestItem> mRequestItemList = new List<UIFriendRequestItem>();
     HashSet<string> mCheckedItemList = new HashSet<string>();
     
-    public event Action<List<string>,Action> OnRemoveButtonClicked;
+    public event Action<List<string>> OnInviteButtonClicked;
     public event Action OnExitButtonClicked;
     
     private void Awake()
     {
-        OnRemoveButtonClicked += UserManager.Instance.OnRemoveFriend;
-        mRemoveButton.onClick.AddListener(() =>
-        {
-            OnRemoveButtonClicked?.Invoke(mCheckedItemList.ToList(), () =>
-            {
-                UserManager.Instance.OnShowFriends(() =>
-                {
-                    List<ViewItemData> viewItemList = new List<ViewItemData>();
-                    foreach (var friend in UserManager.Instance.FriendList)
-                    {
-                        var itemData = new ViewItemData
-                        {
-                            userEmail = friend
-                        };
-                        viewItemList.Add(itemData);
-                    }
-                    UpdateListView(viewItemList);
-                });
-            });
-        });
-        
-        mExitButton.onClick.AddListener(() =>
-        {
-            OnExitButtonClicked?.Invoke();
-        });
-        
+        mInviteButton.onClick.AddListener(OnClickedInviteButton);
+        mExitButton.onClick.AddListener(OnClickedExitButton);
+        OnInviteButtonClicked += PartyInviter.Instance.OnInviteFriend;
     }
 
     private void OnEnable()
@@ -111,4 +88,13 @@ public class UIFriendListMenu : MonoBehaviour
         }
     }
 
+    void OnClickedInviteButton()
+    {
+        OnInviteButtonClicked?.Invoke(mCheckedItemList.ToList());
+    }
+
+    void OnClickedExitButton()
+    {
+        OnExitButtonClicked?.Invoke();
+    }
 }
