@@ -15,7 +15,7 @@ public class OnAcceptFriendEventArgs : EventArgs
 
 public class OnInviteEventArgs : EventArgs
 {
-    public List<string> InviteEmails;
+    public string InviteRoomName;
 }
 
 
