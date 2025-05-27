@@ -22,13 +22,14 @@ public class PartyInviter : MonoBehaviour
         mDB = UserManager.Instance.DB;
     }
 
-    public async void InviteFriend(string roomName)
+    public async void InviteFriend()
     {
         try
         {
             string myUid = mAuth.CurrentUser?.UserId;
             string myEmail = mAuth.CurrentUser?.Email;
             string friendEmail = mInputField.text;
+            string roomName = SessionManager.Instance.RoomNameForTesting;
 
             if (myUid == null || string.IsNullOrEmpty(roomName)) return;
 
