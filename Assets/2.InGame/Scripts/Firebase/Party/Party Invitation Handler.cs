@@ -1,0 +1,91 @@
+// PartyInvitationHandler.cs
+using System;
+using System.Threading.Tasks;
+using Firebase.Auth;
+using Firebase.Firestore;
+using Fusion;
+using UnityEngine;
+
+public class PartyInvitationHandler : MonoBehaviour
+{
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore mDB;
+    private NetworkRunner mRunner;
+
+    private void Awake()
+    {
+        mAuth = UserManager.Instance.Auth;
+        mDB = UserManager.Instance.DB;
+        //mRunner = GetComponent<NetworkRunner>() ?? gameObject.AddComponent<NetworkRunner>();
+    }
+
+    public async void ShowInvitations()
+    {
+        try
+        {
+            string myUid = mAuth.CurrentUser?.UserId;
+            if (myUid == null) return;
+
+            var snapshot = await mDB.Collection("users").Document(myUid)
+                .Collection("invitations")
+                .GetSnapshotAsync();
+
+            foreach (var doc in snapshot.Documents)
+            {
+                string roomName = doc.GetValue<string>("roomName");
+                string from = doc.GetValue<string>("from");
+                Debug.Log($"🎉 {from} 님이 '{roomName}' 파티에 초대했습니다.");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("초대 목록 불러오기 실패: " + e.Message);
+        }
+    }
+
+    public async void AcceptInvite(string roomName)
+    {
+        try
+        {
+            string myUid = mAuth.CurrentUser?.UserId;
+            if (string.IsNullOrEmpty(roomName) || myUid == null) return;
+
+            var invitationRef = mDB.Collection("users").Document(myUid)
+                .Collection("invitations").Document(roomName);
+
+            await invitationRef.DeleteAsync();
+
+            await mRunner.StartGame(new StartGameArgs
+            {
+                GameMode = GameMode.Shared,
+                SessionName = roomName,
+                SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            });
+
+            Debug.Log("✅ 초대 수락 후 입장 시도: " + roomName);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("초대 수락 중 오류: " + e.Message);
+        }
+    }
+
+    public async void RejectInvite(string roomName)
+    {
+        try
+        {
+            string myUid = mAuth.CurrentUser?.UserId;
+            if (string.IsNullOrEmpty(roomName) || myUid == null) return;
+
+            var invitationRef = mDB.Collection("users").Document(myUid)
+                .Collection("invitations").Document(roomName);
+
+            await invitationRef.DeleteAsync();
+            Debug.Log("❌ 초대 거절 처리 완료: " + roomName);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("초대 거절 중 오류: " + e.Message);
+        }
+    }
+}
