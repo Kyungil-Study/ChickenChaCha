@@ -265,5 +265,6 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         var leftPlayer = Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>();
         leftPlayer.bHasLeft = true;
         leftPlayer.mRenderer.material.shader = BoardManager.Instance.soulShader;
+        leftPlayer.mRenderer.material.color = new Color(0.3f, 0.3f, 0.3f, 0.8f);
     }
 }

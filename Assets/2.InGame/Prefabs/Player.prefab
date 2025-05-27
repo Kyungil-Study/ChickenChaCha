@@ -480,6 +480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8549b5ffcfb00345abc0ac8abfb912a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mRenderer: {fileID: 2624212572801742928}
   networkTransform: {fileID: 0}
   scoreUI: {fileID: 0}
   inputHandler: {fileID: 0}
@@ -1084,6 +1085,12 @@ Transform:
 --- !u!4 &2624212572215104197 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5510196490160580396, guid: 511008ffae6ab11459f4abdc9e6f876c,
+    type: 3}
+  m_PrefabInstance: {fileID: 7499397097387390441}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &2624212572801742928 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 5510196489708162489, guid: 511008ffae6ab11459f4abdc9e6f876c,
     type: 3}
   m_PrefabInstance: {fileID: 7499397097387390441}
   m_PrefabAsset: {fileID: 0}
