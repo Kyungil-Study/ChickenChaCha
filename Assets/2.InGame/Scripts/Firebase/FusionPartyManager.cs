@@ -11,47 +11,49 @@ using Firebase.Firestore;
 using Firebase.Extensions;
 using Fusion;
 using Fusion.Sockets;
+using UnityEngine.Serialization;
 
 public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
 {
+    [FormerlySerializedAs("inputRoomName")]
     [Header("파티 UI")]
-    [SerializeField] private TMP_InputField inputRoomName;
-    [SerializeField] private TMP_InputField inputInviteFriend;
-    [SerializeField] private TMP_InputField inputAcceptRoomName;
-    [SerializeField] private Button buttonCreateParty;
-    [SerializeField] private Button buttonInviteFriend;
-    [SerializeField] private Button buttonShowInvites;
-    [SerializeField] private Button buttonAcceptInvite;
-    [SerializeField] private Button buttonRejectInvite;
+    [SerializeField] private TMP_InputField mInputRoomName;
+    [FormerlySerializedAs("inputInviteFriend")] [SerializeField] private TMP_InputField mInputInviteFriend;
+    [FormerlySerializedAs("inputAcceptRoomName")] [SerializeField] private TMP_InputField mInputAcceptRoomName;
+    [FormerlySerializedAs("buttonCreateParty")] [SerializeField] private Button mButtonCreateParty;
+    [FormerlySerializedAs("buttonInviteFriend")] [SerializeField] private Button mButtonInviteFriend;
+    [FormerlySerializedAs("buttonShowInvites")] [SerializeField] private Button mButtonShowInvites;
+    [FormerlySerializedAs("buttonAcceptInvite")] [SerializeField] private Button mButtonAcceptInvite;
+    [FormerlySerializedAs("buttonRejectInvite")] [SerializeField] private Button mButtonRejectInvite;
 
-    private FirebaseAuth auth;
-    private FirebaseFirestore db;
-    private NetworkRunner runner;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore mDB;
+    private NetworkRunner mRunner;
 
     private void Start()
     {
-        auth = FirebaseAuth.DefaultInstance;
-        db = FirebaseFirestore.DefaultInstance;
+        mAuth = FirebaseAuth.DefaultInstance;
+        mDB = FirebaseFirestore.DefaultInstance;
 
-        runner = gameObject.AddComponent<NetworkRunner>();
-        runner.ProvideInput = true;
+        mRunner = gameObject.AddComponent<NetworkRunner>();
+        mRunner.ProvideInput = true;
 
-        buttonCreateParty.onClick.AddListener(OnCreatePartyClicked);
-        buttonInviteFriend.onClick.AddListener(OnInviteFriendClicked);
-        buttonShowInvites.onClick.AddListener(ShowPartyInvitations);
-        buttonAcceptInvite.onClick.AddListener(OnAcceptInvite);
-        buttonRejectInvite.onClick.AddListener(OnRejectInvite);
+        mButtonCreateParty.onClick.AddListener(OnCreatePartyClicked);
+        mButtonInviteFriend.onClick.AddListener(OnInviteFriendClicked);
+        mButtonShowInvites.onClick.AddListener(ShowPartyInvitations);
+        mButtonAcceptInvite.onClick.AddListener(OnAcceptInvite);
+        mButtonRejectInvite.onClick.AddListener(OnRejectInvite);
     }
 
     private async void OnCreatePartyClicked()
     {
-        string roomName = inputRoomName.text;
+        string roomName = mInputRoomName.text;
         if (string.IsNullOrEmpty(roomName))
         {
             roomName = "FusionRoom_" + Guid.NewGuid().ToString("N").Substring(0, 6);
         }
 
-        await runner.StartGame(new StartGameArgs
+        await mRunner.StartGame(new StartGameArgs
         {
             GameMode = GameMode.Host,
             SessionName = roomName,
@@ -62,7 +64,7 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void OnInviteFriendClicked()
     {
-        string friendEmail = inputInviteFriend.text;
+        string friendEmail = mInputInviteFriend.text;
         if (!string.IsNullOrEmpty(friendEmail))
         {
             InviteFriendToParty(friendEmail);
@@ -73,16 +75,16 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         try
         {
-            string myUid = auth.CurrentUser?.UserId;
-            string myEmail = auth.CurrentUser?.Email;
-            string roomName = runner.SessionInfo.Name;
+            string myUid = mAuth.CurrentUser?.UserId;
+            string myEmail = mAuth.CurrentUser?.Email;
+            string roomName = mRunner.SessionInfo.Name;
 
             if (myUid == null || string.IsNullOrEmpty(roomName)) return;
 
             string friendUid = await FindUidByEmail(friendEmail);
             if (friendUid == null) return;
 
-            var invitationRef = db.Collection("users").Document(friendUid)
+            var invitationRef = mDB.Collection("users").Document(friendUid)
                 .Collection("invitations").Document(roomName);
 
             var data = new Dictionary<string, object>
@@ -105,10 +107,10 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         try
         {
-            string myUid = auth.CurrentUser?.UserId;
+            string myUid = mAuth.CurrentUser?.UserId;
             if (myUid == null) return;
 
-            var snapshot = await db.Collection("users").Document(myUid)
+            var snapshot = await mDB.Collection("users").Document(myUid)
                 .Collection("invitations")
                 .GetSnapshotAsync();
 
@@ -129,17 +131,17 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         try
         {
-            string roomName = inputAcceptRoomName.text;
-            string myUid = auth.CurrentUser?.UserId;
+            string roomName = mInputAcceptRoomName.text;
+            string myUid = mAuth.CurrentUser?.UserId;
 
             if (string.IsNullOrEmpty(roomName) || myUid == null) return;
 
-            var invitationRef = db.Collection("users").Document(myUid)
+            var invitationRef = mDB.Collection("users").Document(myUid)
                 .Collection("invitations").Document(roomName);
 
             await invitationRef.DeleteAsync();
 
-            await runner.StartGame(new StartGameArgs
+            await mRunner.StartGame(new StartGameArgs
             {
                 GameMode = GameMode.Client,
                 SessionName = roomName,
@@ -158,12 +160,12 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         try
         {
-            string roomName = inputAcceptRoomName.text;
-            string myUid = auth.CurrentUser?.UserId;
+            string roomName = mInputAcceptRoomName.text;
+            string myUid = mAuth.CurrentUser?.UserId;
 
             if (string.IsNullOrEmpty(roomName) || myUid == null) return;
 
-            var invitationRef = db.Collection("users").Document(myUid)
+            var invitationRef = mDB.Collection("users").Document(myUid)
                 .Collection("invitations").Document(roomName);
 
             await invitationRef.DeleteAsync();
@@ -179,7 +181,7 @@ public class FusionPartyManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         try
         {
-            var snapshot = await db.Collection("users")
+            var snapshot = await mDB.Collection("users")
                 .WhereEqualTo("email", email).Limit(1)
                 .GetSnapshotAsync();
 
