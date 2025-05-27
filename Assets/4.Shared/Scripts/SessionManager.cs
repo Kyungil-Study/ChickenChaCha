@@ -82,7 +82,20 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     public GameSessionState SessionState => mSessionState;
     
     [SerializeField] private string mRoomNameForTesting = "00"; // 테스트용 방 이름
+
+    public string RoomNameForTesting
+    {
+        get => mRoomNameForTesting;
+        set => mRoomNameForTesting = value;
+    }
     [SerializeField] private int mRoomMapPlayerCount = 1; // 테스트용 방 플레이어 수
+    
+    public int RoomMapPlayerCount
+    {
+        get => mRoomMapPlayerCount;
+        set => mRoomMapPlayerCount = value;
+    }
+    
     public class Callbacks
     {
         public Action OnLoginSuccess;
