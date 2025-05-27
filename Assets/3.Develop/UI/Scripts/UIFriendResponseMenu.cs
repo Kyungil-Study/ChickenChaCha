@@ -34,6 +34,26 @@ public class UIFriendResponseMenu : UISingleton<UIFriendResponseMenu>
         mRejectButton.onClick.AddListener(OnClickedExitButton);
     }
 
+    private void OnEnable()
+    {
+        UserManager.Instance.OnShowRequests(() =>
+        {
+            UpdateView();
+        });
+    }
+
+    public void UpdateView()
+    {
+        List<ViewItemData> viewItemList = new List<ViewItemData>();
+        foreach (var request in UserManager.Instance.RequestFriendList)
+        {
+            ViewItemData itemData = new ViewItemData();
+            itemData.userEmail = request;
+            viewItemList.Add(itemData);
+        }
+        UpdateListView(viewItemList);
+    }
+    
     public void UpdateListView(List<ViewItemData> requestItemList)
     {
         // destroy all items

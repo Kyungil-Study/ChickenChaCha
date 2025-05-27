@@ -318,8 +318,12 @@ public class UserManager : MonoBehaviour
         }
     }
 
-    public async void OnShowRequests()
+    
+    private List<string> mRequestFriendList = new List<string>();
+    public List<string> RequestFriendList => mRequestFriendList;
+    public async void OnShowRequests(Action OnCompleteTask)
     {
+        mRequestFriendList.Clear();
         try
         {
             string myUid = mAuth.CurrentUser?.UserId;
@@ -327,6 +331,7 @@ public class UserManager : MonoBehaviour
 
             var snapshot = await mDB.Collection("users").Document(myUid).Collection("requests").GetSnapshotAsync();
 
+            
             foreach (var doc in snapshot.Documents)
             {
                 string requesterUid = doc.Id;
@@ -334,6 +339,7 @@ public class UserManager : MonoBehaviour
                 if (userSnap.Exists && userSnap.TryGetValue("email", out string email))
                 {
                     Debug.Log("받은 친구 요청: " + email);
+                    mRequestFriendList.Add(email);
                 }
             }
         }
@@ -341,6 +347,7 @@ public class UserManager : MonoBehaviour
         {
             Debug.LogError("요청 목록 로딩 실패: " + e.Message);
         }
+        OnCompleteTask?.Invoke();
     }
 
     private async System.Threading.Tasks.Task<string> FindUidByEmail(string email)
