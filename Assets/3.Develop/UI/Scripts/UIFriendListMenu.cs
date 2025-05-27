@@ -33,7 +33,24 @@ public class UIFriendListMenu : MonoBehaviour
         mExitButton.onClick.AddListener(OnClickedExitButton);
     }
 
-    
+    private void OnEnable()
+    {
+        UserManager.Instance.OnShowFriends(() =>
+        {
+            List<ViewItemData> viewItemList = new List<ViewItemData>();
+            foreach (var friend in UserManager.Instance.FriendList)
+            {
+                var itemData = new ViewItemData
+                {
+                    userEmail = friend
+                };
+                viewItemList.Add(itemData);
+            }
+            UpdateListView(viewItemList);
+        });
+    }
+
+
     public void UpdateListView(List<ViewItemData> requestItemList)
     {
         // destroy all items
