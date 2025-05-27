@@ -496,6 +496,7 @@ MonoBehaviour:
   - {fileID: 6433433134155460523}
   - {fileID: 5466575454944965265}
   _ScoreCount: 0
+  activeHatNumber: 
 --- !u!114 &588842561614863103
 MonoBehaviour:
   m_ObjectHideFlags: 0

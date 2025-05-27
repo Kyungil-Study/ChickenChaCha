@@ -9,7 +9,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
     public int playerCount; // 현재 플레이어 수
 
     public List<NetworkPlayer> mTailPlayers; // 여기 있는 애들한테 꼬리 뺐으면 됌.
-    public List<int> mActiveHatNumber = new List<int>();
+    public List<int> mActiveHatNumber;
 
     [Networked]
     [OnChangedRender(nameof(OnChangedTurn))]
@@ -162,6 +162,8 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
             
             TakeHats(Runner.LocalPlayer, mActiveHatNumber);
             TakeTails(Runner.LocalPlayer, takeCount);
+            mActiveHatNumber = new List<int>();
+            mTailPlayers = new List<NetworkPlayer>();
             return true;
         }
 
