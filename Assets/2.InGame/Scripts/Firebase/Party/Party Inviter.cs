@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Firebase.Firestore;
+using Fusion;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

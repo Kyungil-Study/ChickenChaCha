@@ -692,7 +692,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b9c6fffc2ef3c048b03d813c9fd15db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mRoomNameForTesting: 00
+  mRoomNameForTesting: 01
   mRoomMapPlayerCount: 1
 --- !u!4 &1617176915641697326
 Transform:
