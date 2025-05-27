@@ -13,6 +13,11 @@ public class OnAcceptFriendEventArgs : EventArgs
     public List<string> AcceptedEmails;
 }
 
+public class OnInviteEventArgs : EventArgs
+{
+    public List<string> InviteEmails;
+}
+
 
 public class OnSignInEventArgs : EventArgs
 {
