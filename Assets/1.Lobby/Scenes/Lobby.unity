@@ -467,6 +467,11 @@ PrefabInstance:
       objectReference: {fileID: 6990752130198797974}
     - target: {fileID: 6339864621921192956, guid: 2b05ecc09e617f64f9358c3da0e94742,
         type: 3}
+      propertyPath: playerCountText
+      value: 
+      objectReference: {fileID: 6990752130198797975}
+    - target: {fileID: 6339864621921192956, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
       propertyPath: mGotoFriendPanel
       value: 
       objectReference: {fileID: 6990752130198797973}
@@ -488,17 +493,17 @@ PrefabInstance:
     - target: {fileID: 8970101787116099097, guid: 2b05ecc09e617f64f9358c3da0e94742,
         type: 3}
       propertyPath: m_ContentType
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8970101787116099097, guid: 2b05ecc09e617f64f9358c3da0e94742,
         type: 3}
       propertyPath: m_KeyboardType
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8970101787116099097, guid: 2b05ecc09e617f64f9358c3da0e94742,
         type: 3}
       propertyPath: m_CharacterValidation
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -507,13 +512,25 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: 2b05ecc09e617f64f9358c3da0e94742, type: 3}
 --- !u!1 &6990752130198797973 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 1522319086938740373, guid: 2b05ecc09e617f64f9358c3da0e94742,
+  m_CorrespondingSourceObject: {fileID: 160822501365643170, guid: 2b05ecc09e617f64f9358c3da0e94742,
     type: 3}
   m_PrefabInstance: {fileID: 6990752130198797972}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &6990752130198797974 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1484526110011362606, guid: 2b05ecc09e617f64f9358c3da0e94742,
+    type: 3}
+  m_PrefabInstance: {fileID: 6990752130198797972}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6990752130198797975 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8970101787116099097, guid: 2b05ecc09e617f64f9358c3da0e94742,
     type: 3}
   m_PrefabInstance: {fileID: 6990752130198797972}
   m_PrefabAsset: {fileID: 0}
