@@ -69,8 +69,8 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
     public GameObject[] hatModels;
     
     [Networked]
-    [OnChangedRender(nameof(OnChangedTailCount))]
-    public int TailCount { get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
+    [OnChangedRender(nameof(OnChangedScoreCount))]
+    public int ScoreCount { get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
 
     [Networked] // 최대 32글자까지 저장 가능
     public NetworkString<_32> Name { get; set; }
