@@ -76,6 +76,9 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     private NetworkRunner mNetworkRunner;
     public NetworkRunner NetworkRunner => mNetworkRunner;
     
+    private NetworkSceneManagerDefault mNetworkSceneManagerDefault;
+    public NetworkSceneManagerDefault NetworkSceneManagerDefault => mNetworkSceneManagerDefault;
+    
     private GameSessionState mSessionState = GameSessionState.Ready;
     public GameSessionState SessionState => mSessionState;
     
@@ -137,6 +140,11 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         if (mNetworkRunner != null)
         {
             Destroy(mNetworkRunner);
+        }
+        
+        if(mNetworkSceneManagerDefault != null)
+        {
+            Destroy(mNetworkSceneManagerDefault);
         }
 
         await Task.Delay(1000);
@@ -243,6 +251,8 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     public void LeaveRoom()
     {
         callbacks?.OnLeftRoom?.Invoke();
+        
+        mNetworkRunner.UnloadScene(SceneRef.FromIndex(IN_GAME_SCENE_INDEX));
         LoadLobbyScene();
     }
     
@@ -253,13 +263,14 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         SceneRef sceneRef = SceneRef.FromIndex(IN_GAME_SCENE_INDEX);
         NetworkSceneInfo sceneInfo = new NetworkSceneInfo();
         sceneInfo.AddSceneRef(sceneRef);
-        
+
+        mNetworkSceneManagerDefault = gameObject.AddComponent<NetworkSceneManagerDefault>();
         var args = new StartGameArgs()
         {
             GameMode = GameMode.Shared,
             SessionName = roomName, // room_{guid} 가 roomName
             PlayerCount = mRoomMapPlayerCount,
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            SceneManager = mNetworkSceneManagerDefault
             ,
             Scene = sceneInfo
         };
@@ -281,12 +292,13 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         NetworkSceneInfo sceneInfo = new NetworkSceneInfo();
         sceneInfo.AddSceneRef(sceneRef);
         
+        mNetworkSceneManagerDefault = gameObject.AddComponent<NetworkSceneManagerDefault>();
         var args = new StartGameArgs()
         {
             GameMode = GameMode.Shared,
             SessionName = roomName, // room_{guid} 가 roomName
             PlayerCount = mRoomMapPlayerCount,
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            SceneManager = mNetworkSceneManagerDefault
             ,
             Scene = sceneInfo
         };
