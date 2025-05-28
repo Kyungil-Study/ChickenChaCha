@@ -344,8 +344,14 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         // 플레이어가 나갔을 때 다른 플레이어에게 알림
         if (GameManager.Instance.IsActivePlayer(player))
         {
-            GameManager.Instance.MoveTurn();
+            RPC_LeftPlayer();
         }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_LeftPlayer()
+    {
+        GameManager.Instance.MoveTurn();
     }
 
     public static void Threat(NetworkPlayer gorgon)
