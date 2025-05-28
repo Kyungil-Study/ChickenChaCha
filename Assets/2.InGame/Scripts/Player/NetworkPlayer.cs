@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Fusion;
@@ -77,7 +78,8 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
     public NetworkTransform networkTransform;
     public InputHandler inputHandler;
     public IPlayerState currentState;
-    public bool bHasLeft = false;
+    [Networked] 
+    public bool bHasLeft { get; set; } = false; // 플레이어가 나갔는지 여부
     public GameObject indicator; // 플레이어가 서있는 타일에 표시할 인디케이터
     
     [Networked] public PlayerRef Ref { get; set; }
@@ -105,6 +107,15 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
     private void RPC_SetTileIndex(int index)
     {
         CurrentSteppingTileIndex = index;
+    }
+
+    private void Update()
+    {
+        if (HasStateAuthority && Input.GetKeyDown(KeyCode.Space))
+        {
+            BoardManager.Instance.DebugStandingPlayer();
+        }
+        
     }
 
     private void OnChangedScoreCount()

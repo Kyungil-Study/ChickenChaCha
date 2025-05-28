@@ -22,6 +22,14 @@ public class BoardManager : DontDestroyOnNetwork<BoardManager>
         StartCoroutine(LinkSteppingTiles());
     }
 
+    public void DebugStandingPlayer()
+    {
+        foreach (var stepping in steppingTiles)
+        {
+            Debug.Log($"{stepping} : {stepping.StandingPlayer}");
+        }
+    }
+
     private IEnumerator LinkSteppingTiles()
     {
         while (steppingTiles.Any(tile => tile == null))

@@ -4,7 +4,7 @@ using System.Linq;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
+public class GameManager : DontDestroyOnNetwork<GameManager>
 {
     public NetworkPlayer[] players = new NetworkPlayer[4];
     public int playerCount; // 현재 플레이어 수
@@ -17,14 +17,6 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
     private NetworkPlayer ActivePlayer { get; set; } // 현재 턴 인덱스, OnChangedRender로 변경 감지
 
     #region GameManager
-
-    private void Update()
-    {
-        if (Runner.IsSharedModeMasterClient && Input.GetKeyDown(KeyCode.Space))
-        {
-            GameStart();
-        }
-    }
 
     public NetworkPlayer[] GetPlayersArray()
     {
@@ -96,24 +88,12 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
         UIAdapter.Instance.SetTurnPlayerName($"{Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>().Name.ToString()}");
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_MoveTo(SteppingTile targetTile, SteppingTile currentSteppingTile, PlayerRef changePlayer)
     {
         // 현재 타일, 다음 타일, 플레이어
         targetTile.StandingPlayer = Runner.GetPlayerObject(changePlayer).GetComponent<NetworkPlayer>();
         currentSteppingTile.StandingPlayer = null;
-    }
-
-    public void PlayerJoined(PlayerRef player)
-    {
-        // UI에게 새로 접속한 플레이어 정보 전달
-        RPC_PlayerJoined(player);
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    private void RPC_PlayerJoined(PlayerRef player)
-    {
-        
     }
 
     #endregion
