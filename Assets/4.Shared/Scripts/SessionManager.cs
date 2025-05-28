@@ -76,6 +76,9 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     private NetworkRunner mNetworkRunner;
     public NetworkRunner NetworkRunner => mNetworkRunner;
     
+    private NetworkSceneManagerDefault mNetworkSceneManagerDefault;
+    public NetworkSceneManagerDefault NetworkSceneManagerDefault => mNetworkSceneManagerDefault;
+    
     private GameSessionState mSessionState = GameSessionState.Ready;
     public GameSessionState SessionState => mSessionState;
     
@@ -129,6 +132,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     private void LoadLobbyScene()
     {
         SceneManager.LoadScene(LOBBY_SCENE_INDEX, LoadSceneMode.Single);
+        EnterLobbyAsync();
     }
 
     private async Task InitRunnerAsync()
@@ -136,6 +140,11 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         if (mNetworkRunner != null)
         {
             Destroy(mNetworkRunner);
+        }
+        
+        if(mNetworkSceneManagerDefault != null)
+        {
+            Destroy(mNetworkSceneManagerDefault);
         }
 
         await Task.Delay(1000);
@@ -203,7 +212,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         Debug.Log($"[SessionManager] OnSignIn ::: 유저 이름 = {eventArgs.UserID}");
         mSessionState = GameSessionState.Login;
         LoadLobbyScene();
-        EnterLobbyAsync();
+        
     }
     
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
@@ -238,6 +247,14 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             JoinRoomAsync(joinAble.Name);
         }
     }
+
+    public void LeaveRoom()
+    {
+        callbacks?.OnLeftRoom?.Invoke();
+        
+        mNetworkRunner.UnloadScene(SceneRef.FromIndex(IN_GAME_SCENE_INDEX));
+        LoadLobbyScene();
+    }
     
     private async void CreateRoomAsync(string roomName)
     {
@@ -246,13 +263,14 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         SceneRef sceneRef = SceneRef.FromIndex(IN_GAME_SCENE_INDEX);
         NetworkSceneInfo sceneInfo = new NetworkSceneInfo();
         sceneInfo.AddSceneRef(sceneRef);
-        
+
+        mNetworkSceneManagerDefault = gameObject.AddComponent<NetworkSceneManagerDefault>();
         var args = new StartGameArgs()
         {
             GameMode = GameMode.Shared,
             SessionName = roomName, // room_{guid} 가 roomName
             PlayerCount = mRoomMapPlayerCount,
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            SceneManager = mNetworkSceneManagerDefault
             ,
             Scene = sceneInfo
         };
@@ -274,12 +292,13 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         NetworkSceneInfo sceneInfo = new NetworkSceneInfo();
         sceneInfo.AddSceneRef(sceneRef);
         
+        mNetworkSceneManagerDefault = gameObject.AddComponent<NetworkSceneManagerDefault>();
         var args = new StartGameArgs()
         {
             GameMode = GameMode.Shared,
             SessionName = roomName, // room_{guid} 가 roomName
             PlayerCount = mRoomMapPlayerCount,
-            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            SceneManager = mNetworkSceneManagerDefault
             ,
             Scene = sceneInfo
         };

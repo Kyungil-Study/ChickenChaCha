@@ -112,7 +112,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
             Debug.Log("Winning!");
             RPC_ReceiveMovePermission(false);
             // 결과 UI 띄우는 코드 작성하시면 됩니다!!!
-            //RPC_Result(Ref);
+            RPC_Result(Ref);
         }
         else
         {
@@ -120,10 +120,12 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         }
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_Result(PlayerRef player)
     {
-        GameResultController.Instance.OnEndedGame(player);
+        Debug.Log("RPC_Result ::: rpc result");
+        Debug.Log("게임 종료");
+        GameResultController.Instance.OnEndedGame(player == Runner.LocalPlayer);
     }
 
     public override void Spawned()
