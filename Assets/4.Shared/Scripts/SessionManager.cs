@@ -239,11 +239,11 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
 
         if (joinAble == null)
         {
-            CreateRoomAsync(mRoomNameForTesting);
+            CreateRoom(mRoomNameForTesting);
         }
         else
         {
-            JoinRoomAsync(joinAble.Name);
+            JoinRoom(joinAble.Name);
         }
     }
 
@@ -255,7 +255,12 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         LoadLobbySceneAsync();
     }
     
-    private async void CreateRoomAsync(string roomName)
+    private void CreateRoom(string roomName)
+    {
+        Task task = CreateRoomAsync(roomName);
+    }
+    
+    private async Task CreateRoomAsync(string roomName)
     {
         Debug.Log($"[SessionManager] CreateRoom : {roomName}");
 
@@ -274,19 +279,23 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             Scene = sceneInfo
         };
         
-        await mNetworkRunner.StartGame(args);
+        StartGameResult startResult = await mNetworkRunner.StartGame(args);
+        if (startResult.Ok == false)
+        {
+            Debug.LogError($"[SessionManager] CreateRoomAsync ::: 방 생성 실패, result = {startResult}");
+            return;
+        }
         
         mSessionState = GameSessionState.Room;
-        
         callbacks.OnEnteredRoom?.Invoke();
     }
 
     public void JoinRoom(string roomName)
     {
-        JoinRoomAsync(roomName);
+        Task task = JoinRoomAsync(roomName);
     }
 
-    public async void JoinRoomAsync(string roomName)
+    public async Task JoinRoomAsync(string roomName)
     {
         Debug.Log($"[SessionManager] JoinRoom : {roomName}");
         
