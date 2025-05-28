@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Fusion;
 using UnityEngine;
 
@@ -14,45 +15,22 @@ public class ScoreBoardUI : MonoBehaviour
 {
     [SerializeField] private PlayerScoreUI[] mPlayerScores;
 
+    Dictionary<NetworkPlayer, PlayerScoreUI> mPlayerScoreUIMap = new Dictionary<NetworkPlayer, PlayerScoreUI>();
+    
     public void Update()
     {
-        var gameManager = GameManager.Instance;
-        if (gameManager == null)
-            return;
-
-        //var playerRefs= gameManager.GetPlayersInfo();
-        //var playerRefs = gameManager.GetPlayersInfo();
-        //UpdatePlayerScores(playerInfos);
+        foreach ( KeyValuePair<NetworkPlayer,PlayerScoreUI> pair in mPlayerScoreUIMap)
+        {
+            pair.Value.UpdateUI(pair.Key.Name.ToString(), pair.Key.TailCount);
+        }
     }
 
     public void BindPlayer(NetworkPlayer player)
     {
         int index = player.Index;
-        player.scoreUI = mPlayerScores[index];
-        player.scoreUI.UpdateUI(player.Name, player.TailCount);
+        mPlayerScoreUIMap.Add(player, mPlayerScores[index]);
+        mPlayerScoreUIMap[player].UpdateUI(player.Name.ToString(), player.TailCount);
     }
 
-    public void UpdatePlayerScores(List<PlayerRef> playerRefs)
-    {
-        var gameManager = GameManager.Instance;
-        if (gameManager == null)
-            return;
-        
-        if (mPlayerScores.Length < playerRefs.Count)
-        {
-            Debug.LogAssertion("PlayerScoreUI is not enough , scores count max is " + mPlayerScores.Length);
-            return;
-        }
-
-        // for (int i = 0; i < playerRefs.Count; i++)
-        // {
-        //     PlayerInfo? infoOrNull = gameManager.GetPlayerInfoOrNull(playerRefs[i]);
-        //     if (infoOrNull.HasValue)
-        //     {
-        //         var playerInfo = infoOrNull.Value;
-        //         mPlayerScores[i].UpdateUI(playerInfo.player.ToString(), playerInfo.score);
-        //     }
-        // }
-    }
     
 }

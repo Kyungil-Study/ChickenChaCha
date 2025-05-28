@@ -75,8 +75,6 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     
     private NetworkRunner mNetworkRunner;
     public NetworkRunner NetworkRunner => mNetworkRunner;
-    private NetworkSceneManagerDefault mNetworkSceneManager;
-    public NetworkSceneManagerDefault NetworkSceneManager => mNetworkSceneManager;
     
     private GameSessionState mSessionState = GameSessionState.Ready;
     public GameSessionState SessionState => mSessionState;
@@ -140,16 +138,9 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             Destroy(mNetworkRunner);
         }
 
-        if (mNetworkSceneManager != null)
-        {
-            Destroy(mNetworkSceneManager);
-        }
-        
         await Task.Delay(1000);
         
         mNetworkRunner = gameObject.AddComponent<NetworkRunner>();
-        mNetworkSceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>();
-        mNetworkSceneManager.Initialize(mNetworkRunner);
         mNetworkRunner.ProvideInput = true;
         
     }
@@ -261,7 +252,8 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             GameMode = GameMode.Shared,
             SessionName = roomName, // room_{guid} 가 roomName
             PlayerCount = mRoomMapPlayerCount,
-            SceneManager = mNetworkSceneManager,
+            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            ,
             Scene = sceneInfo
         };
         
@@ -287,7 +279,8 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             GameMode = GameMode.Shared,
             SessionName = roomName, // room_{guid} 가 roomName
             PlayerCount = mRoomMapPlayerCount,
-            SceneManager = mNetworkSceneManager,
+            SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+            ,
             Scene = sceneInfo
         };
         
@@ -347,8 +340,6 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     {
         
     }
-
-   
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
