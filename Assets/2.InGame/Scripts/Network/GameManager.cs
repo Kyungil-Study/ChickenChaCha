@@ -62,8 +62,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
             MoveTurn();
         }
     }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
+    
     public void MoveTurn()
     {
         Debug.Log($"이전 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 끝났습니다.");
