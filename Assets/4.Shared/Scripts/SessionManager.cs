@@ -39,10 +39,8 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     
     public class GameRoomInfo
     {
-        PlayerRef localPlayer;
-        public string roomName;
-        public List<GameClient> players = new List<GameClient>();
-        public int userCount => players.Count; // 마스터 클라이언트 포함
+        public SessionInfo sessionInfo;
+        public string roomName => sessionInfo.Name;
     }
     
     private static SessionManager mInsatnce;
@@ -70,9 +68,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         }
     }
     
-    private GameRoomInfo mRoomInfo = new GameRoomInfo();
-    public GameRoomInfo RoomInfo => mRoomInfo;
-    
+    private string RoomName => mNetworkRunner?.SessionInfo?.Name ?? "UnknownRoom";
     private NetworkRunner mNetworkRunner;
     public NetworkRunner NetworkRunner => mNetworkRunner;
     
@@ -127,12 +123,16 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         UserManager.Instance.OnLogInEvent += OnLogIn;
         callbacks.OnLoginSuccess += LoadLobbyScene;
     }
-    
-    
+
     private void LoadLobbyScene()
     {
+        LoadLobbySceneAsync();
+    }
+
+    private async void LoadLobbySceneAsync()
+    {
         SceneManager.LoadScene(LOBBY_SCENE_INDEX, LoadSceneMode.Single);
-        EnterLobbyAsync();
+        await EnterLobbyAsync();
     }
 
     private async Task InitRunnerAsync()
@@ -208,11 +208,10 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             Debug.LogWarning($"[SessionManager] OnSignIn ::: 이미 로그인 중입니다. 유저 이름 = {eventArgs.UserID}");
             return;
         }
-
+        
         Debug.Log($"[SessionManager] OnSignIn ::: 유저 이름 = {eventArgs.UserID}");
         mSessionState = GameSessionState.Login;
-        LoadLobbyScene();
-        
+        LoadLobbySceneAsync();
     }
     
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
@@ -253,7 +252,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         callbacks?.OnLeftRoom?.Invoke();
         
         mNetworkRunner.UnloadScene(SceneRef.FromIndex(IN_GAME_SCENE_INDEX));
-        LoadLobbyScene();
+        LoadLobbySceneAsync();
     }
     
     private async void CreateRoomAsync(string roomName)
@@ -276,15 +275,18 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         };
         
         await mNetworkRunner.StartGame(args);
-        mRoomInfo.players.Clear();
-        mRoomInfo.roomName = roomName;
         
         mSessionState = GameSessionState.Room;
         
         callbacks.OnEnteredRoom?.Invoke();
     }
 
-    public async Task JoinRoomAsync(string roomName)
+    public void JoinRoom(string roomName)
+    {
+        JoinRoomAsync(roomName);
+    }
+
+    public async void JoinRoomAsync(string roomName)
     {
         Debug.Log($"[SessionManager] JoinRoom : {roomName}");
         
@@ -304,8 +306,6 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         };
         
         await mNetworkRunner.StartGame(args);
-        mRoomInfo.players.Clear();
-        mRoomInfo.roomName = roomName;
         mSessionState = GameSessionState.Room;
 
         callbacks.OnEnteredRoom?.Invoke();
@@ -327,6 +327,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             Debug.Log($"[SessionManager] OnPlayerJoined : {player.PlayerId} ::: 플레이어 수가 {mRoomMapPlayerCount}명에 도달했습니다. 게임 시작이 가능합니다..");
             callbacks.OnFulledRoom?.Invoke();
         }
+
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)

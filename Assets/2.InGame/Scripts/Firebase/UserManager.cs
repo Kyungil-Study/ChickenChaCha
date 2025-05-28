@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +33,7 @@ public class UserManager : MonoBehaviour
     public class GameUser
     {
         public FirebaseUser User;
-        public string NickName;
+        public string NickName = "Anonymous";
         public string Email => User.IsAnonymous ? "No Email" : User.Email;
         
         public bool IsAnonymous => User.IsAnonymous;
@@ -51,16 +52,7 @@ public class UserManager : MonoBehaviour
     public GameUser User => mUser;
     
     private bool mIsInitialized = false;
-    
     public event Action<OnLogInEventArgs> OnLogInEvent;
-    
-    [Header("친구 기능 UI")]
-    [SerializeField] private TMP_InputField mInputFriendEmail;
-    [SerializeField] private Button mButtonSendRequest;
-    [SerializeField] private Button mButtonAcceptRequest;
-    [SerializeField] private Button mButtonRemoveFriend;
-    [SerializeField] private Button mButtonShowFriends;
-    [SerializeField] private Button mButtonShowRequests;
 
     private async void Start()
     {
@@ -97,7 +89,7 @@ public class UserManager : MonoBehaviour
             Debug.LogError("Firebase 초기화 실패");
         }
     }
-
+    
     public void OnGhostLoginButtonClicked()
     {
         AnoymousLogin();
@@ -154,8 +146,9 @@ public class UserManager : MonoBehaviour
         {
             UserID = newUser.UserId
         };
-        GetUserName();
+        
         OnLogInEvent?.Invoke(args);
+        StartCoroutine(GetUserNameCoroutine());
     }
     
     private void SignIn(string email, string password)
@@ -428,7 +421,12 @@ public class UserManager : MonoBehaviour
         OnCompleteTask?.Invoke();
     }
 
-    private async Task GetUserName()
+    private IEnumerator GetUserNameCoroutine()
+    {
+        yield return GetUserNameAsync();
+    }
+    
+    private async Task GetUserNameAsync()
     {
         try
         {

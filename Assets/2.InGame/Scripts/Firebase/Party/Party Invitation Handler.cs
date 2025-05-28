@@ -94,7 +94,7 @@ public class PartyInvitationHandler : MonoBehaviour
                 await doc.Reference.DeleteAsync();
             }
 
-            await SessionManager.Instance.JoinRoomAsync(roomName);
+            SessionManager.Instance.JoinRoom(roomName);
 
             Debug.Log("✅ 초대 수락 후 입장 시도: " + roomName);
         }
