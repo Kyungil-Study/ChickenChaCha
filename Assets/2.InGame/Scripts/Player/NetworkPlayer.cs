@@ -177,10 +177,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         }
 
         activeHatNumber = new List<int>();
-        if (bHasLeft == false)
-        {
-            RPC_PlayAnimation(EChickenAnimation.Robbed);
-        }
+        RPC_PlayAnimation(EChickenAnimation.Robbed);
     }
     
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -198,6 +195,10 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_PlayAnimation(EChickenAnimation state)
     {
+        if (mAnim.GetCurrentAnimatorStateInfo(0).IsName("Sit"))
+        {
+            return;
+        }
         switch (state)
         {
             case EChickenAnimation.Waiting:
