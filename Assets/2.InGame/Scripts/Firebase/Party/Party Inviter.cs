@@ -69,6 +69,47 @@ public class PartyInviter : MonoBehaviour
             Debug.LogError("❌ 초대 전송 실패: " + ex.Message);
         }
     }
+
+    private void some()
+    {
+        SessionManager.Instance.callbacks.OnLeftRoom += OnLeftRoom;
+    }
+
+    private async void OnLeftRoom()
+    {
+        try
+        {
+            string myEmail = mAuth.CurrentUser?.Email;
+            string roomName = SessionManager.Instance.RoomNameForTesting;
+            
+            if (string.IsNullOrEmpty(myEmail) || string.IsNullOrEmpty(roomName))
+            {
+                Debug.LogWarning("❌ 이메일 또는 방 이름이 없습니다. 초대 삭제 불가");
+                return;
+            }
+            var usersSnapshot = await mDB.Collection("users").GetSnapshotAsync();
+
+            foreach (var userDoc in usersSnapshot.Documents)
+            {
+                var inviteRef = mDB.Collection("users").Document(userDoc.Id)
+                    .Collection("invitations").Document(roomName);
+
+                var inviteSnap = await inviteRef.GetSnapshotAsync();
+
+                if (inviteSnap.Exists &&
+                    inviteSnap.ContainsField("from") &&
+                    inviteSnap.GetValue<string>("from") == myEmail)
+                {
+                    await inviteRef.DeleteAsync();
+                    Debug.Log($"🧹 {userDoc.Id}에게 보낸 '{roomName}' 초대 삭제됨");
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("❌ 초대 정리 중 오류 발생: " + e.Message);
+        }
+    }
     
     public async void OnInviteFriend(List<string> args)
     {
@@ -106,7 +147,6 @@ public class PartyInviter : MonoBehaviour
         {
             Debug.LogError("❌ 초대 전송 실패: " + ex.Message);
         }
-        
     }
 
     private async Task<string> FindUidByEmail(string email)

@@ -88,10 +88,11 @@ public class PartyInvitationHandler : MonoBehaviour
             string roomName = args.InviteRoomName;
             if (string.IsNullOrEmpty(roomName) || myUid == null) return;
             
-            var invitationRef = mDB.Collection("users").Document(myUid)
-                .Collection("invitations").Document(roomName);
-
-            await invitationRef.DeleteAsync();
+            var invites = await mDB.Collection("users").Document(myUid).Collection("invitations").GetSnapshotAsync();
+            foreach (var doc in invites.Documents)
+            {
+                await doc.Reference.DeleteAsync();
+            }
 
             await SessionManager.Instance.JoinRoomAsync(roomName);
 
@@ -104,6 +105,7 @@ public class PartyInvitationHandler : MonoBehaviour
         
         OnComplete?.Invoke();
     }
+    
 
     public async void RejectInvite(OnInviteEventArgs args, Action OnComplete)
     {
