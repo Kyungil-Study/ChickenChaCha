@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Extensions;
@@ -31,7 +32,8 @@ public class UserManager : MonoBehaviour
     public class GameUser
     {
         public FirebaseUser User;
-        public string Name => User.DisplayName ?? "Unknown";
+        public string NickName;
+        public string Email => User.IsAnonymous ? "No Email" : User.Email;
         
         public bool IsAnonymous => User.IsAnonymous;
     }
@@ -152,6 +154,7 @@ public class UserManager : MonoBehaviour
         {
             UserID = newUser.UserId
         };
+        GetUserName();
         OnLogInEvent?.Invoke(args);
     }
     
@@ -333,24 +336,30 @@ public class UserManager : MonoBehaviour
         OnComplete.Invoke();
     }
 
-    public async void OnRemoveFriend()
+    public async void OnRemoveFriend(List<string> removeEmails, Action OnComplete)
     {
         try
         {
-            string friendEmail = mInputFriendEmail.text;
             string myUid = mAuth.CurrentUser?.UserId;
-            string friendUid = await FindUidByEmail(friendEmail);
 
-            if (myUid == null || friendUid == null) return;
+            foreach (var friendEmail in removeEmails)
+            {
+                string friendUid = await FindUidByEmail(friendEmail);
+                if (myUid == null || friendUid == null) return;
+                await mDB.Collection("users").Document(myUid).Collection("friends").Document(friendUid).DeleteAsync();
+                await mDB.Collection("users").Document(friendUid).Collection("friends").Document(myUid).DeleteAsync();
+                
+                Debug.Log($"친구 삭제 {friendEmail}");
 
-            await mDB.Collection("users").Document(myUid).Collection("friends").Document(friendUid).DeleteAsync();
-            await mDB.Collection("users").Document(friendUid).Collection("friends").Document(myUid).DeleteAsync();
+            }
             Debug.Log("친구 삭제 완료");
         }
         catch (Exception e)
         {
             Debug.LogError("친구 삭제 중 오류: " + e.Message);
         }
+        
+        OnComplete?.Invoke();
     }
     
     public List<string> FriendList { get; private set; } = new List<string>();
@@ -419,7 +428,26 @@ public class UserManager : MonoBehaviour
         OnCompleteTask?.Invoke();
     }
 
-    private async System.Threading.Tasks.Task<string> FindUidByEmail(string email)
+    private async Task GetUserName()
+    {
+        try
+        {
+            var userSnap = await mDB.Collection("users").Document(mAuth.CurrentUser.UserId).GetSnapshotAsync();
+            if (userSnap.Exists && userSnap.TryGetValue("nickname", out string nickname))
+            {
+                mUser.NickName = nickname;
+            }
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        
+    }
+
+    private async Task<string> FindUidByEmail(string email)
     {
         try
         {

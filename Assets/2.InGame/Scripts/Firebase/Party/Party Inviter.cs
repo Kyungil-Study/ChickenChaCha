@@ -16,6 +16,20 @@ public class PartyInviter : MonoBehaviour
     private FirebaseFirestore mDB;
     
     public TMP_InputField mInputField;
+    
+    private static PartyInviter mInstance;
+    public static PartyInviter Instance
+    {
+        get
+        {
+            if (mInstance == null)
+            {
+                mInstance = FindObjectOfType<PartyInviter>();
+            }
+            return mInstance;
+        }
+        
+    }
 
     private void Awake()
     {
@@ -55,6 +69,45 @@ public class PartyInviter : MonoBehaviour
             Debug.LogError("❌ 초대 전송 실패: " + ex.Message);
         }
     }
+    
+    public async void OnInviteFriend(List<string> args)
+    {
+        try
+        {
+            var emails = args;
+
+            foreach (var email in emails)
+            {
+                string myUid = mAuth.CurrentUser?.UserId;
+                string myEmail = mAuth.CurrentUser?.Email;
+                string friendEmail = email;
+                string roomName = SessionManager.Instance.RoomNameForTesting;
+
+                if (myUid == null || string.IsNullOrEmpty(roomName)) return;
+
+                string friendUid = await FindUidByEmail(friendEmail);
+                if (friendUid == null) return;
+
+                var invitationRef = mDB.Collection("users").Document(friendUid)
+                    .Collection("invitations").Document(roomName);
+
+                var data = new Dictionary<string, object>
+                {
+                    { "roomName", roomName },
+                    { "from", myEmail },
+                    { "timestamp", Timestamp.GetCurrentTimestamp() }
+                };
+
+                await invitationRef.SetAsync(data);
+                Debug.Log($"✅ {friendEmail}에게 파티 초대 전송 완료");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("❌ 초대 전송 실패: " + ex.Message);
+        }
+        
+    }
 
     private async Task<string> FindUidByEmail(string email)
     {
@@ -72,4 +125,5 @@ public class PartyInviter : MonoBehaviour
             return null;
         }
     }
+
 }

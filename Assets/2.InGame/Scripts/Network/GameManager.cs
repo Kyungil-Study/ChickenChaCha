@@ -79,14 +79,14 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
 
     public void OnChangedTurn()
     {
-        UIAdapter.Instance.SetTurnPlayerName($"{ActivePlayer.Ref.PlayerId}");
+        UIAdapter.Instance.SetTurnPlayerName($"{ActivePlayer.Name.ToString()}");
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_ChangeActivePlayer(PlayerRef player)
     {
         // 현재 턴 변경
-        UIAdapter.Instance.SetTurnPlayerName($"{player.PlayerId}");
+        UIAdapter.Instance.SetTurnPlayerName($"{Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>().Name.ToString()}");
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]

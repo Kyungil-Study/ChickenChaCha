@@ -58,7 +58,6 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
 {
     [SerializeField] private Renderer mRenderer;
     public NetworkTransform networkTransform;
-    public PlayerScoreUI scoreUI;
     public InputHandler inputHandler;
     public IPlayerState currentState;
     public bool bHasLeft = false;
@@ -70,10 +69,11 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
     public GameObject[] hatModels;
     
     [Networked]
-    [OnChangedRender(nameof(OnChangedScoreCount))]
-    public int ScoreCount { get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
-    
-    public string Name => $"Player {Ref.PlayerId.ToString()}";
+    [OnChangedRender(nameof(OnChangedTailCount))]
+    public int TailCount { get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
+
+    [Networked] // 최대 32글자까지 저장 가능
+    public NetworkString<_32> Name { get; set; }
 
     [Networked] private int CurrentSteppingTileIndex { get; set; }
 
@@ -102,8 +102,6 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         {
             Debug.Log("Continue playing...");
         }
-
-        scoreUI.UpdateScore(ScoreCount);
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -121,11 +119,11 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         // 타일 선택 동작 위임 : 이벤트
         inputHandler.OnTileSelected = HandleTileSelected;
         SetState(new WaitingState()); // 초기 상태는 대기로
-
+        
         StartCoroutine(RegisterPlayer());
         if (HasStateAuthority)
         {
-            UIAdapter.Instance.SetLocalPlayerName($"{Ref.PlayerId}");
+            UIAdapter.Instance.SetLocalPlayerName($"{Name.ToString()}");
         }
         activeHatNumber = new List<int>();
         UIAdapter.Instance.RegisterPlayer(this);

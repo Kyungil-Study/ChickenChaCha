@@ -107,7 +107,7 @@ public class PartyInvitationHandler : MonoBehaviour
                 GameMode = GameMode.Shared,
                 SessionName = roomName,
                 PlayerCount = 1,
-                SceneManager = SessionManager.Instance.NetworkSceneManager,
+                SceneManager = SessionManager.Instance.gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Scene = sceneInfo
             });
 
