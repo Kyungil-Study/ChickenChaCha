@@ -231,15 +231,15 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
 
         if (joinAble == null)
         {
-            CreateRoom(mRoomNameForTesting);
+            CreateRoomAsync(mRoomNameForTesting);
         }
         else
         {
-            JoinRoom(joinAble.Name);
+            JoinRoomAsync(joinAble.Name);
         }
     }
     
-    private async void CreateRoom(string roomName)
+    private async void CreateRoomAsync(string roomName)
     {
         Debug.Log($"[SessionManager] CreateRoom : {roomName}");
 
@@ -266,7 +266,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         callbacks.OnEnteredRoom?.Invoke();
     }
 
-    private async void JoinRoom(string roomName)
+    public async Task JoinRoomAsync(string roomName)
     {
         Debug.Log($"[SessionManager] JoinRoom : {roomName}");
         
