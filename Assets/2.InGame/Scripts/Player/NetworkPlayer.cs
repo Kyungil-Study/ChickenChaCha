@@ -19,6 +19,7 @@ public class ActiveState : IPlayerState
     {
         Debug.Log($"[{player.Index}] : Active 진입");
         player.inputHandler.bCanInput = true;
+        player.RPC_SetIndicator(true);
     }
 
     public void ExitState(NetworkPlayer player)
@@ -41,6 +42,7 @@ public class WaitingState : IPlayerState
         {
             player.inputHandler.bCanInput = false;
         }
+        player.RPC_SetIndicator(false);
     }
 
     public void ExitState(NetworkPlayer player)
@@ -61,6 +63,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
     public InputHandler inputHandler;
     public IPlayerState currentState;
     public bool bHasLeft = false;
+    public GameObject indicator; // 플레이어가 서있는 타일에 표시할 인디케이터
     
     [Networked] public PlayerRef Ref { get; set; }
     [Networked] public int Index { get; set; }
@@ -161,7 +164,17 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         activeHatNumber = new List<int>();
     }
     
-    
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_SetIndicator(bool isActive)
+    {
+        if (isActive)
+        {
+            indicator.SetActive(true);
+        }else
+        {
+            indicator.SetActive(false);
+        }
+    }
 
     public void AfterSpawned()
     {
