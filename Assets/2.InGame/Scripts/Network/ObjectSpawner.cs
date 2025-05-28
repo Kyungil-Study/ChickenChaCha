@@ -33,7 +33,7 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
                 var netPlayer = netObj.GetComponent<NetworkPlayer>();
                 netPlayer.Ref = player;
                 netPlayer.Index = player.AsIndex - 1;
-                netPlayer.TailCount = 1; // 초기 꼬리 개수 설정
+                netPlayer.ScoreCount = 1; // 초기 꼬리 개수 설정
                 netPlayer.RPC_ReceiveMovePermission(false);
                 netPlayer.Name = UserManager.Instance.User.NickName;
                 runner.SetPlayerObject(player, netObj);

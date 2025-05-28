@@ -11,7 +11,7 @@ public class UISingleton<T> : MonoBehaviour where T : MonoBehaviour
         {
             if (mInstance == null)
             {
-                mInstance = FindObjectOfType<T>();
+                mInstance = FindObjectOfType<T>(true);
             }
             return mInstance;
         }

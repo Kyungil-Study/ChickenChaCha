@@ -88,28 +88,13 @@ public class PartyInvitationHandler : MonoBehaviour
             string roomName = args.InviteRoomName;
             if (string.IsNullOrEmpty(roomName) || myUid == null) return;
             
-            // 내가 참가할 방을 선택했어
-            
-            // 방이 어딘지를 조회해야돼
-
-            
-            var invitationRef = mDB.Collection("users").Document(myUid)
-                .Collection("invitations").Document(roomName);
-
-            await invitationRef.DeleteAsync();
-            
-            SceneRef sceneRef = SceneRef.FromIndex(SessionManager.IN_GAME_SCENE_INDEX);
-            NetworkSceneInfo sceneInfo = new NetworkSceneInfo();
-            sceneInfo.AddSceneRef(sceneRef);
-            
-            await SessionManager.Instance.NetworkRunner.StartGame(new StartGameArgs
+            var invites = await mDB.Collection("users").Document(myUid).Collection("invitations").GetSnapshotAsync();
+            foreach (var doc in invites.Documents)
             {
-                GameMode = GameMode.Shared,
-                SessionName = roomName,
-                PlayerCount = 1,
-                SceneManager = SessionManager.Instance.gameObject.AddComponent<NetworkSceneManagerDefault>(),
-                Scene = sceneInfo
-            });
+                await doc.Reference.DeleteAsync();
+            }
+
+            await SessionManager.Instance.JoinRoomAsync(roomName);
 
             Debug.Log("✅ 초대 수락 후 입장 시도: " + roomName);
         }
@@ -120,6 +105,7 @@ public class PartyInvitationHandler : MonoBehaviour
         
         OnComplete?.Invoke();
     }
+    
 
     public async void RejectInvite(OnInviteEventArgs args, Action OnComplete)
     {

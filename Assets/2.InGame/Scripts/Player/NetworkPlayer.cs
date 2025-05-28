@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -58,16 +59,18 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
     [SerializeField] private Renderer mRenderer;
     public NetworkTransform networkTransform;
     public InputHandler inputHandler;
-    public GameObject[] tailModels;
     public IPlayerState currentState;
     public bool bHasLeft = false;
     
     [Networked] public PlayerRef Ref { get; set; }
     [Networked] public int Index { get; set; }
-
+    
+    public Transform[] hatTransform; // 모자 위치
+    public GameObject[] hatModels;
+    
     [Networked]
-    [OnChangedRender(nameof(OnChangedTailCount))]
-    public int TailCount { get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
+    [OnChangedRender(nameof(OnChangedScoreCount))]
+    public int ScoreCount { get; set; } // 꼬리 개수, OnChangedRender로 변경 감지
 
     [Networked] // 최대 32글자까지 저장 가능
     public NetworkString<_32> Name { get; set; }
@@ -86,21 +89,13 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         CurrentSteppingTileIndex = index;
     }
 
-    private void OnChangedTailCount()
+    private void OnChangedScoreCount()
     {
-        for (int i = 0; i < TailCount; i++)
-        {
-            tailModels[i].SetActive(true);
-        }
-
-        for (int i = TailCount; i < tailModels.Length; i++)
-        {
-            tailModels[i].SetActive(false);
-        }
-
-        if (GameManager.Instance.CheckTail(TailCount))
+        if (GameManager.Instance.CheckTail(ScoreCount))
         {
             Debug.Log("Winning!");
+            RPC_ReceiveMovePermission(false);
+            // 결과 UI 띄우는 코드 작성하시면 됩니다!!!
             RPC_Result(Ref);
         }
         else
@@ -109,10 +104,12 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         }
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_Result(PlayerRef player)
     {
-        GameResultController.Instance.OnEndedGame(player);
+        Debug.Log("RPC_Result ::: rpc result");
+        Debug.Log("게임 종료");
+        GameResultController.Instance.OnEndedGame(player == Runner.LocalPlayer);
     }
 
     public override void Spawned()
@@ -130,9 +127,11 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         {
             UIAdapter.Instance.SetLocalPlayerName($"{Name.ToString()}");
         }
-
+        activeHatNumber = new List<int>();
         UIAdapter.Instance.RegisterPlayer(this);
-        tailModels[0].SetActive(true);
+        hatModels[Index].SetActive(true);
+        activeHatNumber.Add(Index);
+        RPC_ActiveHat();
         IEnumerator RegisterPlayer()
         {
             yield return new WaitForSeconds(0.5f);
@@ -140,6 +139,31 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
             GameManager.Instance.playerCount++;
         }
     }
+    
+    public List<int> activeHatNumber; // 모자 활성화 상태
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_ActiveHat()
+    {
+        for (int i = 0; i < activeHatNumber.Count; i++)
+        {
+            hatModels[activeHatNumber[i]].SetActive(true);
+            hatModels[activeHatNumber[i]].transform.position = hatTransform[i].position;
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_ResetHat()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            hatModels[i].SetActive(false);
+        }
+
+        activeHatNumber = new List<int>();
+    }
+    
+    
 
     public void AfterSpawned()
     {
@@ -238,6 +262,9 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
 
     public void PlayerLeft(PlayerRef player)
     {
-        Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>().bHasLeft = true;
+        var leftPlayer = Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>();
+        leftPlayer.bHasLeft = true;
+        leftPlayer.mRenderer.material.shader = BoardManager.Instance.soulShader;
+        leftPlayer.mRenderer.material.color = new Color(0.3f, 0.3f, 0.3f, 0.8f);
     }
 }
