@@ -21,7 +21,7 @@ public class ScoreBoardUI : MonoBehaviour
     {
         foreach ( KeyValuePair<NetworkPlayer,PlayerScoreUI> pair in mPlayerScoreUIMap)
         {
-            pair.Value.UpdateUI(pair.Key.Name.ToString(), pair.Key.TailCount);
+            pair.Value.UpdateUI(pair.Key.Name.ToString(), pair.Key.ScoreCount);
         }
     }
 
@@ -29,8 +29,6 @@ public class ScoreBoardUI : MonoBehaviour
     {
         int index = player.Index;
         mPlayerScoreUIMap.Add(player, mPlayerScores[index]);
-        mPlayerScoreUIMap[player].UpdateUI(player.Name.ToString(), player.TailCount);
+        mPlayerScoreUIMap[player].UpdateUI(player.Name.ToString(), player.ScoreCount);
     }
-
-    
 }
