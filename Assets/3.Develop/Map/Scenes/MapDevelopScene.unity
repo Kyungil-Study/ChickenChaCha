@@ -1157,30 +1157,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player (1)
       objectReference: {fileID: 0}
-    - target: {fileID: 5067146165900170610, guid: 0cabec4324e4872469817ba81f35a024,
-        type: 3}
-      propertyPath: m_CastShadows
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5067146165900170610, guid: 0cabec4324e4872469817ba81f35a024,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 357c51bcd9062a24babca176c4be9712, type: 2}
-    - target: {fileID: 6204045263265967645, guid: 0cabec4324e4872469817ba81f35a024,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 6204045263265967645, guid: 0cabec4324e4872469817ba81f35a024,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 6204045263265967645, guid: 0cabec4324e4872469817ba81f35a024,
         type: 3}
-      propertyPath: m_LocalScale.z
-      value: 2
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6724686677494330535, guid: 0cabec4324e4872469817ba81f35a024,
         type: 3}
@@ -2347,6 +2332,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1704958314}
+    - target: {fileID: 405232373749549865, guid: d8d9e3802ac69e640b91b3f314311be2,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 841
+      objectReference: {fileID: 0}
     - target: {fileID: 624954047014219233, guid: d8d9e3802ac69e640b91b3f314311be2,
         type: 3}
       propertyPath: SortKey
@@ -2442,11 +2432,21 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 518087218}
+    - target: {fileID: 7859590943911382724, guid: d8d9e3802ac69e640b91b3f314311be2,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 193
+      objectReference: {fileID: 0}
     - target: {fileID: 8313401437392719379, guid: d8d9e3802ac69e640b91b3f314311be2,
         type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 594841953}
+    - target: {fileID: 8313401437392719379, guid: d8d9e3802ac69e640b91b3f314311be2,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 148
+      objectReference: {fileID: 0}
     - target: {fileID: 8982231452992977296, guid: d8d9e3802ac69e640b91b3f314311be2,
         type: 3}
       propertyPath: m_Mesh

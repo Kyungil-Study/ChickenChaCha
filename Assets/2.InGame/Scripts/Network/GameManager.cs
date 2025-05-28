@@ -187,7 +187,19 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
 
         return tile.Next;
     }
+    
+    public List<NetworkPlayer> GetPotentialVictim(SteppingTile tile)
+    {
+        var reVal = new List<NetworkPlayer>();
+        while (tile.Next.StandingPlayer != null) // "나 자신"은 예외 처리 해야 함
+        {
+            NetworkPlayer netPlayer = tile.Next.StandingPlayer;
+            reVal.Add(netPlayer);
+            tile = tile.Next; // 있으면 그 다음 발판 확인
+        }
 
+        return reVal;
+    }
     
     // 4.  뺏은 꼬리 개수만큼 액티브 플레이어에게 추가
     public void TakeTails(PlayerRef player, int takeCount)

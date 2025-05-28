@@ -3,8 +3,18 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 // 플레이어 데이터, 애니메이션 등 처리하기
+
+public enum EChickenAnimation
+{
+    Waiting,
+    Active,
+    Trepid,
+    Robbed,
+    Left,
+}
 
 public interface IPlayerState
 {
@@ -20,6 +30,7 @@ public class ActiveState : IPlayerState
         Debug.Log($"[{player.Index}] : Active 진입");
         player.inputHandler.bCanInput = true;
         player.RPC_SetIndicator(true);
+        player.RPC_PlayAnimation(EChickenAnimation.Active);
     }
 
     public void ExitState(NetworkPlayer player)
@@ -43,6 +54,7 @@ public class WaitingState : IPlayerState
             player.inputHandler.bCanInput = false;
         }
         player.RPC_SetIndicator(false);
+        player.RPC_PlayAnimation(EChickenAnimation.Waiting);
     }
 
     public void ExitState(NetworkPlayer player)
@@ -59,6 +71,7 @@ public class WaitingState : IPlayerState
 public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
 {
     [SerializeField] private Renderer mRenderer;
+    [SerializeField] private Animator mAnim;
     public NetworkTransform networkTransform;
     public InputHandler inputHandler;
     public IPlayerState currentState;
@@ -162,6 +175,10 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         }
 
         activeHatNumber = new List<int>();
+        if (bHasLeft == false)
+        {
+            RPC_PlayAnimation(EChickenAnimation.Robbed);
+        }
     }
     
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -173,6 +190,34 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         }else
         {
             indicator.SetActive(false);
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_PlayAnimation(EChickenAnimation state)
+    {
+        switch (state)
+        {
+            case EChickenAnimation.Waiting:
+                mAnim.Play("Idle_A");
+                mAnim.Play("Eyes_Blink");
+                break;
+            case EChickenAnimation.Active:
+                mAnim.Play("Attack");
+                mAnim.Play("Eyes_Happy");
+                break;
+            case EChickenAnimation.Trepid:
+                mAnim.Play("Fear");
+                mAnim.Play("Eyes_Trauma");
+                break;
+            case EChickenAnimation.Robbed:
+                mAnim.Play("Spin");
+                mAnim.Play("Eyes_Spin");
+                break;
+            case EChickenAnimation.Left:
+                mAnim.Play("Sit");
+                mAnim.Play("Eyes_Sleep");
+                break;
         }
     }
 
@@ -239,6 +284,11 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile, Runner.LocalPlayer);
         CurrentSteppingTile = targetTile;
         LookAtNextTile();
+        List<NetworkPlayer> victims = GameManager.Instance.GetPotentialVictim(CurrentSteppingTile);
+        foreach (var victim in victims)
+        {
+            victim.RPC_PlayAnimation(EChickenAnimation.Trepid);
+        }
     }
 
     private void LookAtNextTile()
@@ -277,5 +327,6 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         leftPlayer.bHasLeft = true;
         leftPlayer.mRenderer.material.shader = BoardManager.Instance.soulShader;
         leftPlayer.mRenderer.material.color = new Color(0.3f, 0.3f, 0.3f, 0.8f);
+        leftPlayer.RPC_PlayAnimation(EChickenAnimation.Left);
     }
 }
