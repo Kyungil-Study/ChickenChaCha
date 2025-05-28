@@ -35,7 +35,10 @@ public class ActiveState : IPlayerState
 
     public void ExitState(NetworkPlayer player)
     {
+        player.RPC_SetIndicator(false);
         player.inputHandler.bCanInput = false;
+        
+        NetworkPlayer.Threat(player);
     }
 
     public void Update(NetworkPlayer player)
@@ -53,7 +56,6 @@ public class WaitingState : IPlayerState
         {
             player.inputHandler.bCanInput = false;
         }
-        player.RPC_SetIndicator(false);
         player.RPC_PlayAnimation(EChickenAnimation.Waiting);
     }
 
@@ -287,11 +289,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile, Runner.LocalPlayer);
         CurrentSteppingTile = targetTile;
         LookAtNextTile();
-        List<NetworkPlayer> victims = GameManager.Instance.GetPotentialVictim(CurrentSteppingTile);
-        foreach (var victim in victims)
-        {
-            victim.RPC_PlayAnimation(EChickenAnimation.Trepid);
-        }
+        Threat(this);
     }
 
     private void LookAtNextTile()
@@ -305,7 +303,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         LookAtNextTile();
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_ReceiveMovePermission(bool allowed)
     {
         if (allowed)
@@ -331,5 +329,19 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         leftPlayer.mRenderer.material.shader = BoardManager.Instance.soulShader;
         leftPlayer.mRenderer.material.color = new Color(0.3f, 0.3f, 0.3f, 0.8f);
         leftPlayer.RPC_PlayAnimation(EChickenAnimation.Left);
+
+        if (GameManager.Instance.IsActivePlayer(player))
+        {
+            GameManager.Instance.MoveTurn();
+        }
+    }
+
+    public static void Threat(NetworkPlayer gorgon)
+    {
+        List<NetworkPlayer> victims = GameManager.Instance.GetPotentialVictim(gorgon.CurrentSteppingTile);
+        foreach (var victim in victims)
+        {
+            victim.RPC_PlayAnimation(EChickenAnimation.Trepid);
+        }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPlayerLeft
+public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined
 {
     public NetworkPlayer[] players = new NetworkPlayer[4];
     public int playerCount; // 현재 플레이어 수
@@ -44,6 +44,13 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
     public override void Spawned()
     {
         base.Spawned();
+    }
+
+    public bool IsActivePlayer(PlayerRef playerRef)
+    {
+        Debug.Log(ActivePlayer);
+        Debug.Log(ActivePlayer.Ref);
+        return ActivePlayer.Ref == playerRef;
     }
 
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
@@ -108,21 +115,6 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
     {
         
     }
-    
-    public void PlayerLeft(PlayerRef player)
-    {
-        if (ActivePlayer.Ref == player)
-        {
-            RPC_ActivePlayerLeft();
-        }
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_ActivePlayerLeft()
-    {
-        MoveTurn();
-    }
-    
 
     #endregion
 
