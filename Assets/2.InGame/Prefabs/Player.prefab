@@ -484,7 +484,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mRenderer: {fileID: 2624212572801742928}
   networkTransform: {fileID: 0}
-  scoreUI: {fileID: 0}
   inputHandler: {fileID: 0}
   bHasLeft: 0
   indicator: {fileID: 6724686677494330535}
@@ -500,6 +499,10 @@ MonoBehaviour:
   - {fileID: 6433433134155460523}
   - {fileID: 5466575454944965265}
   _ScoreCount: 0
+  _Name:
+    _length: 0
+    _data:
+      Data: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   activeHatNumber: 
 --- !u!114 &588842561614863103
 MonoBehaviour:
@@ -1103,17 +1106,17 @@ PrefabInstance:
     - target: {fileID: 910875279276534870, guid: e4fcd6454bc61e5489daf0bbde6048f7,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.6000001
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 910875279276534870, guid: e4fcd6454bc61e5489daf0bbde6048f7,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.6000001
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 910875279276534870, guid: e4fcd6454bc61e5489daf0bbde6048f7,
         type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.6000001
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 910875279276534870, guid: e4fcd6454bc61e5489daf0bbde6048f7,
         type: 3}
@@ -1168,8 +1171,13 @@ PrefabInstance:
     - target: {fileID: 910875279276534870, guid: e4fcd6454bc61e5489daf0bbde6048f7,
         type: 3}
       propertyPath: m_ConstrainProportionsScale
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2084947692117137209, guid: e4fcd6454bc61e5489daf0bbde6048f7,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 357c51bcd9062a24babca176c4be9712, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
