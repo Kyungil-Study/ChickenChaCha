@@ -63,16 +63,21 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         }
     }
 
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void MoveTurn()
     {
+        Debug.Log($"이전 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 끝났습니다.");
         ActivePlayer.RPC_ReceiveMovePermission(false);
-
+        
         ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
+        Debug.Log($"다음 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 맞는지 체크했습니다.");
         while (ActivePlayer.bHasLeft)
         {
             ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
+            Debug.Log($"다음 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 맞는지 체크했습니다.");
         }
         
+        Debug.Log($"다음 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 끝났습니다.");
         ActivePlayer.RPC_ReceiveMovePermission(true);
     }
 
