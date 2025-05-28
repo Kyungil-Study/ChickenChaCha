@@ -129,6 +129,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     private void LoadLobbyScene()
     {
         SceneManager.LoadScene(LOBBY_SCENE_INDEX, LoadSceneMode.Single);
+        EnterLobbyAsync();
     }
 
     private async Task InitRunnerAsync()
@@ -203,7 +204,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         Debug.Log($"[SessionManager] OnSignIn ::: 유저 이름 = {eventArgs.UserID}");
         mSessionState = GameSessionState.Login;
         LoadLobbyScene();
-        EnterLobbyAsync();
+        
     }
     
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
@@ -237,6 +238,12 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         {
             JoinRoomAsync(joinAble.Name);
         }
+    }
+
+    public void LeaveRoom()
+    {
+        callbacks?.OnLeftRoom?.Invoke();
+        LoadLobbyScene();
     }
     
     private async void CreateRoomAsync(string roomName)
