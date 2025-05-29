@@ -145,7 +145,7 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
             mTailPlayers = new List<NetworkPlayer>();
             return true;
         }
-
+        mTailPlayers = new List<NetworkPlayer>();
         RPC_OpenTileResult(false);
         return false;
     }
