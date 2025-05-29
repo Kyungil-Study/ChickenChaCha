@@ -16,7 +16,7 @@ public class ChatManager : NetworkBehaviour
 
     [Header("출력 ContentUI")]
     [SerializeField] private Transform mChatContentParent; // ScrollView 아래 Content 오브젝트
-
+    
     void Start()
     {
         mSendButton.onClick.AddListener(OnSendChatButtonClicked);
@@ -45,7 +45,6 @@ public class ChatManager : NetworkBehaviour
         TextMeshProUGUI text = msgObj.GetComponentInChildren<TextMeshProUGUI>();
         text.text = message;
 
-        // 다음 프레임에 Scroll 강제 이동
         StartCoroutine(ScrollToBottomNextFrame());
     }
 
@@ -53,16 +52,17 @@ public class ChatManager : NetworkBehaviour
     {
         yield return null; // 한 프레임 기다림 (UI 업데이트 후)
         Canvas.ForceUpdateCanvases();
-        ScrollRect scroll = mChatContentParent.GetComponentInParent<ScrollRect>();
-        if (scroll != null)
-        {
-            scroll.verticalNormalizedPosition = 0f;
-            
-                // 만약 Scrollbar를 따로 연결해놨다면:
-                if (scroll.verticalScrollbar != null)
-                {
-                    scroll.verticalScrollbar.value = 0f;
-                }
-        }
+        
+        // ScrollRect scroll = mChatContentParent.GetComponentInParent<ScrollRect>();
+        // if (scroll != null)
+        // {
+        //     scroll.verticalNormalizedPosition = 0f;
+        //     
+        //         // 만약 Scrollbar를 따로 연결해놨다면:
+        //         if (scroll.verticalScrollbar != null)
+        //         {
+        //             scroll.verticalScrollbar.value = 0f;
+        //         }
+        // }
     }
 }
