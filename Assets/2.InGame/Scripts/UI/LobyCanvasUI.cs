@@ -42,8 +42,7 @@ public class LobyCanvasUI : MonoBehaviour
         {
             mGotoFriendPanel.SetActive(false);
         }
-
-        userNameText.text = UserManager.Instance.User.NickName;
+        UserManager.Instance.OnLoadedUserInfomation += () => { userNameText.text = UserManager.Instance.User.NickName;};
     }
 
     private void Update()

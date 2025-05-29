@@ -13,6 +13,13 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
+public enum EUserState
+{
+    LoggedOut,
+    LggingIn,
+    LoggedIn,
+}
+
 public class UserManager : MonoBehaviour
 {
     private static UserManager mInstance;
@@ -52,6 +59,7 @@ public class UserManager : MonoBehaviour
     public GameUser User => mUser;
     
     private bool mIsInitialized = false;
+    public EUserState UserState { get; private set; } = EUserState.LoggedOut;
     public event Action<OnLogInEventArgs> OnLogInEvent;
 
     private async void Start()
@@ -105,6 +113,13 @@ public class UserManager : MonoBehaviour
                 return;
             }
 
+            if (UserState != EUserState.LoggedOut)
+            {
+                Debug.Log("이미 로그인 중입니다.");
+                return;
+            }
+            UserState = EUserState.LggingIn;
+
             mAuth.SignInAnonymouslyAsync().ContinueWithOnMainThread(task =>
             {
                 if (task.IsFaulted)
@@ -128,6 +143,7 @@ public class UserManager : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError("SignIn에서 예외 발생: " + ex.Message);
+            UserState = EUserState.LoggedOut;
         }
     }
 
@@ -139,16 +155,20 @@ public class UserManager : MonoBehaviour
     {
         CreateAccount(args.Email, args.Password, args.Nickname);
     }
+    
+    public event Action OnLoadedUserInfomation;
     private void OnLogIn(FirebaseUser newUser)
     {
         mUser.User = newUser;
+        LoadUserInformation();
         OnLogInEventArgs args = new OnLogInEventArgs()
         {
-            UserID = newUser.UserId
+            UserID = mUser.User.UserId
         };
-        
         OnLogInEvent?.Invoke(args);
-        StartCoroutine(GetUserNameCoroutine());
+        UserState = EUserState.LoggedIn;
+        Debug.Log($"로그인 완료: {mUser.NickName}");
+       
     }
     
     private void SignIn(string email, string password)
@@ -421,27 +441,29 @@ public class UserManager : MonoBehaviour
         OnCompleteTask?.Invoke();
     }
 
-    private IEnumerator GetUserNameCoroutine()
-    {
-        yield return GetUserNameAsync();
-    }
     
-    private async Task GetUserNameAsync()
+    private async void LoadUserInformation()
     {
         try
         {
-            var userSnap = await mDB.Collection("users").Document(mAuth.CurrentUser.UserId).GetSnapshotAsync();
-            if (userSnap.Exists && userSnap.TryGetValue("nickname", out string nickname))
-            {
-                mUser.NickName = nickname;
-            }
-
+             await mDB.Collection("users").Document(mAuth.CurrentUser.UserId).GetSnapshotAsync().ContinueWithOnMainThread(
+                taks =>
+                {
+                    var userSnap = taks.Result;
+                    if (userSnap.Exists && userSnap.TryGetValue("nickname", out string nickname))
+                    {
+                        mUser.NickName = nickname;
+                    }
+                    OnLoadedUserInfomation?.Invoke();
+                    Debug.Log($"사용자 이름 로드 완료: {mUser.NickName}");
+                });
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             throw;
         }
+        
         
     }
 
