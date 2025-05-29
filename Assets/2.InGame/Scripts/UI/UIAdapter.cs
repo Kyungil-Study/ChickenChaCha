@@ -48,7 +48,7 @@ public class UIAdapter : NetworkBehaviour, IToUI
         RPC_OnStartedGame();
     }
     
-    [Rpc(RpcSources.All, RpcTargets.All)]
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     void RPC_OnStartedGame()
     {
         RoomUI.Instance.OnStartedGame();
