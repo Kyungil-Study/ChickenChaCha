@@ -1,10 +1,21 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 // 플레이어 데이터, 애니메이션 등 처리하기
+
+public enum EChickenAnimation
+{
+    Waiting,
+    Active,
+    Trepid,
+    Robbed,
+    Left,
+}
 
 public interface IPlayerState
 {
@@ -19,11 +30,16 @@ public class ActiveState : IPlayerState
     {
         Debug.Log($"[{player.Index}] : Active 진입");
         player.inputHandler.bCanInput = true;
+        player.RPC_SetIndicator(true);
+        player.RPC_PlayAnimation(EChickenAnimation.Active);
     }
 
     public void ExitState(NetworkPlayer player)
     {
+        player.RPC_SetIndicator(false);
         player.inputHandler.bCanInput = false;
+        
+        NetworkPlayer.Threat(player);
     }
 
     public void Update(NetworkPlayer player)
@@ -41,6 +57,7 @@ public class WaitingState : IPlayerState
         {
             player.inputHandler.bCanInput = false;
         }
+        player.RPC_PlayAnimation(EChickenAnimation.Waiting);
     }
 
     public void ExitState(NetworkPlayer player)
@@ -57,10 +74,13 @@ public class WaitingState : IPlayerState
 public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
 {
     [SerializeField] private Renderer mRenderer;
+    [SerializeField] private Animator mAnim;
     public NetworkTransform networkTransform;
     public InputHandler inputHandler;
     public IPlayerState currentState;
-    public bool bHasLeft = false;
+    [Networked] 
+    public bool bHasLeft { get; set; } = false; // 플레이어가 나갔는지 여부
+    public GameObject indicator; // 플레이어가 서있는 타일에 표시할 인디케이터
     
     [Networked] public PlayerRef Ref { get; set; }
     [Networked] public int Index { get; set; }
@@ -87,6 +107,15 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
     private void RPC_SetTileIndex(int index)
     {
         CurrentSteppingTileIndex = index;
+    }
+
+    private void Update()
+    {
+        if (HasStateAuthority && Input.GetKeyDown(KeyCode.Space))
+        {
+            BoardManager.Instance.DebugStandingPlayer();
+        }
+        
     }
 
     private void OnChangedScoreCount()
@@ -161,9 +190,52 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         }
 
         activeHatNumber = new List<int>();
+        RPC_PlayAnimation(EChickenAnimation.Robbed);
     }
     
-    
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_SetIndicator(bool isActive)
+    {
+        if (isActive)
+        {
+            indicator.SetActive(true);
+        }else
+        {
+            indicator.SetActive(false);
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_PlayAnimation(EChickenAnimation state)
+    {
+        if (mAnim.GetCurrentAnimatorStateInfo(0).IsName("Sit"))
+        {
+            return;
+        }
+        switch (state)
+        {
+            case EChickenAnimation.Waiting:
+                mAnim.Play("Idle_A");
+                mAnim.Play("Eyes_Blink");
+                break;
+            case EChickenAnimation.Active:
+                mAnim.Play("Attack");
+                mAnim.Play("Eyes_Happy");
+                break;
+            case EChickenAnimation.Trepid:
+                mAnim.Play("Fear");
+                mAnim.Play("Eyes_Trauma");
+                break;
+            case EChickenAnimation.Robbed:
+                mAnim.Play("Spin");
+                mAnim.Play("Eyes_Spin");
+                break;
+            case EChickenAnimation.Left:
+                mAnim.Play("Sit");
+                mAnim.Play("Eyes_Sleep");
+                break;
+        }
+    }
 
     public void AfterSpawned()
     {
@@ -228,6 +300,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile, Runner.LocalPlayer);
         CurrentSteppingTile = targetTile;
         LookAtNextTile();
+        Threat(this);
     }
 
     private void LookAtNextTile()
@@ -241,7 +314,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         LookAtNextTile();
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_ReceiveMovePermission(bool allowed)
     {
         if (allowed)
@@ -266,5 +339,27 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         leftPlayer.bHasLeft = true;
         leftPlayer.mRenderer.material.shader = BoardManager.Instance.soulShader;
         leftPlayer.mRenderer.material.color = new Color(0.3f, 0.3f, 0.3f, 0.8f);
+        leftPlayer.RPC_PlayAnimation(EChickenAnimation.Left);
+        
+        // 플레이어가 나갔을 때 다른 플레이어에게 알림
+        if (GameManager.Instance.IsActivePlayer(player))
+        {
+            RPC_LeftPlayer();
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_LeftPlayer()
+    {
+        GameManager.Instance.MoveTurn();
+    }
+
+    public static void Threat(NetworkPlayer gorgon)
+    {
+        List<NetworkPlayer> victims = GameManager.Instance.GetPotentialVictim(gorgon.CurrentSteppingTile);
+        foreach (var victim in victims)
+        {
+            victim.RPC_PlayAnimation(EChickenAnimation.Trepid);
+        }
     }
 }

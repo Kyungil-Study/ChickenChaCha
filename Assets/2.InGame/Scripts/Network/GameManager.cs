@@ -4,7 +4,7 @@ using System.Linq;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPlayerLeft
+public class GameManager : DontDestroyOnNetwork<GameManager>
 {
     public NetworkPlayer[] players = new NetworkPlayer[4];
     public int playerCount; // 현재 플레이어 수
@@ -17,14 +17,6 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
     private NetworkPlayer ActivePlayer { get; set; } // 현재 턴 인덱스, OnChangedRender로 변경 감지
 
     #region GameManager
-
-    private void Update()
-    {
-        if (Runner.IsSharedModeMasterClient && Input.GetKeyDown(KeyCode.Space))
-        {
-            GameStart();
-        }
-    }
 
     public NetworkPlayer[] GetPlayersArray()
     {
@@ -46,6 +38,13 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
         base.Spawned();
     }
 
+    public bool IsActivePlayer(PlayerRef playerRef)
+    {
+        Debug.Log(ActivePlayer);
+        Debug.Log(ActivePlayer.Ref);
+        return ActivePlayer.Ref == playerRef;
+    }
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_OpenTileResult(bool result)
     {
@@ -63,17 +62,21 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
             MoveTurn();
         }
     }
-
+    
     public void MoveTurn()
     {
+        Debug.Log($"이전 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 끝났습니다.");
         ActivePlayer.RPC_ReceiveMovePermission(false);
-
+        
         ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
+        Debug.Log($"다음 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 맞는지 체크했습니다.");
         while (ActivePlayer.bHasLeft)
         {
             ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
+            Debug.Log($"다음 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 맞는지 체크했습니다.");
         }
         
+        Debug.Log($"다음 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 끝났습니다.");
         ActivePlayer.RPC_ReceiveMovePermission(true);
     }
 
@@ -89,40 +92,13 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
         UIAdapter.Instance.SetTurnPlayerName($"{Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>().Name.ToString()}");
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_MoveTo(SteppingTile targetTile, SteppingTile currentSteppingTile, PlayerRef changePlayer)
     {
         // 현재 타일, 다음 타일, 플레이어
         targetTile.StandingPlayer = Runner.GetPlayerObject(changePlayer).GetComponent<NetworkPlayer>();
         currentSteppingTile.StandingPlayer = null;
     }
-
-    public void PlayerJoined(PlayerRef player)
-    {
-        // UI에게 새로 접속한 플레이어 정보 전달
-        RPC_PlayerJoined(player);
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    private void RPC_PlayerJoined(PlayerRef player)
-    {
-        
-    }
-    
-    public void PlayerLeft(PlayerRef player)
-    {
-        if (ActivePlayer.Ref == player)
-        {
-            RPC_ActivePlayerLeft();
-        }
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_ActivePlayerLeft()
-    {
-        MoveTurn();
-    }
-    
 
     #endregion
 
@@ -187,7 +163,19 @@ public class GameManager : DontDestroyOnNetwork<GameManager>, IPlayerJoined, IPl
 
         return tile.Next;
     }
+    
+    public List<NetworkPlayer> GetPotentialVictim(SteppingTile tile)
+    {
+        var reVal = new List<NetworkPlayer>();
+        while (tile.Next.StandingPlayer != null) // "나 자신"은 예외 처리 해야 함
+        {
+            NetworkPlayer netPlayer = tile.Next.StandingPlayer;
+            reVal.Add(netPlayer);
+            tile = tile.Next; // 있으면 그 다음 발판 확인
+        }
 
+        return reVal;
+    }
     
     // 4.  뺏은 꼬리 개수만큼 액티브 플레이어에게 추가
     public void TakeTails(PlayerRef player, int takeCount)
