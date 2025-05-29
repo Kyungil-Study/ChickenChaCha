@@ -15,6 +15,18 @@ public class SelectingTile : Tile, IPointerClickHandler
         onClick?.Invoke(this);
     }
 
+    private void Update()
+    {
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            AnimatorOverrideController overrideController = new AnimatorOverrideController(anim.runtimeAnimatorController);
+            overrideController["Tile_Facedown"] = new AnimationClip();
+            anim.runtimeAnimatorController = overrideController;
+        }
+#endif
+    }
+
     public void ShowFace()
     {
         if (anim.GetCurrentAnimatorStateInfo(0).IsName("FaceDown") == false)

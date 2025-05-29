@@ -37,7 +37,7 @@ public class ActiveState : IPlayerState
         {
             if(player != null && player.CurrentSteppingTile != null)
             {
-                NetworkPlayer.Threat(player);
+                player.Threat();
                 Debug.Log("공포 애니메이션");
             }
         }
@@ -326,7 +326,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         GameManager.Instance.RPC_MoveTo(targetTile, CurrentSteppingTile, Runner.LocalPlayer);
         CurrentSteppingTile = targetTile;
         LookAtNextTile();
-        Threat(this);
+        Threat();
     }
 
     private void LookAtNextTile()
@@ -380,9 +380,9 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         GameManager.Instance.MoveTurn();
     }
 
-    public static void Threat(NetworkPlayer gorgon)
+    public void Threat()
     {
-        List<NetworkPlayer> victims = GameManager.Instance.GetPotentialVictim(gorgon.CurrentSteppingTile);
+        List<NetworkPlayer> victims = GameManager.Instance.GetPotentialVictim(CurrentSteppingTile);
         foreach (var victim in victims)
         {
             victim.RPC_PlayAnimation(EChickenAnimation.Trepid);
