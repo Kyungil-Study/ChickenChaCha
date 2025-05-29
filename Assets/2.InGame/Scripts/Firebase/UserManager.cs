@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,13 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+
+public enum EUserState
+{
+    LoggedOut,
+    LggingIn,
+    LoggedIn,
+}
 
 public class UserManager : MonoBehaviour
 {
@@ -32,7 +40,7 @@ public class UserManager : MonoBehaviour
     public class GameUser
     {
         public FirebaseUser User;
-        public string NickName;
+        public string NickName = "Anonymous";
         public string Email => User.IsAnonymous ? "No Email" : User.Email;
         
         public bool IsAnonymous => User.IsAnonymous;
@@ -51,16 +59,8 @@ public class UserManager : MonoBehaviour
     public GameUser User => mUser;
     
     private bool mIsInitialized = false;
-    
+    public EUserState UserState { get; private set; } = EUserState.LoggedOut;
     public event Action<OnLogInEventArgs> OnLogInEvent;
-    
-    [Header("친구 기능 UI")]
-    [SerializeField] private TMP_InputField mInputFriendEmail;
-    [SerializeField] private Button mButtonSendRequest;
-    [SerializeField] private Button mButtonAcceptRequest;
-    [SerializeField] private Button mButtonRemoveFriend;
-    [SerializeField] private Button mButtonShowFriends;
-    [SerializeField] private Button mButtonShowRequests;
 
     private async void Start()
     {
@@ -97,7 +97,7 @@ public class UserManager : MonoBehaviour
             Debug.LogError("Firebase 초기화 실패");
         }
     }
-
+    
     public void OnGhostLoginButtonClicked()
     {
         AnoymousLogin();
@@ -112,6 +112,13 @@ public class UserManager : MonoBehaviour
                 Debug.LogError("Firebase가 초기화되지 않았습니다.");
                 return;
             }
+
+            if (UserState != EUserState.LoggedOut)
+            {
+                Debug.Log("이미 로그인 중입니다.");
+                return;
+            }
+            UserState = EUserState.LggingIn;
 
             mAuth.SignInAnonymouslyAsync().ContinueWithOnMainThread(task =>
             {
@@ -136,6 +143,7 @@ public class UserManager : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError("SignIn에서 예외 발생: " + ex.Message);
+            UserState = EUserState.LoggedOut;
         }
     }
 
@@ -147,15 +155,20 @@ public class UserManager : MonoBehaviour
     {
         CreateAccount(args.Email, args.Password, args.Nickname);
     }
+    
+    public event Action OnLoadedUserInfomation;
     private void OnLogIn(FirebaseUser newUser)
     {
         mUser.User = newUser;
+        LoadUserInformation();
         OnLogInEventArgs args = new OnLogInEventArgs()
         {
-            UserID = newUser.UserId
+            UserID = mUser.User.UserId
         };
-        GetUserName();
         OnLogInEvent?.Invoke(args);
+        UserState = EUserState.LoggedIn;
+        Debug.Log($"로그인 완료: {mUser.NickName}");
+       
     }
     
     private void SignIn(string email, string password)
@@ -428,22 +441,29 @@ public class UserManager : MonoBehaviour
         OnCompleteTask?.Invoke();
     }
 
-    private async Task GetUserName()
+    
+    private async void LoadUserInformation()
     {
         try
         {
-            var userSnap = await mDB.Collection("users").Document(mAuth.CurrentUser.UserId).GetSnapshotAsync();
-            if (userSnap.Exists && userSnap.TryGetValue("nickname", out string nickname))
-            {
-                mUser.NickName = nickname;
-            }
-
+             await mDB.Collection("users").Document(mAuth.CurrentUser.UserId).GetSnapshotAsync().ContinueWithOnMainThread(
+                taks =>
+                {
+                    var userSnap = taks.Result;
+                    if (userSnap.Exists && userSnap.TryGetValue("nickname", out string nickname))
+                    {
+                        mUser.NickName = nickname;
+                    }
+                    OnLoadedUserInfomation?.Invoke();
+                    Debug.Log($"사용자 이름 로드 완료: {mUser.NickName}");
+                });
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             throw;
         }
+        
         
     }
 

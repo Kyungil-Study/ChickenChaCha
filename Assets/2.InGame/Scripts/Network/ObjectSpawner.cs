@@ -35,7 +35,9 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
                 netPlayer.Index = player.AsIndex - 1;
                 netPlayer.ScoreCount = 1; // 초기 꼬리 개수 설정
                 netPlayer.RPC_ReceiveMovePermission(false);
-                netPlayer.Name = UserManager.Instance.User.NickName;
+
+                var user = UserManager.Instance.User;
+                netPlayer.Name = user.IsAnonymous ? ("Guest" + netPlayer.Index.ToString()) : user.NickName ;
                 runner.SetPlayerObject(player, netObj);
             });
         }

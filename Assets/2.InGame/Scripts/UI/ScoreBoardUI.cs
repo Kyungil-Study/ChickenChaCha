@@ -14,10 +14,9 @@ public struct UIPlayerScoreData
 public class ScoreBoardUI : MonoBehaviour
 {
     [SerializeField] private PlayerScoreUI[] mPlayerScores;
-
     Dictionary<NetworkPlayer, PlayerScoreUI> mPlayerScoreUIMap = new Dictionary<NetworkPlayer, PlayerScoreUI>();
     
-    public void Update()
+    public void OnPropertyChanged(NetworkPlayer player)
     {
         foreach ( KeyValuePair<NetworkPlayer,PlayerScoreUI> pair in mPlayerScoreUIMap)
         {
@@ -27,6 +26,7 @@ public class ScoreBoardUI : MonoBehaviour
 
     public void BindPlayer(NetworkPlayer player)
     {
+        Debug.Log("Bind player To ScoreBoardUI: " + player.Name);
         int index = player.Index;
         mPlayerScoreUIMap.Add(player, mPlayerScores[index]);
         mPlayerScoreUIMap[player].UpdateUI(player.Name.ToString(), player.ScoreCount);

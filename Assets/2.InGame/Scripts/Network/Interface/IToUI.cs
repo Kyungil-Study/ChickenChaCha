@@ -13,6 +13,10 @@ public interface IToUI
     void SetTurnPlayerName(string playerName);
     //void UpdatePlayerScore(List<UIPlayerScoreData> playerScores);
 
+    void OnPropertyChanged(NetworkPlayer player);
+    
+    void OnStartedGame();
+
     #endregion
 
     #region From 기술 리드_김우태

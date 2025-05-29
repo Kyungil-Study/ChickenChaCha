@@ -31,6 +31,8 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
         ActivePlayer = players[0];
         mTailPlayers = new List<NetworkPlayer>();
         mActiveHatNumber = new List<int>();
+        
+        UIAdapter.Instance.OnStartedGame();
     }
 
     public override void Spawned()

@@ -22,7 +22,6 @@ public enum GameSessionState
     MatchMaking,
     Room,
     InGame,
-    Result
 }
 
 public class GameClient
@@ -39,11 +38,18 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     
     public class GameRoomInfo
     {
-        PlayerRef localPlayer;
-        public string roomName;
-        public List<GameClient> players = new List<GameClient>();
-        public int userCount => players.Count; // 마스터 클라이언트 포함
+        private NetworkRunner mRunner;
+        public GameRoomInfo(NetworkRunner runner)
+        {
+            mRunner = runner;
+        }
+
+        public string roomName => mRunner.SessionInfo.Name;
+        public int roomMaxPlayerCount => mRunner.SessionInfo.MaxPlayers;
+        public int roomPlayerCount => mRunner.SessionInfo.PlayerCount;
     }
+    GameRoomInfo mGameRoomInfo;
+    public GameRoomInfo RoomInfo => mGameRoomInfo;
     
     private static SessionManager mInsatnce;
     public static SessionManager Instance
@@ -70,9 +76,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         }
     }
     
-    private GameRoomInfo mRoomInfo = new GameRoomInfo();
-    public GameRoomInfo RoomInfo => mRoomInfo;
-    
+    private string RoomName => mNetworkRunner?.SessionInfo?.Name ?? "UnknownRoom";
     private NetworkRunner mNetworkRunner;
     public NetworkRunner NetworkRunner => mNetworkRunner;
     
@@ -127,12 +131,11 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         UserManager.Instance.OnLogInEvent += OnLogIn;
         callbacks.OnLoginSuccess += LoadLobbyScene;
     }
-    
-    
+
     private void LoadLobbyScene()
     {
         SceneManager.LoadScene(LOBBY_SCENE_INDEX, LoadSceneMode.Single);
-        EnterLobbyAsync();
+        Task task = EnterLobbyAsync();
     }
 
     private async Task InitRunnerAsync()
@@ -151,6 +154,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         
         mNetworkRunner = gameObject.AddComponent<NetworkRunner>();
         mNetworkRunner.ProvideInput = true;
+        mGameRoomInfo = new GameRoomInfo(mNetworkRunner);
         
     }
 
@@ -166,6 +170,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     {
         if (mSessionState == GameSessionState.MatchMaking)
         {
+            Debug.Log($"[SessionManager] EnterMatchMakingAsync ::: 이미 매치메이킹 중입니다.");
             return;
         }
         
@@ -188,18 +193,6 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         
     }
 
-    public async void LeaveMatchMakingAsync()
-    {
-        if (mNetworkRunner == null)
-        {
-            Debug.LogAssertion($"<color=red>[SessionManager] LeaveMatchMakingAsync ::: NetworkRunner가 초기화되지 않았습니다.</color>");
-            return;
-        }
-        mSessionState = GameSessionState.Lobby;
-        await EnterLobbyAsync();
-        callbacks.OnLeftRoom?.Invoke();
-    }
-
     private void OnLogIn(OnLogInEventArgs eventArgs)
     {
         // 중복요청 제외
@@ -208,11 +201,10 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             Debug.LogWarning($"[SessionManager] OnSignIn ::: 이미 로그인 중입니다. 유저 이름 = {eventArgs.UserID}");
             return;
         }
-
+        
         Debug.Log($"[SessionManager] OnSignIn ::: 유저 이름 = {eventArgs.UserID}");
         mSessionState = GameSessionState.Login;
         LoadLobbyScene();
-        
     }
     
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
@@ -240,23 +232,28 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
 
         if (joinAble == null)
         {
-            CreateRoomAsync(mRoomNameForTesting);
+            CreateRoom(mRoomNameForTesting);
         }
         else
         {
-            JoinRoomAsync(joinAble.Name);
+            JoinRoom(joinAble.Name);
         }
     }
 
     public void LeaveRoom()
     {
         callbacks?.OnLeftRoom?.Invoke();
-        
-        mNetworkRunner.UnloadScene(SceneRef.FromIndex(IN_GAME_SCENE_INDEX));
+        if(mNetworkRunner.IsSharedModeMasterClient)
+            mNetworkRunner.UnloadScene(SceneRef.FromIndex(IN_GAME_SCENE_INDEX));
         LoadLobbyScene();
     }
     
-    private async void CreateRoomAsync(string roomName)
+    private void CreateRoom(string roomName)
+    {
+        Task task = CreateRoomAsync(roomName);
+    }
+    
+    private async Task CreateRoomAsync(string roomName)
     {
         Debug.Log($"[SessionManager] CreateRoom : {roomName}");
 
@@ -275,13 +272,20 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             Scene = sceneInfo
         };
         
-        await mNetworkRunner.StartGame(args);
-        mRoomInfo.players.Clear();
-        mRoomInfo.roomName = roomName;
+        StartGameResult startResult = await mNetworkRunner.StartGame(args);
+        if (startResult.Ok == false)
+        {
+            Debug.LogError($"[SessionManager] CreateRoomAsync ::: 방 생성 실패, result = {startResult}");
+            return;
+        }
         
         mSessionState = GameSessionState.Room;
-        
         callbacks.OnEnteredRoom?.Invoke();
+    }
+
+    public void JoinRoom(string roomName)
+    {
+        Task task = JoinRoomAsync(roomName);
     }
 
     public async Task JoinRoomAsync(string roomName)
@@ -304,8 +308,6 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         };
         
         await mNetworkRunner.StartGame(args);
-        mRoomInfo.players.Clear();
-        mRoomInfo.roomName = roomName;
         mSessionState = GameSessionState.Room;
 
         callbacks.OnEnteredRoom?.Invoke();
@@ -327,6 +329,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
             Debug.Log($"[SessionManager] OnPlayerJoined : {player.PlayerId} ::: 플레이어 수가 {mRoomMapPlayerCount}명에 도달했습니다. 게임 시작이 가능합니다..");
             callbacks.OnFulledRoom?.Invoke();
         }
+
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
