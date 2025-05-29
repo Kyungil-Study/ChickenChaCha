@@ -42,6 +42,8 @@ public class UserManager : MonoBehaviour
     private FirebaseAuth mAuth;
     private FirebaseFirestore mDB;
     private GameUser mUser = new GameUser();
+    
+    private int mUserCnt = 0; // 중복 로그인 확인용 변수
 
     public FirebaseApp App => mApp;
     public FirebaseAuth Auth => mAuth;
@@ -158,6 +160,51 @@ public class UserManager : MonoBehaviour
         OnLogInEvent?.Invoke(args);
     }
     
+    public async void OnlyOne(FirebaseUser user) // 중복 로그인 체크 함수
+    {
+        if (string.IsNullOrEmpty(user?.UserId))
+        {
+            Debug.LogError("❌ 로그인 유저 정보 없음. 중복 로그인 체크 실패.");
+            return;
+        }
+        
+        var userRef = mDB.Collection("users").Document(user.UserId);
+
+        try
+        {
+            var doc = await userRef.GetSnapshotAsync();
+            if (doc.Exists && doc.ContainsField("isOnline") && doc.GetValue<bool>("isOnline"))
+            {
+                Debug.LogWarning("🚫 이미 접속 중인 계정입니다!");
+                mUserCnt++; // 중복일 시 변화
+                Application.Quit();
+            }
+            else
+            {
+                await userRef.UpdateAsync(new Dictionary<string, object> {
+                    { "isOnline", true },
+                    { "lastLoginAt", Timestamp.GetCurrentTimestamp() }
+                });
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("❌ 중복 로그인 확인 실패: " + e.Message);
+        }
+    }
+
+    
+    private void OnApplicationQuit() // 유니티 생명 주기(앱이 꺼질 때(종료될 때))
+    {
+        if (mUserCnt == 0)
+        {
+            var userRef = mDB.Collection("users").Document(mUser.User.UserId);
+            userRef.UpdateAsync(new Dictionary<string, object> {
+                { "isOnline", false }
+            });
+        }
+    }
+    
     private void SignIn(string email, string password)
     {
         try
@@ -203,7 +250,7 @@ public class UserManager : MonoBehaviour
                     Debug.Log("로그인 성공: " + newUser.Email);
                     FriendManager.MyUid = newUser?.UserId;
                     Debug.Log("CurrentUser: " + newUser?.Email);
-
+                    OnlyOne(newUser);
                     OnLogIn(newUser);
                 }
 
@@ -252,7 +299,7 @@ public class UserManager : MonoBehaviour
         {
             { "email", email },
             { "nickname", nickname },
-            { "password", HashPassword(password) }
+            { "password", HashPassword(password) },
         };
 
         mDB.Collection("users").Document(uid).SetAsync(data);
