@@ -16,6 +16,7 @@ public class ChatManager : NetworkBehaviour
 
     [Header("출력 ContentUI")]
     [SerializeField] private Transform mChatContentParent; // ScrollView 아래 Content 오브젝트
+    [SerializeField] private Scrollbar mVerticalScrollbar;
     
     void Start()
     {
@@ -60,5 +61,6 @@ public class ChatManager : NetworkBehaviour
     {
         yield return null; // 한 프레임 기다림 (UI 업데이트 후)
         Canvas.ForceUpdateCanvases();
+        mVerticalScrollbar.value = 0;
     }
 }
