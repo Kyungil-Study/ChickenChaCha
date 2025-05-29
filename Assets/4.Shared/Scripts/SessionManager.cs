@@ -39,9 +39,18 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
     
     public class GameRoomInfo
     {
-        public SessionInfo sessionInfo;
-        public string roomName => sessionInfo.Name;
+        private NetworkRunner mRunner;
+        public GameRoomInfo(NetworkRunner runner)
+        {
+            mRunner = runner;
+        }
+
+        public string roomName => mRunner.SessionInfo.Name;
+        public int roomMaxPlayerCount => mRunner.SessionInfo.MaxPlayers;
+        public int roomPlayerCount => mRunner.SessionInfo.PlayerCount;
     }
+    GameRoomInfo mGameRoomInfo;
+    public GameRoomInfo RoomInfo => mGameRoomInfo;
     
     private static SessionManager mInsatnce;
     public static SessionManager Instance
@@ -151,6 +160,7 @@ public class SessionManager : MonoBehaviour , INetworkRunnerCallbacks
         
         mNetworkRunner = gameObject.AddComponent<NetworkRunner>();
         mNetworkRunner.ProvideInput = true;
+        mGameRoomInfo = new GameRoomInfo(mNetworkRunner);
         
     }
 
