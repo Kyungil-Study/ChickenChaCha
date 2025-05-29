@@ -22,6 +22,9 @@ public class LobyCanvasUI : MonoBehaviour
     [Header("게임 떠가니")]
     public UnityEvent OnLeaveClicked;
     
+    [Header("User Info")]
+    [SerializeField] private TMP_Text userNameText;
+    
     [Header("Testing")]
     [SerializeField] private TMP_InputField roomNameText;
     [SerializeField] private TMP_InputField playerCountText;
@@ -39,6 +42,8 @@ public class LobyCanvasUI : MonoBehaviour
         {
             mGotoFriendPanel.SetActive(false);
         }
+
+        userNameText.text = UserManager.Instance.User.NickName;
     }
 
     private void Update()
