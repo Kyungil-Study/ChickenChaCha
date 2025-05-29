@@ -44,7 +44,9 @@ public class ChatManager : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_BroadcastChat(string senderName, string message)
     {
+        Debug.Log($"ChatManager RPC_BroadcastChat {senderName} : {message}");
         AddChatLog($"{senderName} : {message}");
+        ChatBubbleController.Instance.ShowBubble(senderName, message);
     }
 
     public void AddChatLog(string message)
