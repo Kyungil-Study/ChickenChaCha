@@ -2298,6 +2298,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6339864621921192956, guid: 2b05ecc09e617f64f9358c3da0e94742,
         type: 3}
+      propertyPath: exitButton
+      value: 
+      objectReference: {fileID: 6990752130198797973}
+    - target: {fileID: 6339864621921192956, guid: 2b05ecc09e617f64f9358c3da0e94742,
+        type: 3}
       propertyPath: roomNameText
       value: 
       objectReference: {fileID: 8475278239639073722}
@@ -2624,6 +2629,18 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 7151574579981584695}
   m_SourcePrefab: {fileID: 100100000, guid: 2b05ecc09e617f64f9358c3da0e94742, type: 3}
+--- !u!114 &6990752130198797973 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 867781706308745318, guid: 2b05ecc09e617f64f9358c3da0e94742,
+    type: 3}
+  m_PrefabInstance: {fileID: 6990752130198797972}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &7079605895786768932 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7642856003661232917, guid: 937706bfbfb9a2f4b95fe856c41bbb7b,

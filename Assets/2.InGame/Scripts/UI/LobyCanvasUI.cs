@@ -10,6 +10,7 @@ public class LobyCanvasUI : MonoBehaviour
 {
     [Header("Buttons")]
     [SerializeField] private Button createButton;
+    [SerializeField] private Button exitButton;
     [Header("WaitImages")]
     [SerializeField] private GameObject[] waitImage;
     [Header("PartyMember")]
@@ -31,9 +32,8 @@ public class LobyCanvasUI : MonoBehaviour
     {
         // 버튼 클릭 시 각 패널을 토글하는 리스너 등록
         createButton.onClick.AddListener(OnInviteClicked);
-        
+        exitButton.onClick.AddListener(Application.Quit);
         OnMatchClicked.AddListener(EnterMatchMaking);
-        OnLeaveClicked.AddListener(SessionManager.Instance.LeaveMatchMakingAsync);
 
         if (UserManager.Instance.User.IsAnonymous)
         {
