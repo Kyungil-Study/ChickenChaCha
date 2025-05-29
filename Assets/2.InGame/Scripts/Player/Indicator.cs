@@ -8,6 +8,7 @@ public class Indicator : MonoBehaviour
 {
     public float scaleValue = 1.25f;
     public float duration = 1f;
+    public float rotation = 90;
 
     private Vector3 mOriginScale;
     private bool mBIsActive;
@@ -22,6 +23,11 @@ public class Indicator : MonoBehaviour
     private void OnDisable()
     {
         mBIsActive = false;
+    }
+
+    private void Update()
+    {
+        transform.Rotate(Vector3.up, Time.deltaTime * rotation);
     }
 
     private IEnumerator co_ScaleUpAndDown()
