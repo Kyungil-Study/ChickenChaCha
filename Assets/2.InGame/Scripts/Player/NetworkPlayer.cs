@@ -30,13 +30,13 @@ public class ActiveState : IPlayerState
     {
         Debug.Log($"[{player.Index}] : Active 진입");
         player.inputHandler.bCanInput = true;
-        player.RPC_SetIndicator(true);
+        player.SetIndicator(true);
         player.RPC_PlayAnimation(EChickenAnimation.Active);
     }
 
     public void ExitState(NetworkPlayer player)
     {
-        player.RPC_SetIndicator(false);
+        player.SetIndicator(false);
         player.inputHandler.bCanInput = false;
         
         NetworkPlayer.Threat(player);
@@ -194,12 +194,11 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         RPC_PlayAnimation(EChickenAnimation.Robbed);
     }
     
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_SetIndicator(bool isActive)
+    public void SetIndicator(bool isActive)
     {
-        if (isActive)
+        if (HasStateAuthority)
         {
-            indicator.SetActive(true);
+            indicator.SetActive(isActive);
         }else
         {
             indicator.SetActive(false);
