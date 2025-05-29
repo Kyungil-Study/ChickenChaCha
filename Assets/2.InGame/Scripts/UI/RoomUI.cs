@@ -11,6 +11,7 @@ public class RoomUI : UISingleton<RoomUI>
 {
     [SerializeField] Button startGameButton;
     [SerializeField] Button InviteButton;
+    [SerializeField] Button ExitButton;
     [SerializeField] TMP_Text roomMessageText;
     
     private void Awake()
@@ -26,6 +27,7 @@ public class RoomUI : UISingleton<RoomUI>
         }
         
         startGameButton.onClick.AddListener(OnStartGame);
+        ExitButton.onClick.AddListener(SessionManager.Instance.LeaveRoom);
     }
     
     public void RegistPlayer(NetworkPlayer player)
