@@ -131,6 +131,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         {
             Debug.Log("Continue playing...");
         }
+        UIAdapter.Instance.OnPropertyChanged(this);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]

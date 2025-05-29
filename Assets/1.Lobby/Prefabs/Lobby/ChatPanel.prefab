@@ -866,7 +866,7 @@ MonoBehaviour:
   m_Content: {fileID: 7003258811015960045}
   m_Horizontal: 1
   m_Vertical: 1
-  m_MovementType: 1
+  m_MovementType: 2
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
@@ -1059,6 +1059,8 @@ GameObject:
   - component: {fileID: 7263710237104061054}
   - component: {fileID: 7050968005327728112}
   - component: {fileID: 4325006275101031529}
+  - component: {fileID: 2555203902197082133}
+  - component: {fileID: 5933823866917745162}
   m_Layer: 5
   m_Name: ChatPanel
   m_TagString: Untagged
@@ -1126,3 +1128,40 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2555203902197082133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9109978931489188636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae4b221ecb85fb74ca17195e07140ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mInputField: {fileID: 4907982635348442516}
+  mSendButton: {fileID: 1519278106966837959}
+  mMessageBoxPrefab: {fileID: 2495911914059983268, guid: dfc9eaddd2394d54da12596f095f09d1,
+    type: 3}
+  mChatContentParent: {fileID: 7003258811015960045}
+  mVerticalScrollbar: {fileID: 0}
+--- !u!114 &5933823866917745162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9109978931489188636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 2768438004
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 2555203902197082133}
+  ForceRemoteRenderTimeframe: 0

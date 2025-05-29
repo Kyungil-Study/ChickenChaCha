@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using Fusion;
 using UnityEngine;
 
-public class UIAdapter : MonoBehaviour, IToUI
+public class UIAdapter : NetworkBehaviour, IToUI
 {
     private static UIAdapter mInstance;
     public static UIAdapter Instance
@@ -37,8 +38,28 @@ public class UIAdapter : MonoBehaviour, IToUI
         mTurnUI.SetTurnPlayerName(playerName);
     }
 
+    public void OnPropertyChanged(NetworkPlayer player)
+    {
+        mScoreBoardUI.OnPropertyChanged(player);
+    }
+
+    public void OnStartedGame()
+    {
+        RPC_OnStartedGame();
+    }
+    
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    void RPC_OnStartedGame()
+    {
+        RoomUI.Instance.OnStartedGame();
+    }
+
     public void RegisterPlayer(NetworkPlayer player)
     {
         mScoreBoardUI.BindPlayer(player);
+        
+        RoomUI.Instance.RegistPlayer(player);
     }
+    
+   
 }
