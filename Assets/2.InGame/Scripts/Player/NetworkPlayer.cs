@@ -341,7 +341,6 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         leftPlayer.mRenderer.material.shader = BoardManager.Instance.soulShader;
         leftPlayer.mRenderer.material.color = new Color(0.3f, 0.3f, 0.3f, 0.8f);
         leftPlayer.RPC_PlayAnimation(EChickenAnimation.Left);
-        
         // 플레이어가 나갔을 때 다른 플레이어에게 알림
         if (GameManager.Instance.IsActivePlayer(player))
         {
