@@ -50,8 +50,10 @@ public class UserManager : MonoBehaviour
     private FirebaseAuth mAuth;
     private FirebaseFirestore mDB;
     private GameUser mUser = new GameUser();
+
+
+    private int mUserCnt = 0;
     
-    private int mUserCnt = 0; // 중복 로그인 확인용 변수
 
     public FirebaseApp App => mApp;
     public FirebaseAuth Auth => mAuth;
@@ -173,51 +175,73 @@ public class UserManager : MonoBehaviour
        
     }
     
-    public async void OnlyOne(FirebaseUser user) // 중복 로그인 체크 함수
+    public async Task<bool> CheckIfAlreadyLoggedIn() // 중복 로그인 체크 함수
     {
-        if (string.IsNullOrEmpty(user?.UserId))
-        {
-            Debug.LogError("❌ 로그인 유저 정보 없음. 중복 로그인 체크 실패.");
-            return;
-        }
         
-        var userRef = mDB.Collection("users").Document(user.UserId);
+        string uid = mAuth.CurrentUser?.UserId;
 
-        try
+        if (string.IsNullOrEmpty(uid)) return false;
+
+        var userRef = mDB.Collection("users").Document(uid);
+        var snapshot = await userRef.GetSnapshotAsync();
+
+        if (!snapshot.Exists)
         {
-            var doc = await userRef.GetSnapshotAsync();
-            if (doc.Exists && doc.ContainsField("isOnline") && doc.GetValue<bool>("isOnline"))
-            {
-                Debug.LogWarning("🚫 이미 접속 중인 계정입니다!");
-                mUserCnt++; // 중복일 시 변화
-                Application.Quit();
-            }
-            else
-            {
-                await userRef.UpdateAsync(new Dictionary<string, object> {
-                    { "isOnline", true },
-                    { "lastLoginAt", Timestamp.GetCurrentTimestamp() }
-                });
-            }
+            // 사용자 문서가 없다면 새로 생성
+            await userRef.SetAsync(new Dictionary<string, object> {
+                { "isOnline", true },
+                { "lastHeartbeat", Timestamp.GetCurrentTimestamp() }
+            });
+            return true;
         }
-        catch (Exception e)
+
+        bool isOnline = snapshot.ContainsField("isOnline") && snapshot.GetValue<bool>("isOnline");
+        Timestamp lastHeartbeat = snapshot.ContainsField("lastHeartbeat")
+            ? snapshot.GetValue<Timestamp>("lastHeartbeat")
+            : Timestamp.FromDateTime(DateTime.UtcNow.AddHours(-2));
+
+        TimeSpan timeSinceHeartbeat = DateTime.UtcNow - lastHeartbeat.ToDateTime();
+
+        if (isOnline && timeSinceHeartbeat < TimeSpan.FromSeconds(60))
         {
-            Debug.LogError("❌ 중복 로그인 확인 실패: " + e.Message);
+            Debug.LogWarning("🚫 다른 기기에서 접속 중입니다.");
+            return false;
+        }
+
+        // 접속 가능 상태이므로 상태 갱신
+        await userRef.UpdateAsync(new Dictionary<string, object> {
+            { "isOnline", true },
+            { "lastHeartbeat", Timestamp.GetCurrentTimestamp() }
+        });
+
+        return true;
+    }
+    
+    public async void OnlyOne() // 중복 로그인 시도 시 종료하는 함수
+    {
+        bool canLogin = await CheckIfAlreadyLoggedIn();
+        if (!canLogin)
+        {
+            mUserCnt++;
+            Application.Quit();
         }
     }
 
-    
-    private void OnApplicationQuit() // 유니티 생명 주기(앱이 꺼질 때(종료될 때))
+    private void OnApplicationQuit()
     {
         if (mUserCnt == 0)
         {
-            var userRef = mDB.Collection("users").Document(mUser.User.UserId);
-            userRef.UpdateAsync(new Dictionary<string, object> {
-                { "isOnline", false }
-            });
+            if (mUser != null)
+            {
+                mDB.Collection("users").Document(mUser.User.UserId)
+                    .UpdateAsync(new Dictionary<string, object>
+                    {
+                        { "isOnline", false }
+                    });
+            }
         }
     }
-    
+
     private void SignIn(string email, string password)
     {
         try
@@ -263,7 +287,7 @@ public class UserManager : MonoBehaviour
                     Debug.Log("로그인 성공: " + newUser.Email);
                     FriendManager.MyUid = newUser?.UserId;
                     Debug.Log("CurrentUser: " + newUser?.Email);
-                    OnlyOne(newUser);
+                    OnlyOne();
                     OnLogIn(newUser);
                 }
 

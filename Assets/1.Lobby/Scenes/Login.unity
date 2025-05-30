@@ -625,6 +625,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8663550698444813502, guid: 3828aa308ba8fd5469dd05cfef4d8b48,
+        type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8795933168028605386, guid: 3828aa308ba8fd5469dd05cfef4d8b48,
         type: 3}
       propertyPath: m_Type
@@ -1734,12 +1739,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cd7555e80c7ef94285c48698369ef55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mInputFriendEmail: {fileID: 0}
-  mButtonSendRequest: {fileID: 0}
-  mButtonAcceptRequest: {fileID: 0}
-  mButtonRemoveFriend: {fileID: 0}
-  mButtonShowFriends: {fileID: 0}
-  mButtonShowRequests: {fileID: 0}
 --- !u!1 &5044901201014538127
 GameObject:
   m_ObjectHideFlags: 0
@@ -1751,6 +1750,7 @@ GameObject:
   - component: {fileID: 3610947978722557826}
   - component: {fileID: 3883139293561369047}
   - component: {fileID: 5044901201014538128}
+  - component: {fileID: 5044901201014538129}
   m_Layer: 0
   m_Name: UserManager
   m_TagString: Untagged
@@ -1768,6 +1768,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d944d3adb5cc7bc40a76dbc5e6986404, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5044901201014538129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5044901201014538127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70698b2a77251364b8389e3d11c61440, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &6446602818579115843
