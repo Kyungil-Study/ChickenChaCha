@@ -31,6 +31,7 @@ public class InputHandler : NetworkBehaviour
             bClicked = true;
         }
     }
+    
     public override void FixedUpdateNetwork()
     {
         SelectTileInfo();

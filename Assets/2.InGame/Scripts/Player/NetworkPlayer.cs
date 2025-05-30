@@ -87,14 +87,14 @@ public class WaitingState : IPlayerState
     }
 }
 
-public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
+public class NetworkPlayer : NetworkBehaviour, IAfterSpawned
 {
-    [SerializeField] private Renderer mRenderer;
+    [SerializeField] public Renderer mRenderer;
     [SerializeField] private Animator mAnim;
     public NetworkTransform networkTransform;
     public InputHandler inputHandler;
     public IPlayerState currentState;
-    [Networked] 
+     
     public bool bHasLeft { get; set; } = false; // 플레이어가 나갔는지 여부
     public GameObject indicator; // 플레이어가 서있는 타일에 표시할 인디케이터
     
@@ -275,7 +275,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
     // 타일 선택 처리 (상태가 Active일 때만 처리)
     private void HandleTileSelected(SelectingTile tile)
     {
-        if (currentState is ActiveState && mbIsWaitingTile == false)
+        if (currentState is ActiveState)// && mbIsWaitingTile == false)
         {
             RPC_StartWait(tile);
             var currentTile = GameManager.Instance.GetMatchTile(CurrentSteppingTile);
@@ -349,20 +349,6 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         networkTransform.Teleport(position);
     }
 
-    public void PlayerLeft(PlayerRef player)
-    {
-        var leftPlayer = Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>();
-        leftPlayer.bHasLeft = true;
-        leftPlayer.mRenderer.material.shader = BoardManager.Instance.soulShader;
-        leftPlayer.mRenderer.material.color = new Color(0.3f, 0.3f, 0.3f, 0.8f);
-        leftPlayer.RPC_PlayAnimation(EChickenAnimation.Left);
-        // 플레이어가 나갔을 때 다른 플레이어에게 알림
-        if (GameManager.Instance.IsActivePlayer(player))
-        {
-            RPC_LeftPlayer();
-        }
-    }
-
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_LeftPlayer()
     {
@@ -376,5 +362,14 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         {
             victim.RPC_PlayAnimation(EChickenAnimation.Trepid);
         }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_Left()
+    {
+        bHasLeft = true;
+        mRenderer.material.shader = BoardManager.Instance.soulShader;
+        mRenderer.material.color = new Color(0.3f, 0.3f, 0.3f, 0.8f);
+        RPC_PlayAnimation(EChickenAnimation.Left);
     }
 }

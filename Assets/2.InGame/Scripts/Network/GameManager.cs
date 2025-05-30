@@ -4,7 +4,7 @@ using System.Linq;
 using Fusion;
 using UnityEngine;
 
-public class GameManager : DontDestroyOnNetwork<GameManager>
+public class GameManager : DontDestroyOnNetwork<GameManager>, IStateAuthorityChanged, IPlayerLeft
 {
     public NetworkPlayer[] players = new NetworkPlayer[4];
     public int playerCount; // 현재 플레이어 수
@@ -69,17 +69,24 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
     {
         Debug.Log($"이전 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 끝났습니다.");
         ActivePlayer.RPC_ReceiveMovePermission(false);
-        
-        ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
-        Debug.Log($"다음 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 맞는지 체크했습니다.");
-        while (ActivePlayer.bHasLeft)
-        {
-            ActivePlayer = players[(ActivePlayer.Index + 1) % playerCount];
-            Debug.Log($"다음 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 맞는지 체크했습니다.");
-        }
+
+        ActivePlayer = GetNextPlayer(ActivePlayer);
         
         Debug.Log($"다음 플레이어의 인덱스는 {ActivePlayer.Name} {ActivePlayer.Index}의 턴이 끝났습니다.");
         ActivePlayer.RPC_ReceiveMovePermission(true);
+    }
+
+    private NetworkPlayer GetNextPlayer(NetworkPlayer currentPlayer)
+    {
+        NetworkPlayer nextPlayer = players[(currentPlayer.Index + 1) % playerCount];
+        Debug.Log($"다음 플레이어의 인덱스는 {nextPlayer.Name} {nextPlayer.Index}의 턴이 맞는지 체크했습니다.");
+        while (nextPlayer.bHasLeft)
+        {
+            nextPlayer = players[(nextPlayer.Index + 1) % playerCount];
+            Debug.Log($"다음 플레이어의 인덱스는 {nextPlayer.Name} {nextPlayer.Index}의 턴이 맞는지 체크했습니다.");
+        }
+        
+        return nextPlayer;
     }
 
     public void OnChangedTurn()
@@ -212,5 +219,41 @@ public class GameManager : DontDestroyOnNetwork<GameManager>
     #endregion
 
 
+    public void StateAuthorityChanged()
+    {
+        NetworkPlayer local = Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<NetworkPlayer>();
+        NetworkPlayer leftPlayer = null;
+        foreach (NetworkPlayer remote in players)
+        {
+            if (GetNextPlayer(remote) == local)
+            {
+                leftPlayer = remote;
+                break;
+            }
+        }
+        
+        if (leftPlayer == ActivePlayer)
+        {
+            MoveTurn();
+        }
+        
+        leftPlayer.RPC_Left();
+    }
 
+    public void PlayerLeft(PlayerRef player)
+    {
+        if (player == Runner.LocalPlayer)
+        {
+            return;
+        }
+        
+        NetworkPlayer leftPlayer = Runner.GetPlayerObject(player).GetComponent<NetworkPlayer>();
+        
+        if (leftPlayer == ActivePlayer)
+        {
+            MoveTurn();
+        }
+        
+        leftPlayer.RPC_Left();
+    }
 }
