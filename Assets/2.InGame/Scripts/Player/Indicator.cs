@@ -20,9 +20,15 @@ public class Indicator : MonoBehaviour
         StartCoroutine(co_ScaleUpAndDown());
     }
 
+    private void OnEnable()
+    {
+        mBIsActive = true;
+        StartCoroutine(co_ScaleUpAndDown());
+    }
     private void OnDisable()
     {
         mBIsActive = false;
+        StopCoroutine(co_ScaleUpAndDown());
     }
 
     private void Update()

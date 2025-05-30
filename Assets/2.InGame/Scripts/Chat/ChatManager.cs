@@ -16,7 +16,6 @@ public class ChatManager : NetworkBehaviour
 
     [Header("출력 ContentUI")]
     [SerializeField] private Transform mChatContentParent; // ScrollView 아래 Content 오브젝트
-    [SerializeField] private Scrollbar mVerticalScrollbar;
     
     void Start()
     {
@@ -45,7 +44,9 @@ public class ChatManager : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_BroadcastChat(string senderName, string message)
     {
+        Debug.Log($"ChatManager RPC_BroadcastChat {senderName} : {message}");
         AddChatLog($"{senderName} : {message}");
+        ChatBubbleController.Instance.ShowBubble(senderName, message);
     }
 
     public void AddChatLog(string message)
@@ -61,6 +62,5 @@ public class ChatManager : NetworkBehaviour
     {
         yield return null; // 한 프레임 기다림 (UI 업데이트 후)
         Canvas.ForceUpdateCanvases();
-        mVerticalScrollbar.value = 0;
     }
 }

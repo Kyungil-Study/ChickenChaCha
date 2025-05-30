@@ -59,6 +59,8 @@ public class UIAdapter : NetworkBehaviour, IToUI
         mScoreBoardUI.BindPlayer(player);
         
         RoomUI.Instance.RegistPlayer(player);
+        
+        ChatBubbleController.Instance.RegisterPlayer(player);
     }
     
    
