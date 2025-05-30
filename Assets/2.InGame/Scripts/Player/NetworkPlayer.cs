@@ -68,19 +68,9 @@ public class WaitingState : IPlayerState
         if (player.inputHandler != null)
         {
             player.inputHandler.bCanInput = false;
+            player.RPC_PlayAnimation(EChickenAnimation.Waiting);
         }
 
-        try
-        {
-            if (player.CurrentSteppingTile.Prev.StandingPlayer == null)
-            {
-                player.RPC_PlayAnimation(EChickenAnimation.Waiting);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.Log("First turn");
-        }
         
         
         Debug.Log("대기 애니메이션");
@@ -231,7 +221,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft, IAfterSpawned
         }
     }
 
-    [Rpc(RpcSources.All, RpcTargets.All)]
+    [Rpc(RpcSources.All, RpcTargets.All, TickAligned = false)]
     public void RPC_PlayAnimation(EChickenAnimation state)
     {
         if (mAnim.GetCurrentAnimatorStateInfo(0).IsName("Sit"))

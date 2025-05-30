@@ -48,12 +48,13 @@ public class RoomUI : UISingleton<RoomUI>
         gameObject.SetActive(false);
     }
 
+    private bool mbHasStarted = false;
     private void OnStartGame()
     {
-        if (SessionManager.Instance.CanStartGame == true )
+        if (SessionManager.Instance.CanStartGame && mbHasStarted == false)
         {
             GameManager.Instance.GameStart();
+            mbHasStarted = true;
         }
     }
-    
 }

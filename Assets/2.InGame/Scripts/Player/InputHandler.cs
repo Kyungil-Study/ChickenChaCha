@@ -59,9 +59,4 @@ public class InputHandler : NetworkBehaviour
             }
         }
     }
-    
-    private void OnGUI()
-    {
-        GUI.Label(new Rect(20, 300, 250, 30), $"Clicked: {bClicked}");
-    }
 }
