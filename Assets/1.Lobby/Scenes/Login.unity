@@ -625,6 +625,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8663550698444813502, guid: 3828aa308ba8fd5469dd05cfef4d8b48,
+        type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8795933168028605386, guid: 3828aa308ba8fd5469dd05cfef4d8b48,
         type: 3}
       propertyPath: m_Type
@@ -1734,12 +1739,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cd7555e80c7ef94285c48698369ef55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mInputFriendEmail: {fileID: 0}
-  mButtonSendRequest: {fileID: 0}
-  mButtonAcceptRequest: {fileID: 0}
-  mButtonRemoveFriend: {fileID: 0}
-  mButtonShowFriends: {fileID: 0}
-  mButtonShowRequests: {fileID: 0}
 --- !u!1 &5044901201014538127
 GameObject:
   m_ObjectHideFlags: 0
