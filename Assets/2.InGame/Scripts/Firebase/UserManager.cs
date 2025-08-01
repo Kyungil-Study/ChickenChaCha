@@ -41,6 +41,7 @@ public class UserManager : MonoBehaviour
     {
         public FirebaseUser User;
         public string NickName = "Anonymous";
+        public string InGameName = "Anonymous";
         public string Email => User.IsAnonymous ? "No Email" : User.Email;
         
         public bool IsAnonymous => User.IsAnonymous;

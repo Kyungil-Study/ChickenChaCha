@@ -37,7 +37,9 @@ public class ObjectSpawner : SimulationBehaviour, IPlayerJoined, IPlayerLeft
                 netPlayer.RPC_ReceiveMovePermission(false);
 
                 var user = UserManager.Instance.User;
-                netPlayer.Name = user.IsAnonymous ? ("Guest" + netPlayer.Index.ToString()) : user.NickName ;
+                user.InGameName =  user.IsAnonymous ? ("Guest" + netPlayer.Index.ToString()) : user.NickName ;
+                netPlayer.Name = user.InGameName;
+                
                 runner.SetPlayerObject(player, netObj);
             });
         }

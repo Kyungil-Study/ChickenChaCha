@@ -27,7 +27,7 @@ public class ChatManager : NetworkBehaviour
     public void OnSendChatButtonClicked()
     {
         string message = mInputField.text;
-        string nickname = UserManager.Instance.User.NickName;
+        string nickname = UserManager.Instance.User.InGameName;
 
         if (string.IsNullOrWhiteSpace(message)) return;
 
